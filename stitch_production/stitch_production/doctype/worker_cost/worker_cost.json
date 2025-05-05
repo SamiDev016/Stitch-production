@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-05 12:14:46.486726",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "worker",
+  "cost_per_hour",
+  "total_hours"
+ ],
+ "fields": [
+  {
+   "fieldname": "worker",
+   "fieldtype": "Data",
+   "label": "Worker"
+  },
+  {
+   "fieldname": "cost_per_hour",
+   "fieldtype": "Float",
+   "label": "Cost per hour"
+  },
+  {
+   "fieldname": "total_hours",
+   "fieldtype": "Float",
+   "label": "Total hours"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-05-05 13:06:52.860605",
+ "modified_by": "Administrator",
+ "module": "Stitch Production",
+ "name": "Worker Cost",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

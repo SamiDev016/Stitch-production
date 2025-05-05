@@ -1,0 +1,114 @@
+{
+ "app": "Stitch Production",
+ "charts": [
+  {
+   "chart_name": "Warehouse wise Stock Value",
+   "label": "Stock Value"
+  }
+ ],
+ "content": "[{\"id\":\"8-Ff2XVmBE\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\">Accueil</span>\",\"col\":12}},{\"id\":\"QSUMvz4r2k\",\"type\":\"card\",\"data\":{\"card_name\":\"Cutting Operation\",\"col\":5}},{\"id\":\"mZD9SF75zx\",\"type\":\"card\",\"data\":{\"card_name\":\"Rolls\",\"col\":5}},{\"id\":\"UqCu6uF65p\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock\",\"col\":5}},{\"id\":\"NKTIlHsfdh\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchase Receipt\",\"col\":5}},{\"id\":\"UF9CXkg1wE\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Stock Value\",\"col\":12}}]",
+ "creation": "2025-05-05 12:52:11.040770",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "file-large",
+ "idx": 5,
+ "indicator_color": "blue",
+ "is_hidden": 0,
+ "label": "Stitch Production",
+ "link_type": "DocType",
+ "links": [
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Cutting Operation",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Op\u00e9rations",
+   "link_count": 0,
+   "link_to": "cutting operation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Rolls",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Rolls",
+   "link_count": 0,
+   "link_to": "Rolls",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Stock",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Stock",
+   "link_count": 0,
+   "link_to": "Item",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchase Receipt",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Purchase Receipt",
+   "link_count": 0,
+   "link_to": "Purchase Receipt",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
+  }
+ ],
+ "modified": "2025-05-05 13:58:20.151308",
+ "modified_by": "Administrator",
+ "module": "Stitch Production",
+ "name": "Stitch Production",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "Stitch Production",
+ "public": 1,
+ "quick_lists": [],
+ "roles": [],
+ "sequence_id": 42.0,
+ "shortcuts": [],
+ "title": "Stitch Production",
+ "type": "Workspace"
+}

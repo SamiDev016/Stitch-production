@@ -1,0 +1,44 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-05 12:12:42.517735",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "workstation_name",
+  "cost_per_hour",
+  "total_hours"
+ ],
+ "fields": [
+  {
+   "fieldname": "workstation_name",
+   "fieldtype": "Data",
+   "label": "Workstation name"
+  },
+  {
+   "fieldname": "cost_per_hour",
+   "fieldtype": "Float",
+   "label": "Cost per Hour"
+  },
+  {
+   "fieldname": "total_hours",
+   "fieldtype": "Float",
+   "label": "total hours"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-05-05 12:14:20.566597",
+ "modified_by": "Administrator",
+ "module": "Stitch Production",
+ "name": "Workstation Cost",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

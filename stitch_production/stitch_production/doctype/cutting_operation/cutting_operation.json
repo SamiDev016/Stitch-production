@@ -1,0 +1,111 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-05 10:42:18.892337",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_6uag",
+  "amended_from",
+  "used_rolls",
+  "cutting_parts",
+  "section_break_vzgq",
+  "workstation_cost",
+  "column_break_kujk",
+  "worker_cost",
+  "section_break_iyys",
+  "individual_cost",
+  "tatal_cost"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_6uag",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "cutting operation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "used_rolls",
+   "fieldtype": "Table",
+   "label": "Used Rolls",
+   "options": "Cutting Rolls"
+  },
+  {
+   "fieldname": "section_break_vzgq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "workstation_cost",
+   "fieldtype": "Table",
+   "label": "Workstation Cost",
+   "options": "Workstation Cost"
+  },
+  {
+   "fieldname": "column_break_kujk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "worker_cost",
+   "fieldtype": "Table",
+   "label": "Worker Cost",
+   "options": "Worker Cost"
+  },
+  {
+   "fieldname": "section_break_iyys",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "individual_cost",
+   "fieldtype": "Float",
+   "label": "Individual Cost"
+  },
+  {
+   "fieldname": "tatal_cost",
+   "fieldtype": "Float",
+   "label": "Tatal Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "cutting_parts",
+   "fieldtype": "Table",
+   "label": "Cutting Parts",
+   "options": "Cutting Parts"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-05-05 12:54:05.095400",
+ "modified_by": "Administrator",
+ "module": "Stitch Production",
+ "name": "cutting operation",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

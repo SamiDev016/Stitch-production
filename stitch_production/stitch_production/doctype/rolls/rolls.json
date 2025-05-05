@@ -1,16 +1,18 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "fabric_item.####",
  "creation": "2025-05-03 16:17:06.807851",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
   "serial_number",
   "fabric_item",
+  "supplier",
   "warehouse",
   "company",
+  "price_per_kg",
   "weight",
-  "used_weight",
   "amended_from"
  ],
  "fields": [
@@ -24,30 +26,32 @@
   {
    "fieldname": "fabric_item",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Fabric item",
-   "options": "Item"
+   "options": "Item",
+   "reqd": 1
   },
   {
    "fieldname": "warehouse",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Warehouse",
-   "options": "Warehouse"
+   "options": "Warehouse",
+   "reqd": 1
   },
   {
    "fieldname": "company",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Company",
-   "options": "Company"
+   "options": "Company",
+   "reqd": 1
   },
   {
    "fieldname": "weight",
    "fieldtype": "Float",
-   "label": "Weight"
-  },
-  {
-   "fieldname": "used_weight",
-   "fieldtype": "Float",
-   "label": "Used weight"
+   "label": "Weight",
+   "reqd": 1
   },
   {
    "fieldname": "amended_from",
@@ -58,16 +62,29 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "price_per_kg",
+   "fieldtype": "Float",
+   "in_list_view": 1,
+   "label": "Price 1kg",
+   "reqd": 1
+  },
+  {
+   "fieldname": "supplier",
+   "fieldtype": "Link",
+   "label": "Supplier",
+   "options": "Supplier"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
- "is_submittable": 1,
  "links": [],
- "modified": "2025-05-04 10:04:28.155185",
+ "modified": "2025-05-05 22:00:41.390839",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Rolls",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {

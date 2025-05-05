@@ -5,6 +5,8 @@ app_description = "Custom app for stitch company"
 app_email = "adelim0555@gmail.com"
 app_license = "mit"
 
+
+
 # Apps
 # ------------------
 

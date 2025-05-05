@@ -1,0 +1,45 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-05 10:33:46.650585",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "roll",
+  "used_qty",
+  "lap"
+ ],
+ "fields": [
+  {
+   "fieldname": "roll",
+   "fieldtype": "Link",
+   "label": "Roll",
+   "options": "Rolls"
+  },
+  {
+   "fieldname": "used_qty",
+   "fieldtype": "Float",
+   "label": "Used QTY"
+  },
+  {
+   "fieldname": "lap",
+   "fieldtype": "Float",
+   "label": "Lap"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-05-05 11:19:24.682755",
+ "modified_by": "Administrator",
+ "module": "Stitch Production",
+ "name": "Cutting Rolls",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}
