@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:Operation.{#####}",
  "creation": "2025-05-05 10:42:18.892337",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -9,13 +10,14 @@
   "amended_from",
   "used_rolls",
   "cutting_parts",
+  "costs_tab",
   "section_break_vzgq",
   "workstation_cost",
   "column_break_kujk",
   "worker_cost",
   "section_break_iyys",
   "individual_cost",
-  "tatal_cost"
+  "total_cost"
  ],
  "fields": [
   {
@@ -68,26 +70,32 @@
    "label": "Individual Cost"
   },
   {
-   "fieldname": "tatal_cost",
-   "fieldtype": "Float",
-   "label": "Tatal Cost",
-   "read_only": 1
-  },
-  {
    "fieldname": "cutting_parts",
    "fieldtype": "Table",
    "label": "Cutting Parts",
    "options": "Cutting Parts"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Float",
+   "label": "Total Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "costs_tab",
+   "fieldtype": "Tab Break",
+   "label": "Costs"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-05 12:54:05.095400",
+ "modified": "2025-05-07 03:33:05.252789",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "cutting operation",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {

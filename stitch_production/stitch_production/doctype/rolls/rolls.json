@@ -13,7 +13,9 @@
   "company",
   "price_per_kg",
   "weight",
-  "amended_from"
+  "column_break_e6se",
+  "serial_number_barcode",
+  "used_time"
  ],
  "fields": [
   {
@@ -54,20 +56,10 @@
    "reqd": 1
   },
   {
-   "fieldname": "amended_from",
-   "fieldtype": "Link",
-   "label": "Amended From",
-   "no_copy": 1,
-   "options": "Rolls",
-   "print_hide": 1,
-   "read_only": 1,
-   "search_index": 1
-  },
-  {
    "fieldname": "price_per_kg",
    "fieldtype": "Float",
    "in_list_view": 1,
-   "label": "Price 1kg",
+   "label": "Price per Kg",
    "reqd": 1
   },
   {
@@ -75,12 +67,29 @@
    "fieldtype": "Link",
    "label": "Supplier",
    "options": "Supplier"
+  },
+  {
+   "fieldname": "serial_number_barcode",
+   "fieldtype": "Barcode",
+   "label": "Serial Number Barcode",
+   "read_only": 1
+  },
+  {
+   "fieldname": "column_break_e6se",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "used_time",
+   "fieldtype": "Table",
+   "label": "Used Time",
+   "options": "Time Used",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-05 22:00:41.390839",
+ "modified": "2025-05-06 19:10:22.509819",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Rolls",

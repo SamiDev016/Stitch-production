@@ -21,4 +21,5 @@ class Rolls(Document):
             max_seq = result[0][0] or 0
             next_seq = max_seq + 1
             self.serial_number = f"{prefix}{next_seq:04d}"
+            self.serial_number_barcode = f"{prefix}{next_seq:04d}"
 

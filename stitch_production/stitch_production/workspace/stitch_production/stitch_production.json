@@ -6,7 +6,7 @@
    "label": "Stock Value"
   }
  ],
- "content": "[{\"id\":\"8-Ff2XVmBE\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\">Accueil</span>\",\"col\":12}},{\"id\":\"QSUMvz4r2k\",\"type\":\"card\",\"data\":{\"card_name\":\"Cutting Operation\",\"col\":5}},{\"id\":\"mZD9SF75zx\",\"type\":\"card\",\"data\":{\"card_name\":\"Rolls\",\"col\":5}},{\"id\":\"UqCu6uF65p\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock\",\"col\":5}},{\"id\":\"NKTIlHsfdh\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchase Receipt\",\"col\":5}},{\"id\":\"UF9CXkg1wE\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Stock Value\",\"col\":12}}]",
+ "content": "[{\"id\":\"8-Ff2XVmBE\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\">Accueil</span>\",\"col\":12}},{\"id\":\"LDzFvQuIUj\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Cutting Operation\",\"col\":3}},{\"id\":\"mZD9SF75zx\",\"type\":\"card\",\"data\":{\"card_name\":\"Rolls\",\"col\":5}},{\"id\":\"UqCu6uF65p\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock\",\"col\":5}},{\"id\":\"NKTIlHsfdh\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchase Receipt\",\"col\":5}},{\"id\":\"UF9CXkg1wE\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Stock Value\",\"col\":12}}]",
  "creation": "2025-05-05 12:52:11.040770",
  "custom_blocks": [],
  "docstatus": 0,
@@ -14,31 +14,12 @@
  "for_user": "",
  "hide_custom": 0,
  "icon": "file-large",
- "idx": 5,
+ "idx": 8,
  "indicator_color": "blue",
  "is_hidden": 0,
  "label": "Stitch Production",
  "link_type": "DocType",
  "links": [
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Cutting Operation",
-   "link_count": 1,
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Card Break"
-  },
-  {
-   "hidden": 0,
-   "is_query_report": 0,
-   "label": "Op\u00e9rations",
-   "link_count": 0,
-   "link_to": "cutting operation",
-   "link_type": "DocType",
-   "onboard": 0,
-   "type": "Link"
-  },
   {
    "hidden": 0,
    "is_query_report": 0,
@@ -97,7 +78,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-05-05 13:58:20.151308",
+ "modified": "2025-05-06 22:04:45.335510",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Stitch Production",
@@ -108,7 +89,16 @@
  "quick_lists": [],
  "roles": [],
  "sequence_id": 42.0,
- "shortcuts": [],
+ "shortcuts": [
+  {
+   "color": "Blue",
+   "doc_view": "List",
+   "label": "Cutting Operation",
+   "link_to": "cutting operation",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
  "title": "Stitch Production",
  "type": "Workspace"
 }
