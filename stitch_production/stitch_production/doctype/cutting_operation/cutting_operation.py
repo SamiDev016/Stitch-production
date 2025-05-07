@@ -30,12 +30,12 @@ class cuttingoperation(Document):
 
             # a) record the usage in the Rolls.used_time child table
             roll.append('used_time', {
-                'operation': self.name,
-                'weight_used': used_qty
+                'weight_used': used_qty,
+                'cutting_operation': self.name
             })
 
             # b) decrement the roll's remaining weight
-            roll.weight = roll.weight - used_qty
+            roll.weight -= used_qty
 
             # c) save both weight change and new used_time row in one go
             roll.save(ignore_permissions=True)
@@ -43,7 +43,7 @@ class cuttingoperation(Document):
             # d) issue the fabric via Material Issue
             se = frappe.new_doc("Stock Entry")
             se.stock_entry_type = "Material Issue"
-            se.from_warehouse     = roll.warehouse
+            se.from_warehouse   = roll.warehouse
             se.append("items", {
                 "item_code":  roll.fabric_item,
                 "qty":         used_qty,
@@ -54,14 +54,27 @@ class cuttingoperation(Document):
             se.insert(ignore_permissions=True)
             se.submit()
 
-        # 2) Process each cutting part: receive into stock at zero valuation
+        # 2) Process each cutting part: create a Batch then receive into stock at zero valuation
         for pr in self.cutting_parts:
             item      = pr.part
             qty       = pr.quantity or 0
             warehouse = pr.warehouse
+
             if not warehouse:
                 frappe.throw(f"Please set a Warehouse on Cutting Part {item}")
 
+            # ---- a) create a Batch using your Operation series + part name ----
+            batch_name = f"{self.name}-{item}"
+            # Only create if it doesn't already exist
+            if not frappe.db.exists("Batch", batch_name):
+                batch = frappe.get_doc({
+                    "doctype": "Batch",
+                    "batch_id": batch_name,
+                    "item":     item
+                })
+                batch.insert(ignore_permissions=True)
+
+            # ---- b) create the Material Receipt with that batch ----
             se = frappe.new_doc("Stock Entry")
             se.stock_entry_type          = "Material Receipt"
             se.to_warehouse              = warehouse
@@ -73,6 +86,7 @@ class cuttingoperation(Document):
                 "uom":                       "Nos",
                 "stock_uom":                 "Nos",
                 "t_warehouse":               warehouse,
+                "batch_no":                  batch_name,
                 "allow_zero_valuation_rate": True
             })
             se.insert(ignore_permissions=True)
