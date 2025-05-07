@@ -6,7 +6,7 @@
    "label": "Stock Value"
   }
  ],
- "content": "[{\"id\":\"8-Ff2XVmBE\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\">Short Cuts</span>\",\"col\":12}},{\"id\":\"LDzFvQuIUj\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Cutting Operation\",\"col\":10}},{\"id\":\"mZD9SF75zx\",\"type\":\"card\",\"data\":{\"card_name\":\"Rolls\",\"col\":5}},{\"id\":\"UqCu6uF65p\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock\",\"col\":5}},{\"id\":\"NKTIlHsfdh\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchase Receipt\",\"col\":5}},{\"id\":\"q2bUPNBU1L\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock Entry\",\"col\":5}},{\"id\":\"Pl-FEGOZWT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transfer Roll Warehouse\",\"col\":3}},{\"id\":\"dKRtSbcSx5\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Valeur du Stock</b></span>\",\"col\":12}},{\"id\":\"UF9CXkg1wE\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Stock Value\",\"col\":12}}]",
+ "content": "[{\"id\":\"8-Ff2XVmBE\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\">Short Cuts</span>\",\"col\":12}},{\"id\":\"LDzFvQuIUj\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Cutting Operation\",\"col\":10}},{\"id\":\"mZD9SF75zx\",\"type\":\"card\",\"data\":{\"card_name\":\"Rolls\",\"col\":5}},{\"id\":\"UqCu6uF65p\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock\",\"col\":5}},{\"id\":\"NKTIlHsfdh\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchase Receipt\",\"col\":5}},{\"id\":\"q2bUPNBU1L\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock Entry\",\"col\":5}},{\"id\":\"Pl-FEGOZWT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Transfer Roll Warehouse\",\"col\":12}},{\"id\":\"dKRtSbcSx5\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Valeur du Stock</b></span>\",\"col\":12}},{\"id\":\"UF9CXkg1wE\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Stock Value\",\"col\":12}}]",
  "creation": "2025-05-05 12:52:11.040770",
  "custom_blocks": [],
  "docstatus": 0,
@@ -97,7 +97,7 @@
    "type": "Link"
   }
  ],
- "modified": "2025-05-07 13:12:58.424334",
+ "modified": "2025-05-07 13:30:31.881778",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Stitch Production",
