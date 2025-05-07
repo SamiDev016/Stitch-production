@@ -1,0 +1,12 @@
+# Purchase Receipt → On Submit ( aprés validation)
+for r in doc.get("custom_rolls", []):
+    roll = frappe.get_doc({
+        "doctype":      "Rolls",
+        "fabric_item":  r.fabric_item,
+        "supplier":     doc.supplier,
+        "warehouse":    r.warehouse,
+        "company":      doc.company,
+        "weight":       r.weight,
+        "price_per_kg": r.price_per_qty,
+    })
+    roll.insert(ignore_permissions=True)

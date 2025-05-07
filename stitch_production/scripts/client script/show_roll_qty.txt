@@ -1,0 +1,32 @@
+frappe.ui.form.on('Cutting Rolls', {
+  // 1) default to full weight when you pick a roll
+  roll(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    if (row.roll && (!row.used_qty || row.used_qty === 0)) {
+      frappe.db.get_value('Rolls', row.roll, 'weight')
+        .then(r => {
+          const wt = r.message.weight || 0;
+          frappe.model.set_value(cdt, cdn, 'used_qty', wt);
+        });
+    }
+  },
+
+  // 2) prevent them typing more than that weight
+  used_qty(frm, cdt, cdn) {
+    let row = locals[cdt][cdn];
+    if (!row.roll) return;             // no roll = nothing to check
+    frappe.db.get_value('Rolls', row.roll, 'weight')
+      .then(r => {
+        const max = r.message.weight || 0;
+        if (row.used_qty > max) {
+          frappe.msgprint({
+            title: __('Too much!'),
+            message: __('You can’t use more than {0}.kg from roll {1}', [max, row.roll]),
+            indicator: 'red'
+          });
+          // clamp it
+          frappe.model.set_value(cdt, cdn, 'used_qty', max);
+        }
+      });
+  }
+});
