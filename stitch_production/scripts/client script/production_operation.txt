@@ -1,0 +1,79 @@
+// production_operation.js
+
+// 1) Whenever the BOM or Quantity changes, refill the Production Materials table
+frappe.ui.form.on('Production Operation', {
+  poduction_bom(frm) {
+    populate_raw_materials(frm);
+  },
+  produced_quantity(frm) {
+    populate_raw_materials(frm);
+  }
+});
+
+// helper to load BOM items into raw_materials
+function populate_raw_materials(frm) {
+  // if no BOM chosen, clear the table
+  if (!frm.doc.poduction_bom) {
+    frm.clear_table('raw_materials');
+    frm.refresh_field('raw_materials');
+    return;
+  }
+
+  // fetch the BOM record
+  frappe.call({
+    method: 'frappe.client.get',
+    args: {
+      doctype: 'BOM',
+      name: frm.doc.poduction_bom
+    },
+    callback: function(r) {
+      if (!r.message) return;
+      const bom = r.message;
+
+      // clear existing child rows
+      frm.clear_table('raw_materials');
+
+      // append one row per BOM item
+      bom.items.forEach(item => {
+        const row = frm.add_child('raw_materials');
+        row.material          = item.item_code;
+        // calculate required qty = BOM qty × produced_quantity / BOM base qty
+        row.required_quantity = ((item.qty || 0) * (frm.doc.produced_quantity || 0)) / (bom.quantity || 1);
+      });
+
+      frm.refresh_field('raw_materials');
+    }
+  });
+}
+
+
+// 2) In each Production Materials row, when you pick Material, filter Batch No
+frappe.ui.form.on('Production Materials', {
+  material(frm, cdt, cdn) {
+    const row = locals[cdt][cdn];
+
+    // clear any batch previously chosen
+    frappe.model.set_value(cdt, cdn, 'batch_no', null);
+
+    // only show batches for that material
+    frm.set_query('batch_no', 'raw_materials', () => ({
+      filters: { item: row.material }
+    }));
+  }
+});
+
+
+// 3) Make sure new child-rows also have the same Batch filter
+frappe.ui.form.on('Production Operation', {
+  onload_post_render(frm) {
+    const grid = frm.fields_dict['raw_materials'];
+    if (!grid) return;
+
+    grid.grid.get_field('batch_no').get_query = (doc, cdt, cdn) => {
+      const row = locals[cdt][cdn];
+      return {
+        filters: { item: row.material }
+      };
+    };
+  }
+});
