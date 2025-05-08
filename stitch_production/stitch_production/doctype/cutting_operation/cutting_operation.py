@@ -31,7 +31,7 @@ class cuttingoperation(Document):
             # a) record the usage in the Rolls.used_time child table
             roll.append('used_time', {
                 'weight_used': used_qty,
-                'cutting_operation': self.name
+                'operation': self.name
             })
 
             # b) decrement the roll's remaining weight
