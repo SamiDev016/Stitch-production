@@ -1,0 +1,98 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "format:ProdOperation-{#####}",
+ "creation": "2025-05-07 21:22:50.195321",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_lput",
+  "poduction_bom",
+  "production_item",
+  "produced_quantity",
+  "warehouse",
+  "amended_from",
+  "section_break_zchw",
+  "raw_materials"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_lput",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Production Operation",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fetch_from": "poduction_bom.item",
+   "fieldname": "production_item",
+   "fieldtype": "Link",
+   "label": "Production Item",
+   "options": "Item",
+   "read_only": 1
+  },
+  {
+   "fieldname": "produced_quantity",
+   "fieldtype": "Float",
+   "label": "Produced Quantity"
+  },
+  {
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "section_break_zchw",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "raw_materials",
+   "fieldtype": "Table",
+   "label": "Raw Materials",
+   "options": "Production Materials"
+  },
+  {
+   "fieldname": "poduction_bom",
+   "fieldtype": "Link",
+   "label": "Poduction BOM",
+   "options": "BOM"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-05-08 10:32:10.360178",
+ "modified_by": "Administrator",
+ "module": "Stitch Production",
+ "name": "Production Operation",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,46 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-05-07 21:34:31.654646",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "material",
+  "batch_no",
+  "required_quantity"
+ ],
+ "fields": [
+  {
+   "fieldname": "material",
+   "fieldtype": "Link",
+   "label": "Material",
+   "options": "Item"
+  },
+  {
+   "fieldname": "batch_no",
+   "fieldtype": "Link",
+   "label": "Batch Number",
+   "options": "Batch"
+  },
+  {
+   "fieldname": "required_quantity",
+   "fieldtype": "Float",
+   "label": "Required Quantity"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-05-08 10:23:53.073475",
+ "modified_by": "Administrator",
+ "module": "Stitch Production",
+ "name": "Production Materials",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

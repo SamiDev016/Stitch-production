@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:{source_warehouse}-{destination_warehouse}-{####}",
  "creation": "2025-05-07 13:04:01.722330",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -50,10 +51,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-07 13:14:13.766297",
+ "modified": "2025-05-07 13:38:49.475138",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Rolls Transfer",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
