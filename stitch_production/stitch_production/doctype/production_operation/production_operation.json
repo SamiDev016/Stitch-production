@@ -12,8 +12,14 @@
   "produced_quantity",
   "warehouse",
   "amended_from",
+  "finish_good_batch",
   "section_break_zchw",
-  "raw_materials"
+  "raw_materials",
+  "cost_tab",
+  "workers_cost",
+  "section_break_agfq",
+  "individual_cost",
+  "total_cost"
  ],
  "fields": [
   {
@@ -39,6 +45,7 @@
    "read_only": 1
   },
   {
+   "default": "1.0",
    "fieldname": "produced_quantity",
    "fieldtype": "Float",
    "label": "Produced Quantity"
@@ -64,13 +71,46 @@
    "fieldtype": "Link",
    "label": "Poduction BOM",
    "options": "BOM"
+  },
+  {
+   "fieldname": "cost_tab",
+   "fieldtype": "Tab Break",
+   "label": "Cost"
+  },
+  {
+   "fieldname": "workers_cost",
+   "fieldtype": "Table",
+   "label": "Workesrs Cost",
+   "options": "Worker Cost"
+  },
+  {
+   "fieldname": "section_break_agfq",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "individual_cost",
+   "fieldtype": "Float",
+   "label": "individual Cost"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Float",
+   "label": "Total Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "finish_good_batch",
+   "fieldtype": "Link",
+   "label": "finish_good_batch",
+   "options": "Batch",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-08 10:32:10.360178",
+ "modified": "2025-05-08 19:10:59.055652",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Production Operation",
