@@ -13,6 +13,7 @@
   "warehouse",
   "amended_from",
   "finish_good_batch",
+  "company",
   "section_break_zchw",
   "raw_materials",
   "cost_tab",
@@ -104,13 +105,19 @@
    "label": "finish_good_batch",
    "options": "Batch",
    "read_only": 1
+  },
+  {
+   "fieldname": "company",
+   "fieldtype": "Link",
+   "label": "Company",
+   "options": "Company"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-08 19:10:59.055652",
+ "modified": "2025-05-11 01:23:16.518485",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Production Operation",
