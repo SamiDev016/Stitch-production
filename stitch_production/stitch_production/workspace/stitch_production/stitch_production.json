@@ -6,7 +6,7 @@
    "label": "Stock Value"
   }
  ],
- "content": "[{\"id\":\"8-Ff2XVmBE\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\">Short Cuts</span>\",\"col\":12}},{\"id\":\"LDzFvQuIUj\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Cutting Operation\",\"col\":10}},{\"id\":\"Pl-FEGOZWT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Roll Transfer\",\"col\":10}},{\"id\":\"mZD9SF75zx\",\"type\":\"card\",\"data\":{\"card_name\":\"Rolls\",\"col\":5}},{\"id\":\"UqCu6uF65p\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock\",\"col\":5}},{\"id\":\"NKTIlHsfdh\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchase Receipt\",\"col\":5}},{\"id\":\"q2bUPNBU1L\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock Entry\",\"col\":5}},{\"id\":\"dKRtSbcSx5\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Valeur du Stock</b></span>\",\"col\":12}},{\"id\":\"UF9CXkg1wE\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Stock Value\",\"col\":12}}]",
+ "content": "[{\"id\":\"8-Ff2XVmBE\",\"type\":\"header\",\"data\":{\"text\":\"<span style=\\\"font-size: 16px;\\\">Short Cuts</span>\",\"col\":12}},{\"id\":\"LDzFvQuIUj\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Cutting Operation\",\"col\":10}},{\"id\":\"Pl-FEGOZWT\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Roll Transfer\",\"col\":10}},{\"id\":\"mZD9SF75zx\",\"type\":\"card\",\"data\":{\"card_name\":\"Rolls\",\"col\":5}},{\"id\":\"UqCu6uF65p\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock\",\"col\":5}},{\"id\":\"NKTIlHsfdh\",\"type\":\"card\",\"data\":{\"card_name\":\"Purchase Receipt\",\"col\":5}},{\"id\":\"6_OgEEg6Co\",\"type\":\"card\",\"data\":{\"card_name\":\"Production Operation\",\"col\":5}},{\"id\":\"q2bUPNBU1L\",\"type\":\"card\",\"data\":{\"card_name\":\"Stock Entry\",\"col\":5}},{\"id\":\"dKRtSbcSx5\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\"><b>Valeur du Stock</b></span>\",\"col\":12}},{\"id\":\"UF9CXkg1wE\",\"type\":\"chart\",\"data\":{\"chart_name\":\"Stock Value\",\"col\":12}}]",
  "creation": "2025-05-05 12:52:11.040770",
  "custom_blocks": [],
  "docstatus": 0,
@@ -14,7 +14,7 @@
  "for_user": "",
  "hide_custom": 0,
  "icon": "color-monthly-rank",
- "idx": 10,
+ "idx": 15,
  "indicator_color": "blue",
  "is_hidden": 0,
  "label": "Stitch Production",
@@ -95,9 +95,28 @@
    "link_type": "DocType",
    "onboard": 0,
    "type": "Link"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Production Operation",
+   "link_count": 1,
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Card Break"
+  },
+  {
+   "hidden": 0,
+   "is_query_report": 0,
+   "label": "Production list",
+   "link_count": 0,
+   "link_to": "Production Operation",
+   "link_type": "DocType",
+   "onboard": 0,
+   "type": "Link"
   }
  ],
- "modified": "2025-05-07 13:44:21.663842",
+ "modified": "2025-05-10 21:47:02.707878",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Stitch Production",

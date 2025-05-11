@@ -9,6 +9,8 @@
   "section_break_6uag",
   "amended_from",
   "used_rolls",
+  "section_break_xold",
+  "finish_good",
   "cutting_parts",
   "costs_tab",
   "section_break_vzgq",
@@ -85,13 +87,23 @@
    "fieldname": "costs_tab",
    "fieldtype": "Tab Break",
    "label": "Costs"
+  },
+  {
+   "fieldname": "section_break_xold",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "finish_good",
+   "fieldtype": "Table",
+   "label": "Finish good",
+   "options": "Cutted Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-07 10:52:31.581491",
+ "modified": "2025-05-10 02:03:33.699366",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "cutting operation",
