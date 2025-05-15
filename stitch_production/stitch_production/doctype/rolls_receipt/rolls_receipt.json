@@ -10,7 +10,9 @@
   "weight",
   "price_per_qty",
   "warehouse",
-  "rolls_details"
+  "rolls_details",
+  "longeur",
+  "turbolantouvert"
  ],
  "fields": [
   {
@@ -46,13 +48,24 @@
    "fieldname": "rolls_details",
    "fieldtype": "Small Text",
    "label": "Rolls"
+  },
+  {
+   "fieldname": "longeur",
+   "fieldtype": "Float",
+   "label": "longeur"
+  },
+  {
+   "fieldname": "turbolantouvert",
+   "fieldtype": "Select",
+   "label": "turbolantouvert",
+   "options": "Turbolant\nOuvert"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-15 09:12:20.948467",
+ "modified": "2025-05-15 12:09:18.019520",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Rolls Receipt",
