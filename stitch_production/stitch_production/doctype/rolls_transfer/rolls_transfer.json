@@ -7,8 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_ov4h",
-  "roll",
-  "source_warehouse",
+  "rolls",
   "destination_warehouse",
   "amended_from"
  ],
@@ -28,30 +27,23 @@
    "search_index": 1
   },
   {
-   "fetch_from": "roll.warehouse",
-   "fieldname": "source_warehouse",
-   "fieldtype": "Link",
-   "label": "Source Warehouse",
-   "options": "Warehouse"
-  },
-  {
    "fieldname": "destination_warehouse",
    "fieldtype": "Link",
    "label": "Destination Warehouse",
    "options": "Warehouse"
   },
   {
-   "fieldname": "roll",
-   "fieldtype": "Link",
-   "label": "Roll",
-   "options": "Rolls"
+   "fieldname": "rolls",
+   "fieldtype": "Table",
+   "label": "Rolls",
+   "options": "Roll Warehouse"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-07 13:38:49.475138",
+ "modified": "2025-05-15 10:48:55.811365",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Rolls Transfer",

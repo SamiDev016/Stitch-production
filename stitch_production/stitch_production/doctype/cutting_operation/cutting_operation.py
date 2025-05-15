@@ -31,11 +31,13 @@ class cuttingoperation(Document):
             # a) record the usage in the Rolls.used_time child table
             roll.append('used_time', {
                 'weight_used': used_qty,
-                'operation': self.name
+                'operation': self.name,
             })
 
             # b) decrement the roll's remaining weight
             roll.weight -= used_qty
+            if roll.weight == 0.0:
+                roll.finished = 1
 
             # c) save both weight change and new used_time row in one go
             roll.save(ignore_permissions=True)

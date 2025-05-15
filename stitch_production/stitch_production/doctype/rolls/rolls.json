@@ -15,7 +15,8 @@
   "weight",
   "column_break_e6se",
   "serial_number_barcode",
-  "used_time"
+  "used_time",
+  "finished"
  ],
  "fields": [
   {
@@ -31,6 +32,7 @@
    "in_list_view": 1,
    "label": "Fabric item",
    "options": "Item",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -39,6 +41,7 @@
    "in_list_view": 1,
    "label": "Warehouse",
    "options": "Warehouse",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -47,12 +50,14 @@
    "in_list_view": 1,
    "label": "Company",
    "options": "Company",
+   "read_only": 1,
    "reqd": 1
   },
   {
    "fieldname": "weight",
    "fieldtype": "Float",
    "label": "Weight",
+   "read_only": 1,
    "reqd": 1
   },
   {
@@ -60,13 +65,15 @@
    "fieldtype": "Float",
    "in_list_view": 1,
    "label": "Price per Kg",
+   "read_only": 1,
    "reqd": 1
   },
   {
    "fieldname": "supplier",
    "fieldtype": "Link",
    "label": "Supplier",
-   "options": "Supplier"
+   "options": "Supplier",
+   "read_only": 1
   },
   {
    "fieldname": "serial_number_barcode",
@@ -84,12 +91,20 @@
    "label": "Used Time",
    "options": "Time Used",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "finished",
+   "fieldtype": "Check",
+   "in_list_view": 1,
+   "label": "Finished",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-07 13:02:52.988830",
+ "modified": "2025-05-11 13:22:41.001660",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Rolls",

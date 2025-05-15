@@ -3,6 +3,7 @@
 
 import frappe
 from frappe.model.document import Document
+from frappe.utils import nowdate, nowtime
 from frappe import _
 
 class ProductionOperation(Document):
@@ -24,31 +25,47 @@ class ProductionOperation(Document):
         se.production_item      = self.production_item
         se.fg_warehouse         = self.warehouse
         se.produced_qty         = self.produced_quantity
-        se.from_bom             = 0  # we are manually adding all items
+        se.from_bom             = 0
         se.company              = self.company
         se.set_posting_time     = 1
+        se.posting_date         = nowdate()
+        se.posting_time         = nowtime()
 
-        # Add Finished Good row
+        # Add Finished Good
         se.append("items", {
             "item_code": self.production_item,
             "qty": self.produced_quantity,
             "t_warehouse": self.warehouse,
             "is_finished_item": 1,
-            "allow_zero_valuation_rate": 1
+            "allow_zero_valuation_rate": 1,
+            "use_serial_batch_fields": 0  # Avoid SABB creation
         })
 
-        # Add Raw Material rows from your child table
+        # Add Raw Materials
         for row in self.raw_materials:
-            se.append("items", {
+            item_row = {
                 "item_code": row.material,
                 "qty": row.required_quantity,
                 "s_warehouse": row.item_warehouse,
-                "batch_no": row.batch_no,
-                "allow_zero_valuation_rate": 1
-            })
+                "allow_zero_valuation_rate": 1,
+                "use_serial_batch_fields": 1  # Force SABB usage
+            }
+
+            # Optional: only set batch_no if not already used
+            if row.batch_no:
+                existing_bundle = frappe.db.exists("Serial and Batch Bundle", {
+                    "production_operation": self.name,
+                    "item": row.material
+                })
+                if not existing_bundle:
+                    item_row["batch_no"] = row.batch_no
+
+            se.append("items", item_row)
 
         # Save and submit
         se.insert(ignore_permissions=True)
         se.submit()
 
+        # Link back
         self.db_set("stock_entry", se.name)
+        frappe.msgprint(_("Stock Entry {0} has been created and submitted.").format(se.name))

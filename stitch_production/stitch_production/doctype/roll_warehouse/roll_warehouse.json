@@ -1,41 +1,46 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-05-05 10:33:46.650585",
+ "creation": "2025-05-15 10:38:34.196254",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
+  "code_bar",
   "roll",
-  "used_qty",
-  "lap"
+  "warehouse"
  ],
  "fields": [
   {
    "fieldname": "roll",
    "fieldtype": "Link",
    "label": "Roll",
+   "options": "Rolls",
+   "read_only": 1
+  },
+  {
+   "fetch_from": "roll.warehouse",
+   "fieldname": "warehouse",
+   "fieldtype": "Link",
+   "label": "Warehouse",
+   "options": "Warehouse",
+   "read_only": 1
+  },
+  {
+   "fieldname": "code_bar",
+   "fieldtype": "Barcode",
+   "label": "Code Bar",
    "options": "Rolls"
-  },
-  {
-   "fieldname": "used_qty",
-   "fieldtype": "Float",
-   "label": "Used QTY"
-  },
-  {
-   "fieldname": "lap",
-   "fieldtype": "Float",
-   "label": "Lap"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-11 13:01:16.906054",
+ "modified": "2025-05-15 10:50:45.302549",
  "modified_by": "Administrator",
  "module": "Stitch Production",
- "name": "Cutting Rolls",
+ "name": "Roll Warehouse",
  "owner": "Administrator",
  "permissions": [],
  "row_format": "Dynamic",
