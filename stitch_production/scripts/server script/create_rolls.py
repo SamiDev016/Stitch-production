@@ -1,4 +1,4 @@
-# Purchase Receipt → On Submit ( aprés validation)
+# Purchase Receipt → On Submit
 for r in doc.get("custom_rolls", []):
     roll = frappe.get_doc({
         "doctype":      "Rolls",
