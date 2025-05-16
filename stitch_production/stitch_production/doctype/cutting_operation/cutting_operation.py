@@ -70,7 +70,8 @@ class cuttingoperation(Document):
                     if color_val == roll_color and size_val == size_value:
                         parts_qty_list.append({
                             'variant': variant_code,
-                            'quantity': total_qty
+                            'quantity': total_qty,
+                            'roll_relation': ur.roll
                         })
 
         # 4. Append results to cutting_parts
@@ -78,12 +79,14 @@ class cuttingoperation(Document):
             cp = self.append('cutting_parts', {})
             cp.part = p['variant']
             cp.quantity = p['quantity']
+            cp.warehouse = self.distination_warehouse
+            cp.roll_relation = p['roll_relation']
 
     def on_submit(self):
-        # Create Stock Entry to issue fabric from used rolls
         if not self.used_rolls:
             return
 
+        # 1. Create Stock Entry
         stock_entry = frappe.new_doc("Stock Entry")
         stock_entry.purpose = "Material Issue"
         stock_entry.stock_entry_type = "Material Issue"
@@ -111,3 +114,33 @@ class cuttingoperation(Document):
         if stock_entry.items:
             stock_entry.insert()
             stock_entry.submit()
+
+            # 2. Update Rolls weight and append to used_time
+            for ur in self.used_rolls:
+                if not ur.roll:
+                    continue
+
+                roll_doc = frappe.get_doc("Rolls", ur.roll)
+                used_qty = ur.used_qty or 0
+
+                roll_doc.weight = (roll_doc.weight or 0) - used_qty
+
+                used_time_entry = roll_doc.append("used_time", {})
+                used_time_entry.operation_type = self.name
+                used_time_entry.weight_used = used_qty
+
+                roll_doc.save()
+
+        # 3. Create Batches with proper batch_qty
+        for part in self.cutting_parts:
+            if not part.part or not part.roll_relation:
+                continue
+
+            batch_id = f"{part.roll_relation}-{self.name}-{part.part}"
+            if not frappe.db.exists("Batch", batch_id):
+                frappe.get_doc({
+                    "doctype": "Batch",
+                    "batch_id": batch_id,
+                    "item": part.part,
+                    "batch_qty": part.quantity  # ✅ Set batch quantity correctly
+                }).insert()
