@@ -1,0 +1,157 @@
+import frappe
+from frappe.model.document import Document
+
+class CuttingOperation(Document):
+
+    SIZE_MAP = {
+        'S': 'Small',
+        'M': 'Medium',
+        'L': 'Large',
+        'XL': 'Extra Large',
+        'XXL': '2X Large'
+    }
+
+    def before_save(self):
+        self.set('cutting_parts', [])
+
+        raw_material_variants = []
+        for pb in (self.parent_boms or []):
+            if not pb.parent_bom:
+                continue
+            bom = frappe.get_doc('BOM', pb.parent_bom)
+            for bi in (bom.items or []):
+                for v in frappe.get_all('Item', filters={'variant_of': bi.item_code, 'disabled': 0}, fields=['name']):
+                    raw_material_variants.append(v.name)
+
+        parts_qty = []
+        for idx, ur in enumerate(self.used_rolls, 1):
+            try:
+                lap = ur.lap or 0
+                color = (ur.color or '').strip()
+                roll_code = ur.roll
+
+                if lap <= 0 or not color or not roll_code:
+                    continue
+
+                roll_doc = frappe.get_doc('Rolls', roll_code)
+                ur.roll_relation = roll_code
+
+                # Autofill missing warehouse
+                if not ur.roll_warehouse:
+                    ur.roll_warehouse = roll_doc.warehouse
+                    frappe.log_error(f"Row {idx}: roll_warehouse auto-filled with {roll_doc.warehouse} for roll {roll_code}", "Auto-fill Debug")
+
+                roll_wh = ur.roll_warehouse
+                if not roll_wh:
+                    msg = f"Entrepôt source est obligatoire à la ligne {idx} (Roll: {roll_code})"
+                    frappe.log_error(msg, "Missing Warehouse Error")
+                    frappe.throw(msg)
+
+                for sm in (self.size_matrix or []):
+                    raw = (sm.size or '').strip()
+                    size = self.SIZE_MAP.get(raw, raw)
+                    total = lap * (sm.qty or 0)
+                    if total <= 0:
+                        continue
+
+                    for variant in raw_material_variants:
+                        attrs = frappe.get_all(
+                            'Item Variant Attribute',
+                            filters={'parent': variant},
+                            fields=['attribute', 'attribute_value']
+                        )
+                        amap = {a.attribute.strip().lower(): (a.attribute_value or '').strip() for a in attrs}
+                        if amap.get('colour') == color and amap.get('size') == size:
+                            parts_qty.append({
+                                'variant': variant,
+                                'quantity': total,
+                                'warehouse': roll_wh,
+                                'roll': roll_code
+                            })
+            except Exception as e:
+                frappe.log_error(f"Error in used_roll row {idx}: {str(e)}", "CuttingOperation.before_save")
+
+        for p in parts_qty:
+            cp = self.append('cutting_parts', {})
+            cp.part = p['variant']
+            cp.quantity = p['quantity']
+            cp.warehouse = p['warehouse']
+            cp.roll = p['roll']
+
+    def on_submit(self):
+        frappe.msgprint(f"⏳ Soumission de {self.name}")
+
+        issue_items = []
+        for idx, ur in enumerate(self.used_rolls, 1):
+            try:
+                lap = ur.lap or 0
+                roll_code = ur.roll
+                if lap <= 0 or not roll_code:
+                    continue
+
+                roll_doc = frappe.get_doc('Rolls', roll_code)
+                fabric_item = roll_doc.fabric_item
+                from_wh = ur.roll_warehouse
+
+                if not from_wh:
+                    msg = f"Entrepôt source est obligatoire à la ligne {idx} (Roll: {roll_code})"
+                    frappe.log_error(msg, "Missing Warehouse Error")
+                    frappe.throw(msg)
+
+                stock_uom = frappe.get_value('Item', fabric_item, 'stock_uom')
+                issue_items.append({
+                    'item_code': fabric_item,
+                    'qty': lap,
+                    'uom': stock_uom,
+                    'from_warehouse': from_wh
+                })
+
+            except Exception as e:
+                frappe.log_error(f"Error in on_submit used_roll row {idx}: {str(e)}", "CuttingOperation.on_submit")
+
+        # Create stock entry: Material Issue
+        if issue_items:
+            try:
+                se_issue = frappe.get_doc({
+                    'doctype': 'Stock Entry',
+                    'stock_entry_type': 'Material Issue',
+                    'items': issue_items
+                })
+                se_issue.insert(ignore_permissions=True)
+                frappe.msgprint(f"✅ Sortie de stock créée : {se_issue.name}")
+            except Exception as e:
+                frappe.log_error(f"Failed to create Material Issue: {str(e)}", "CuttingOperation.on_submit")
+
+        # Create Material Receipt entries
+        for idx, cp in enumerate(self.cutting_parts, 1):
+            try:
+                to_wh = cp.warehouse
+                if not to_wh:
+                    frappe.throw(f"Entrepôt cible est obligatoire à la ligne: {cp.part}")
+
+                roll_code = cp.roll or 'ROLL'
+                batch_id = f"{roll_code}-{self.name}-{cp.part}"
+
+                frappe.get_doc({
+                    'doctype': 'Batch',
+                    'batch_id': batch_id,
+                    'item': cp.part
+                }).insert(ignore_permissions=True)
+
+                stock_uom = frappe.get_value('Item', cp.part, 'stock_uom')
+                se_receipt = frappe.get_doc({
+                    'doctype': 'Stock Entry',
+                    'stock_entry_type': 'Material Receipt',
+                    'items': [{
+                        'item_code': cp.part,
+                        'qty': cp.quantity,
+                        'batch_no': batch_id,
+                        'uom': stock_uom,
+                        't_warehouse': to_wh
+                    }]
+                })
+                se_receipt.insert(ignore_permissions=True)
+                frappe.msgprint(f"✅ Entrée de stock créée : {se_receipt.name}")
+
+            except Exception as e:
+                frappe.log_error(f"Error in Material Receipt row {idx}: {str(e)}", "CuttingOperation.on_submit")

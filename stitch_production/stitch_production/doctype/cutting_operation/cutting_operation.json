@@ -7,10 +7,12 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_6uag",
-  "amended_from",
-  "used_rolls",
+  "parent_boms",
+  "column_break_uuzu",
+  "size_matrix",
   "section_break_xold",
-  "finish_good",
+  "used_rolls",
+  "distination_warehouse",
   "cutting_parts",
   "costs_tab",
   "section_break_vzgq",
@@ -19,7 +21,8 @@
   "worker_cost",
   "section_break_iyys",
   "individual_cost",
-  "total_cost"
+  "total_cost",
+  "amended_from"
  ],
  "fields": [
   {
@@ -93,17 +96,35 @@
    "fieldtype": "Section Break"
   },
   {
-   "fieldname": "finish_good",
+   "fieldname": "parent_boms",
    "fieldtype": "Table",
-   "label": "Finish good",
-   "options": "Cutted Item"
+   "label": "Parent Boms",
+   "options": "Parent Boms"
+  },
+  {
+   "fieldname": "column_break_uuzu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "size_matrix",
+   "fieldtype": "Table",
+   "label": "Size Matrix",
+   "options": "Sizes Matrix"
+  },
+  {
+   "fieldname": "distination_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Distination Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-11 01:22:50.801961",
+ "modified": "2025-05-16 16:26:25.441054",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "cutting operation",
