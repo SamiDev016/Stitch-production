@@ -126,7 +126,7 @@ class cuttingoperation(Document):
                 roll_doc.weight = (roll_doc.weight or 0) - used_qty
 
                 used_time_entry = roll_doc.append("used_time", {})
-                used_time_entry.operation_type = self.name
+                used_time_entry.operation = self.name
                 used_time_entry.weight_used = used_qty
 
                 roll_doc.save()
