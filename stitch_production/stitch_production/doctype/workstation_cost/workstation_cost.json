@@ -7,19 +7,14 @@
  "engine": "InnoDB",
  "field_order": [
   "workstation_name",
-  "cost_per_hour",
   "total_hours"
  ],
  "fields": [
   {
    "fieldname": "workstation_name",
-   "fieldtype": "Data",
-   "label": "Workstation name"
-  },
-  {
-   "fieldname": "cost_per_hour",
-   "fieldtype": "Float",
-   "label": "Cost per Hour"
+   "fieldtype": "Link",
+   "label": "Workstation name",
+   "options": "Workstation"
   },
   {
    "fieldname": "total_hours",
@@ -31,7 +26,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-05 12:14:20.566597",
+ "modified": "2025-05-19 09:57:51.933046",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Workstation Cost",

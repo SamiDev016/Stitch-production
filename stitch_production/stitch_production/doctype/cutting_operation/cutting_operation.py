@@ -13,7 +13,16 @@ class cuttingoperation(Document):
     }
 
     def before_save(self):
-        # 0. Fetch roll_warehouse from linked Rolls
+        total_ws = 0
+        total_cost = 0
+        for ws in (self.workstation_cost or []):
+            wrk = frappe.get_doc("Workstation", ws.workstation_name)
+            ws.total_cost = wrk.hour_rate * ws.total_hours
+            total_ws += ws.total_cost
+
+        total_cost += total_ws + self.individual_cost
+        self.total_cost = total_cost
+        
         for ur in (self.used_rolls or []):
             if ur.roll:
                 roll_doc = frappe.get_doc("Rolls", ur.roll)

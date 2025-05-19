@@ -9,6 +9,7 @@
   "section_break_ov4h",
   "rolls",
   "destination_warehouse",
+  "movement_date",
   "amended_from"
  ],
  "fields": [
@@ -37,13 +38,18 @@
    "fieldtype": "Table",
    "label": "Rolls",
    "options": "Roll Warehouse"
+  },
+  {
+   "fieldname": "movement_date",
+   "fieldtype": "Datetime",
+   "label": "Movement Date"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-15 10:48:55.811365",
+ "modified": "2025-05-19 11:43:19.017264",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Rolls Transfer",

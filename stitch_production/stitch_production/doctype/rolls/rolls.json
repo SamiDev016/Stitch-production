@@ -12,6 +12,7 @@
   "warehouse",
   "company",
   "price_per_kg",
+  "gsm",
   "weight",
   "longeur",
   "turbolantouvert",
@@ -60,7 +61,7 @@
   {
    "fieldname": "weight",
    "fieldtype": "Float",
-   "label": "GSM (KG)",
+   "label": "Weight",
    "read_only": 1,
    "reqd": 1
   },
@@ -126,12 +127,17 @@
    "fieldtype": "Data",
    "label": "Color",
    "read_only": 1
+  },
+  {
+   "fieldname": "gsm",
+   "fieldtype": "Data",
+   "label": "GSM (KG)"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-15 12:18:35.416051",
+ "modified": "2025-05-19 11:55:09.527881",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Rolls",
