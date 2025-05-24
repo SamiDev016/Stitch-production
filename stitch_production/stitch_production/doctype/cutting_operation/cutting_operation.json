@@ -14,6 +14,7 @@
   "used_rolls",
   "distination_warehouse",
   "cutting_parts",
+  "stock_entry_name",
   "costs_tab",
   "section_break_vzgq",
   "workstation",
@@ -139,13 +140,20 @@
    "fieldtype": "Float",
    "label": "Used Rolls cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "stock_entry_name",
+   "fieldtype": "Link",
+   "label": "stock_entry_name",
+   "options": "Stock Entry",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-23 22:16:52.323112",
+ "modified": "2025-05-24 11:53:16.341774",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "cutting operation",

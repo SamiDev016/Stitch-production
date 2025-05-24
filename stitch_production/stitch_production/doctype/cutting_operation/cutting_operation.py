@@ -107,6 +107,30 @@ class cuttingoperation(Document):
             cp.warehouse = self.distination_warehouse
             cp.roll_relation = p['roll_relation']
 
+        # — Distribute each roll’s cost across its parts —
+        for ur in (self.used_rolls or []):
+            roll_id = ur.roll
+            if not roll_id:
+                continue
+
+            # 1) total cost for this roll
+            qty_used = ur.used_qty or 0
+            rate     = frappe.get_doc("Rolls", roll_id).price_per_kg or 0
+            total_roll_cost = qty_used * rate
+
+            # 2) how many parts were made from this roll?
+            parts_for_roll = [
+                cp for cp in (self.cutting_parts or [])
+                if cp.roll_relation == roll_id
+            ]
+            total_parts_qty = sum(cp.quantity for cp in parts_for_roll) or 1
+
+            # 3) assign each part its share of cost
+            for cp in parts_for_roll:
+                cp.part_cost = total_roll_cost / total_parts_qty
+
+        
+
     def on_submit(self):
         if not self.used_rolls:
             return
@@ -155,7 +179,8 @@ class cuttingoperation(Document):
                 used_time_entry.weight_used = used_qty
 
                 roll_doc.save()
-
+        
+        self.db_set("stock_entry_name", stock_entry.name)
         # 3. Create Batches with proper batch_qty
         for part in self.cutting_parts:
             if not part.part or not part.roll_relation:
@@ -167,5 +192,38 @@ class cuttingoperation(Document):
                     "doctype": "Batch",
                     "batch_id": batch_id,
                     "item": part.part,
-                    "batch_qty": part.quantity  # ✅ Set batch quantity correctly
+                    "batch_qty": part.quantity
                 }).insert()
+
+    def on_cancel(self):
+        # 1) Cancel the Stock Entry
+        if self.stock_entry_name:
+            try:
+                se = frappe.get_doc("Stock Entry", self.stock_entry_name)
+                if se.docstatus == 1:
+                    se.cancel()
+            except frappe.DoesNotExistError:
+                pass
+
+        # 2) Revert Rolls weight and remove used_time entries
+        for ur in (self.used_rolls or []):
+            if not ur.roll:
+                continue
+
+            roll = frappe.get_doc("Rolls", ur.roll)
+            roll.weight = (roll.weight or 0) + (ur.used_qty or 0)
+            # remove used_time entries for this operation
+            for ut in list(roll.used_time or []):
+                if ut.operation == self.name:
+                    roll.remove(ut)
+            roll.save()
+
+        # 3) Delete Batches
+        for cp in (self.cutting_parts or []):
+            batch_id = f"{cp.roll_relation}-{self.name}-{cp.part}"
+            if frappe.db.exists("Batch", batch_id):
+                frappe.delete_doc("Batch", batch_id, force=True)
+
+        # 4) Clear Cutting Parts table
+        self.set("cutting_parts", [])
+        self.save(ignore_permissions=True)
