@@ -14,13 +14,29 @@ class cuttingoperation(Document):
 
     def before_save(self):
         total_ws = 0
+        total_worker = 0
+        total_rolls = 0
         total_cost = 0
-        for ws in (self.workstation_cost or []):
-            wrk = frappe.get_doc("Workstation", ws.workstation_name)
-            ws.total_cost = wrk.hour_rate * ws.total_hours
-            total_ws += ws.total_cost
+        
+        #workstation
+        ws = frappe.get_doc("Workstation", self.workstation)
+        total_ws = ws.hour_rate * self.total_hours
 
-        total_cost += total_ws + self.individual_cost
+        #worker
+        for row in (self.workers or []):
+            total_worker += row.cost_per_hour * row.total_hours
+
+        #total rolls cost
+        for rolls_cost in (self.used_rolls or []):
+            doc = frappe.get_doc("Rolls", rolls_cost.roll)
+            qty = rolls_cost.used_qty
+            rate = doc.price_per_kg
+            total_rolls += qty * rate
+        
+        self.used_rolls_cost = total_rolls
+
+        #total cost
+        total_cost += total_ws + self.individual_cost + total_worker + total_rolls
         self.total_cost = total_cost
         
         for ur in (self.used_rolls or []):

@@ -16,10 +16,13 @@
   "cutting_parts",
   "costs_tab",
   "section_break_vzgq",
-  "workstation_cost",
-  "column_break_kujk",
-  "worker_cost",
+  "workstation",
+  "column_break_uxwc",
+  "total_hours",
+  "section_break_yhka",
+  "workers",
   "section_break_iyys",
+  "used_rolls_cost",
   "individual_cost",
   "total_cost",
   "amended_from"
@@ -47,27 +50,13 @@
   },
   {
    "fieldname": "section_break_vzgq",
-   "fieldtype": "Section Break"
-  },
-  {
-   "fieldname": "workstation_cost",
-   "fieldtype": "Table",
-   "label": "Workstation Cost",
-   "options": "Workstation Cost"
-  },
-  {
-   "fieldname": "column_break_kujk",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "worker_cost",
-   "fieldtype": "Table",
-   "label": "Worker Cost",
-   "options": "Worker Cost"
+   "fieldtype": "Section Break",
+   "label": "Workstation COST"
   },
   {
    "fieldname": "section_break_iyys",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "label": "TOTAL COST"
   },
   {
    "fieldname": "individual_cost",
@@ -118,13 +107,45 @@
    "label": "Distination Warehouse",
    "options": "Warehouse",
    "reqd": 1
+  },
+  {
+   "fieldname": "workstation",
+   "fieldtype": "Link",
+   "label": "Workstation",
+   "options": "Workstation"
+  },
+  {
+   "fieldname": "column_break_uxwc",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "total_hours",
+   "fieldtype": "Float",
+   "label": "Total Hours"
+  },
+  {
+   "fieldname": "section_break_yhka",
+   "fieldtype": "Section Break",
+   "label": "Workers COST"
+  },
+  {
+   "fieldname": "workers",
+   "fieldtype": "Table",
+   "label": "Workers",
+   "options": "Worker Cost"
+  },
+  {
+   "fieldname": "used_rolls_cost",
+   "fieldtype": "Float",
+   "label": "Used Rolls cost",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-16 16:26:25.441054",
+ "modified": "2025-05-23 22:16:52.323112",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "cutting operation",
