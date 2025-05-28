@@ -144,6 +144,7 @@
   {
    "fieldname": "stock_entry_name",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "stock_entry_name",
    "options": "Stock Entry",
    "read_only": 1
@@ -153,7 +154,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-24 11:53:16.341774",
+ "modified": "2025-05-24 13:47:24.995817",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "cutting operation",

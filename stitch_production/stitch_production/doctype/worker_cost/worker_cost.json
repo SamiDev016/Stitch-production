@@ -13,7 +13,7 @@
  "fields": [
   {
    "fieldname": "worker",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "Worker",
    "options": "Employee"
   },
@@ -32,7 +32,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-19 12:31:50.293257",
+ "modified": "2025-05-23 23:38:15.018122",
  "modified_by": "Administrator",
  "module": "Stitch Production",
  "name": "Worker Cost",
