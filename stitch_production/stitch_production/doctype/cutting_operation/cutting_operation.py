@@ -9,7 +9,13 @@ class cuttingoperation(Document):
         'M': 'Medium',
         'L': 'Large',
         'XL': 'Extra Large',
-        'XXL': '2X Large'
+        'XXL': '2X Large',
+	'2': '2',
+	'4': '4',
+	'6': '6',
+	'8': '8',
+	'14': '14',
+	'16': '16',
     }
 
     def before_save(self):
