@@ -15,6 +15,7 @@
   "distination_warehouse",
   "cutting_parts",
   "stock_entry_name",
+  "receipt_entry_name",
   "costs_tab",
   "section_break_vzgq",
   "workstation",
@@ -148,15 +149,21 @@
    "label": "stock_entry_name",
    "options": "Stock Entry",
    "read_only": 1
+  },
+  {
+   "fieldname": "receipt_entry_name",
+   "fieldtype": "Link",
+   "label": "receipt_entry_name",
+   "options": "Stock Entry"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-24 13:47:24.995817",
+ "modified": "2025-05-29 12:00:15.621177",
  "modified_by": "Administrator",
- "module": "Stitch Production",
+ "module": "stitch production",
  "name": "cutting operation",
  "naming_rule": "Expression",
  "owner": "Administrator",
