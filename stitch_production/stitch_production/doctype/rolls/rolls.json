@@ -21,7 +21,8 @@
   "column_break_e6se",
   "serial_number_barcode",
   "used_time",
-  "finished"
+  "finished",
+  "attache_image"
  ],
  "fields": [
   {
@@ -132,14 +133,20 @@
    "fieldname": "gsm",
    "fieldtype": "Data",
    "label": "GSM (KG)"
+  },
+  {
+   "fieldname": "attache_image",
+   "fieldtype": "Attach Image",
+   "hidden": 1,
+   "label": "Attache Image"
   }
  ],
- "grid_page_length": 50,
+ "image_field": "attache_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-05-19 11:55:09.527881",
+ "modified": "2025-06-03 10:26:50.951696",
  "modified_by": "Administrator",
- "module": "Stitch Production",
+ "module": "stitch production",
  "name": "Rolls",
  "naming_rule": "Expression (old style)",
  "owner": "Administrator",
@@ -166,7 +173,6 @@
    "share": 1
   }
  ],
- "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
