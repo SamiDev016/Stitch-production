@@ -1,21 +1,16 @@
-// Debounce timer (outside event to persist across calls)
 let debounceTimer = null;
 
-// Child-table doctype: Cutting Rolls
 frappe.ui.form.on('Cutting Rolls', {
-    // 1) When barcode is scanned into roll_barcode
     roll_barcode(frm, cdt, cdn) {
-        clearTimeout(debounceTimer);  // Clear any existing timer
+        clearTimeout(debounceTimer); 
         debounceTimer = setTimeout(() => {
             const row = locals[cdt][cdn];
             let raw = row.roll_barcode || '';
             console.log('[Cutting Rolls] raw barcode field:', raw);
 
-            // 1a) Strip any HTML tags
             let bc = raw.replace(/<[^>]*>/g, '').trim();
             console.log('[Cutting Rolls] after strip tags:', bc);
 
-            // 1b) If still empty, read the data-barcode-value attribute from rendered SVG
             if (!bc) {
                 const wrapper = frm.fields_dict.used_rolls.grid
                     .grid_rows_by_docname[cdn]
@@ -29,7 +24,6 @@ frappe.ui.form.on('Cutting Rolls', {
                 return;
             }
 
-            // 2) Lookup by serial_number_barcode
             frappe.db.get_value('Rolls',
                 { serial_number_barcode: bc },
                 ['name', 'weight', 'color']
@@ -44,16 +38,14 @@ frappe.ui.form.on('Cutting Rolls', {
                 frappe.model.set_value(cdt, cdn, 'roll', m.name);
                 frappe.model.set_value(cdt, cdn, 'used_qty', m.weight || 0);
                 frappe.model.set_value(cdt, cdn, 'color', m.color || '');
-                // Ensure the barcode field itself is normalized
                 frappe.model.set_value(cdt, cdn, 'roll_barcode', bc);
             }).catch(err => {
                 console.error('[Cutting Rolls] Error fetching Rolls:', err);
                 frappe.msgprint(__('Error looking up roll — see console.'));
             });
-        }, 300); // Debounce delay in ms
+        }, 300);
     },
 
-    // 3) When user picks a roll manually
     roll(frm, cdt, cdn) {
         const row = locals[cdt][cdn];
         console.log('[Cutting Rolls] roll selected:', row.roll);
@@ -61,7 +53,6 @@ frappe.ui.form.on('Cutting Rolls', {
             return;
         }
 
-        // Fetch weight, color, and serial_number_barcode in one call
         frappe.db.get_value('Rolls', row.roll, ['weight', 'color', 'serial_number_barcode'])
             .then(res => {
                 console.log('[Cutting Rolls] roll data:', res);
@@ -77,7 +68,6 @@ frappe.ui.form.on('Cutting Rolls', {
             .catch(err => console.error('[Cutting Rolls] roll lookup error:', err));
     },
 
-    // 4) Clamp used_qty to roll's available weight
     used_qty(frm, cdt, cdn) {
         const row = locals[cdt][cdn];
         console.log('[Cutting Rolls] used_qty changed:', row.used_qty);
@@ -101,3 +91,4 @@ frappe.ui.form.on('Cutting Rolls', {
             .catch(err => console.error('[Cutting Rolls] clamp lookup error:', err));
     }
 });
+

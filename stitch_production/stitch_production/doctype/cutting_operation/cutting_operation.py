@@ -3,29 +3,63 @@ from frappe.model.document import Document
 
 class cuttingoperation(Document):
     SIZE_MAP = {
-        'S':    'Small',
-        'M':    'Medium',
-        'L':    'Large',
-        'XL':   'Extra Large',
-        'XXL':  '2X Large',
-        '2':    '2',
-        '4':    '4',
-        '6':    '6',
-        '8':    '8',
-        '14':   '14',
-        '16':   '16',
+        'XS':     'XS',
+        'S':    'S',
+        'M':    'M',
+        'L':    'L',
+        'XL':   'XL',
+        'XXL':  'XXL',
+        'XXXL': 'XXXL',
+        '6 ans':    '6',
+        '8 ans':    '8',
+        '10 ans':   '10',
+        '12 ans':   '12',
+        '14 ans':   '14',
+        '16 ans':   '16',
     }
 
     def before_save(self):
-        # Calculate total cost components (if you still need them)
-        total_ws = total_worker = total_rolls = 0.0
+        # Calculate total cost components
+        total_ws = total_rolls = 0.0
+        total_sw = 0.0
+        total_dw = 0.0
+        total_cw = 0.0
+        total_sew = 0.0
+
+
 
         if self.workstation:
             ws = frappe.get_doc("Workstation", self.workstation)
             total_ws = ws.hour_rate * (self.total_hours or 0)
 
-        for w in self.workers or []:
-            total_worker += (w.cost_per_hour or 0) * (w.total_hours or 0)
+        for w in self.spreading_workers or []:
+            if not w.worker:
+                continue
+            emp = frappe.get_doc("Employee", w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            total_sw += rate * (w.total_hours or 0)
+
+        for w in self.drawing_workers or []:
+            if not w.worker:
+                continue
+            emp = frappe.get_doc("Employee", w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            total_dw += rate * (w.total_hours or 0)
+
+        for w in self.cutting_workers or []:
+            if not w.worker:
+                continue
+            emp = frappe.get_doc("Employee", w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            total_cw += rate * (w.total_hours or 0)
+
+        for w in self.separating_workers or []:
+            if not w.worker:
+                continue
+            emp = frappe.get_doc("Employee", w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            total_sew += rate * (w.total_hours or 0)
+
 
         for u in self.used_rolls or []:
             if u.roll:
@@ -33,50 +67,72 @@ class cuttingoperation(Document):
                 total_rolls += (u.used_qty or 0) * (rolls.price_per_kg or 0)
 
         self.used_rolls_cost = total_rolls
-        self.individual_cost = 0.0
-        self.total_cost = total_ws + total_worker + total_rolls
+        self.total_cost = total_ws + total_sw + total_dw + total_cw + total_sew + total_rolls + self.individual_cost
 
-        # Propagate roll warehouse
+    # Propagate roll warehouse
         for u in self.used_rolls or []:
             if u.roll:
                 u.roll_warehouse = frappe.db.get_value("Rolls", u.roll, "warehouse")
 
-        # Build cutting_parts
+    # Build cutting_parts
         self.set('cutting_parts', [])
-        variants = []
+
+    # Prepare map: {bom_name: [variant_names]}
+        bom_variant_map = {}
         for pb in self.parent_boms or []:
-            if not pb.parent_bom: continue
+            if not pb.parent_bom:
+                continue
+            variant_list = []
             for item in frappe.get_doc('BOM', pb.parent_bom).items or []:
                 vs = frappe.get_all('Item',
                     filters={'variant_of': item.item_code, 'disabled': 0},
                     fields=['name'])
-                variants += [v.name for v in vs]
+                variant_list += [v.name for v in vs]
+            bom_variant_map[pb.parent_bom] = variant_list
 
         parts = []
         for u in self.used_rolls or []:
             lap = u.lap or 0
             color = (u.color or '').strip()
-            if lap <= 0 or not color: continue
+            if lap <= 0 or not color:
+                continue
 
-            for sm in self.size_matrix or []:
-                raw = (sm.size or '').strip()
-                size_val = self.SIZE_MAP.get(raw, raw)
-                qty_per = sm.qty or 0
-                qty = lap * qty_per
-                if qty <= 0: continue
+        for sm in self.size_matrix or []:
+            raw = (sm.size or '').strip()
+            size_val = self.SIZE_MAP.get(raw, raw)
+            qty_per = sm.qty or 0
+            qty = lap * qty_per
+            if qty <= 0:
+                continue
 
-                for v in variants:
-                    attrs = frappe.get_all('Item Variant Attribute',
-                        filters={'parent': v},
-                        fields=['attribute', 'attribute_value'])
-                    amap = {a.attribute.strip().lower(): (a.attribute_value or '').strip()
-                            for a in attrs}
-                    if amap.get('colour') == color and amap.get('size') == str(size_val):
-                        parts.append({
-                            'variant': v,
-                            'quantity': qty,
-                            'roll_relation': u.roll
-                        })
+            bom_link = sm.bom_link
+            if not bom_link or bom_link not in bom_variant_map:
+                continue
+
+            for v in bom_variant_map[bom_link]:
+                attrs = frappe.get_all(
+                    'Item Variant Attribute',
+                    filters={'parent': v},
+                    fields=['attribute', 'attribute_value']
+                )
+
+                amap = {
+                    a.attribute.strip().lower(): (a.attribute_value or '').strip()
+                    for a in attrs
+                }
+
+                # Handle both 'color' and 'colour'
+                color_value = (
+                    amap.get('color') or
+                    amap.get('colour')
+                )
+
+                if color_value == color and amap.get('size') == str(size_val):
+                    parts.append({
+                        'variant': v,
+                        'quantity': qty,
+                        'roll_relation': u.roll
+                    })
 
         for p in parts:
             cp = self.append('cutting_parts', {})
