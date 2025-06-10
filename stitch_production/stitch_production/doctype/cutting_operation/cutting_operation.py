@@ -17,7 +17,6 @@ class cuttingoperation(Document):
         '14 ans':   '14',
         '16 ans':   '16',
     }
-
     def before_save(self):
         # Calculate total cost components
         total_ws = total_rolls = 0.0
@@ -131,7 +130,8 @@ class cuttingoperation(Document):
                     parts.append({
                         'variant': v,
                         'quantity': qty,
-                        'roll_relation': u.roll
+                        'roll_relation': u.roll,
+                        'parent_bom': bom_link
                     })
 
         for p in parts:
@@ -140,6 +140,7 @@ class cuttingoperation(Document):
             cp.quantity       = p['quantity']
             cp.warehouse      = self.distination_warehouse
             cp.roll_relation  = p['roll_relation']
+            cp.parent_bom     = p['parent_bom']
 
     def on_submit(self):
         if not self.used_rolls:
@@ -168,48 +169,87 @@ class cuttingoperation(Document):
             issue.submit()
             self.db_set("stock_entry_name", issue.name)
 
-            # adjust roll weight & log used_time
-            for u in self.used_rolls:
-                if not u.roll: continue
-                r = frappe.get_doc("Rolls", u.roll)
-                used = u.used_qty or 0
-                r.weight = (r.weight or 0) - used
-                ute = r.append("used_time", {})
-                ute.operation    = self.name
-                ute.weight_used  = used
-                r.save()
+        # adjust roll weight & log used_time
+        for u in self.used_rolls:
+            if not u.roll:
+                continue
+            r = frappe.get_doc("Rolls", u.roll)
+            used = u.used_qty or 0
+            r.weight = (r.weight or 0) - used
+            ute = r.append("used_time", {})
+            ute.operation = self.name
+            ute.weight_used = used
+            r.save()
 
-        # 2) Material Receipt for cut parts into batches
+        # 2) Create custom Parts Batch per operation, BOM, and roll
+        parts_batches = {}
+        frappe.msgprint(f"Processing {len(self.cutting_parts)} cutting parts")
+
+        for cp in self.cutting_parts:
+            if not cp.part or (cp.quantity or 0) <= 0:
+                frappe.msgprint(f"Skipping part - Missing Item or Quantity: {cp.part or 'No Item'}, Qty: {cp.quantity}")
+                continue
+
+            # ensure each cutting part has parent_bom set
+            bom = cp.parent_bom
+            roll = cp.roll_relation
+            if not bom or not roll:
+                frappe.msgprint(f"BOM/Roll missing for Part: {cp.part} | BOM: {bom}, Roll: {roll}")
+                continue
+
+            # grouping key: (operation, BOM, roll)
+            key = (self.name, bom, roll)
+
+            if key not in parts_batches:
+                batch_name = f"{bom}-{roll}-{self.name}"
+                # create Parts Batch if not exists
+                
+                aa = frappe.get_doc({
+                    "doctype": "Parts Batch",
+                    "batch_name": batch_name
+                })  
+                aa.insert()
+                frappe.msgprint(f"Created new Parts Batch: {batch_name}")
+                
+                parts_batches[key] = aa
+
+            frappe.msgprint(f"Parts batch: {parts_batches[key].name}")
+            # append to the custom Parts Batch child table
+            pb = parts_batches[key]
+            frappe.msgprint(f"Adding Part {cp.part} (Qty: {cp.quantity}) to Batch {pb.name}")
+            pb.append("parts", {
+                "part": cp.part,
+                "qty": cp.quantity
+            })
+            pb.save()
+
+        # 3) Material Receipt (one entry) for all cut parts
         receipt = frappe.new_doc("Stock Entry")
         receipt.purpose = receipt.stock_entry_type = "Material Receipt"
         receipt.company = company
+        items_count = 0  # Counter for debug
 
         for cp in self.cutting_parts:
             if not cp.part or (cp.quantity or 0) <= 0:
                 continue
-
-            # generate or fetch batch
-            batch_id = f"{cp.roll_relation}-{self.name}-{cp.part}"
-            if not frappe.db.exists("Batch", batch_id):
-                frappe.get_doc({
-                    "doctype": "Batch",
-                    "batch_id": batch_id,
-                    "item": cp.part,
-                    "batch_qty": cp.quantity
-                }).insert()
-
+                
+            items_count += 1  # Increment counter
             receipt.append("items", {
                 "item_code": cp.part,
-                "batch_no": batch_id,
                 "qty": cp.quantity,
                 "uom": frappe.db.get_value("Item", cp.part, "stock_uom"),
-                "t_warehouse": cp.warehouse
+                "t_warehouse": cp.warehouse,
+                "allow_zero_valuation_rate": 1
             })
 
         if receipt.items:
+            frappe.msgprint(f"Creating Material Receipt with {items_count} items")
             receipt.insert()
             receipt.submit()
+            frappe.msgprint(f"Material Receipt created: {receipt.name}")
             self.db_set("receipt_entry_name", receipt.name)
+        else:
+            frappe.msgprint("No valid items found for Material Receipt")
 
     def on_cancel(self):
         # 1) Cancel stock entries
