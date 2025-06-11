@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "field:batch_name",
  "creation": "2025-06-10 10:28:01.898261",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -28,7 +29,8 @@
   {
    "fieldname": "batch_name",
    "fieldtype": "Data",
-   "label": "Name"
+   "label": "Name",
+   "unique": 1
   },
   {
    "fieldname": "parts",
@@ -38,11 +40,13 @@
   }
  ],
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-06-10 12:52:54.505726",
+ "modified": "2025-06-11 12:08:42.989351",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parts Batch",
+ "naming_rule": "By fieldname",
  "owner": "Administrator",
  "permissions": [
   {
