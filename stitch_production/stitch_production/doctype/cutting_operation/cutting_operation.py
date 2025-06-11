@@ -18,19 +18,15 @@ class cuttingoperation(Document):
         '16 ans':   '16',
     }
     def before_save(self):
-        # Calculate total cost components
         total_ws = total_rolls = 0.0
-        total_sw = 0.0
-        total_dw = 0.0
-        total_cw = 0.0
-        total_sew = 0.0
+        total_sw = total_dw = total_cw = total_sew = 0.0
 
-
-
+        # Calculate workstation cost
         if self.workstation:
             ws = frappe.get_doc("Workstation", self.workstation)
             total_ws = ws.hour_rate * (self.total_hours or 0)
 
+        # Spreaders
         for w in self.spreading_workers or []:
             if not w.worker:
                 continue
@@ -38,6 +34,7 @@ class cuttingoperation(Document):
             rate = (emp.ctc or 0) / 22 / 8
             total_sw += rate * (w.total_hours or 0)
 
+        # Drawers
         for w in self.drawing_workers or []:
             if not w.worker:
                 continue
@@ -45,6 +42,7 @@ class cuttingoperation(Document):
             rate = (emp.ctc or 0) / 22 / 8
             total_dw += rate * (w.total_hours or 0)
 
+        # Cutters
         for w in self.cutting_workers or []:
             if not w.worker:
                 continue
@@ -52,6 +50,7 @@ class cuttingoperation(Document):
             rate = (emp.ctc or 0) / 22 / 8
             total_cw += rate * (w.total_hours or 0)
 
+        # Separators
         for w in self.separating_workers or []:
             if not w.worker:
                 continue
@@ -59,88 +58,98 @@ class cuttingoperation(Document):
             rate = (emp.ctc or 0) / 22 / 8
             total_sew += rate * (w.total_hours or 0)
 
-
+        # Rolls cost
         for u in self.used_rolls or []:
             if u.roll:
                 rolls = frappe.get_doc("Rolls", u.roll)
                 total_rolls += (u.used_qty or 0) * (rolls.price_per_kg or 0)
 
         self.used_rolls_cost = total_rolls
-        self.total_cost = total_ws + total_sw + total_dw + total_cw + total_sew + total_rolls + self.individual_cost
+        self.total_cost = (total_ws + total_sw + total_dw +
+                           total_cw + total_sew + total_rolls +
+                           (self.individual_cost or 0))
 
-    # Propagate roll warehouse
+        # Update roll warehouses
         for u in self.used_rolls or []:
             if u.roll:
-                u.roll_warehouse = frappe.db.get_value("Rolls", u.roll, "warehouse")
+                u.roll_warehouse = frappe.db.get_value(
+                    "Rolls", u.roll, "warehouse")
 
-    # Build cutting_parts
+        # Clear existing parts
         self.set('cutting_parts', [])
 
-    # Prepare map: {bom_name: [variant_names]}
+        # Build map of BOM variants
         bom_variant_map = {}
         for pb in self.parent_boms or []:
             if not pb.parent_bom:
                 continue
-            variant_list = []
-            for item in frappe.get_doc('BOM', pb.parent_bom).items or []:
+            bom_doc = frappe.get_doc('BOM', pb.parent_bom)
+            variants = []
+            for item in bom_doc.items or []:
                 vs = frappe.get_all('Item',
                     filters={'variant_of': item.item_code, 'disabled': 0},
                     fields=['name'])
-                variant_list += [v.name for v in vs]
-            bom_variant_map[pb.parent_bom] = variant_list
+                variants += [v.name for v in vs]
+            bom_variant_map[pb.parent_bom] = variants
 
-        parts = []
+        # Generate parts for each roll
         for u in self.used_rolls or []:
             lap = u.lap or 0
             color = (u.color or '').strip()
             if lap <= 0 or not color:
                 continue
 
-        for sm in self.size_matrix or []:
-            raw = (sm.size or '').strip()
-            size_val = self.SIZE_MAP.get(raw, raw)
-            qty_per = sm.qty or 0
-            qty = lap * qty_per
-            if qty <= 0:
+            for sm in self.size_matrix or []:
+                raw = (sm.size or '').strip()
+                size_val = self.SIZE_MAP.get(raw, raw)
+                qty_per = sm.qty or 0
+                total_qty = lap * qty_per
+                if total_qty <= 0:
+                    continue
+
+                bom_link = sm.bom_link
+                if not bom_link or bom_link not in bom_variant_map:
+                    continue
+
+                for variant_code in bom_variant_map[bom_link]:
+                    attrs = frappe.get_all(
+                        'Item Variant Attribute',
+                        filters={'parent': variant_code},
+                        fields=['attribute', 'attribute_value']
+                    )
+                    attr_map = {
+                        a.attribute.strip().lower(): (a.attribute_value or '').strip()
+                        for a in attrs
+                    }
+                    color_val = (attr_map.get('color') or
+                                 attr_map.get('colour'))
+                    size_attr = attr_map.get('size')
+
+                    if color_val == color and size_attr == str(size_val):
+                        cp = self.append('cutting_parts', {})
+                        cp.part = variant_code
+                        cp.quantity = total_qty
+                        cp.warehouse = self.distination_warehouse
+                        cp.roll_relation = u.roll
+                        cp.parent_bom = bom_link
+
+        # Distribute each roll’s cost across its parts
+        for u in self.used_rolls or []:
+            if not u.roll:
                 continue
+            used_qty = u.used_qty or 0
+            rate = frappe.get_doc("Rolls", u.roll).price_per_kg or 0
+            total_roll_cost = used_qty * rate
 
-            bom_link = sm.bom_link
-            if not bom_link or bom_link not in bom_variant_map:
-                continue
+            parts_for_roll = [cp for cp in (self.cutting_parts or [])
+                              if cp.roll_relation == u.roll]
+            total_parts_qty = sum(cp.quantity for cp in parts_for_roll) or 1
+            for cp in parts_for_roll:
+                cp.part_cost = total_roll_cost / total_parts_qty
 
-            for v in bom_variant_map[bom_link]:
-                attrs = frappe.get_all(
-                    'Item Variant Attribute',
-                    filters={'parent': v},
-                    fields=['attribute', 'attribute_value']
-                )
 
-                amap = {
-                    a.attribute.strip().lower(): (a.attribute_value or '').strip()
-                    for a in attrs
-                }
 
-                # Handle both 'color' and 'colour'
-                color_value = (
-                    amap.get('color') or
-                    amap.get('colour')
-                )
 
-                if color_value == color and amap.get('size') == str(size_val):
-                    parts.append({
-                        'variant': v,
-                        'quantity': qty,
-                        'roll_relation': u.roll,
-                        'parent_bom': bom_link
-                    })
-
-        for p in parts:
-            cp = self.append('cutting_parts', {})
-            cp.part           = p['variant']
-            cp.quantity       = p['quantity']
-            cp.warehouse      = self.distination_warehouse
-            cp.roll_relation  = p['roll_relation']
-            cp.parent_bom     = p['parent_bom']
 
     def on_submit(self):
         if not self.used_rolls:
