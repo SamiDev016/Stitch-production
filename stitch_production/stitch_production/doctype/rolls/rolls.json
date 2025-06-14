@@ -115,7 +115,7 @@
    "fieldname": "turbolantouvert",
    "fieldtype": "Select",
    "label": "Turbolant/Ouvert",
-   "options": "Turbolant\nOuvert"
+   "options": "Tubulaire\nOuvert"
   },
   {
    "fieldname": "status",
@@ -144,7 +144,7 @@
  "image_field": "attache_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-03 10:26:50.951696",
+ "modified": "2025-06-12 12:55:40.005750",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Rolls",

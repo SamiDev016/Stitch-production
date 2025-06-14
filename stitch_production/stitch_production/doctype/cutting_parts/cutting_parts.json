@@ -11,7 +11,8 @@
   "warehouse",
   "roll_relation",
   "batch_number",
-  "parent_bom"
+  "parent_bom",
+  "size_link"
  ],
  "fields": [
   {
@@ -51,12 +52,17 @@
    "label": "parent_bom",
    "options": "BOM",
    "read_only": 1
+  },
+  {
+   "fieldname": "size_link",
+   "fieldtype": "Data",
+   "label": "size"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-10 13:18:31.718043",
+ "modified": "2025-06-14 18:04:24.462130",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Cutting Parts",

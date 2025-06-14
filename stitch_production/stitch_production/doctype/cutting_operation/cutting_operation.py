@@ -1,5 +1,6 @@
 import frappe
 from frappe.model.document import Document
+from frappe.utils import generate_hash
 
 class cuttingoperation(Document):
     SIZE_MAP = {
@@ -132,6 +133,7 @@ class cuttingoperation(Document):
                         cp.warehouse = self.distination_warehouse
                         cp.roll_relation = u.roll
                         cp.parent_bom = bom_link
+                        cp.size_link = size_val
 
         # Distribute each roll’s cost across its parts
         for u in self.used_rolls or []:
@@ -191,41 +193,49 @@ class cuttingoperation(Document):
             ute.weight_used = used
             r.save()
 
-        # 2) Create custom Parts Batch per operation, BOM, and roll
+        # 2) Create or reuse Parts Batch per operation, BOM, roll, and size
         parts_batches = {}
 
-        # First pass: insert and collect parts
+        # First pass: create (or fetch) batch and append parts
         for cp in self.cutting_parts:
             if not cp.part or (cp.quantity or 0) <= 0:
                 continue
 
-            bom = cp.parent_bom
-            roll = cp.roll_relation
-            key = (self.name, bom, roll)
+            bom   = cp.parent_bom
+            roll  = cp.roll_relation
+            size  = cp.size_link
+            key   = (self.name, bom, roll, size)
+            bname = f"{bom}-{roll}-{size}-{self.name}"
 
             if key not in parts_batches:
-                batch_name = f"{bom}-{roll}-{self.name}"
-                batch = frappe.get_doc({
-                    "doctype": "Parts Batch",
-                    "batch_name": batch_name
-                })
+                # check for an existing Parts Batch with this batch_name
+                existing_name = frappe.db.get_value("Parts Batch",
+                                                    {"batch_name": bname},
+                                                    "name")
+                if existing_name:
+                    batch = frappe.get_doc("Parts Batch", existing_name)
+                else:
+                    batch = frappe.get_doc({
+                        "doctype": "Parts Batch",
+                        "batch_name": bname
+                    })
                 batch.insert()
-                parts_batches[key] = batch
 
-            # append each part before any submission
-            parts_batches[key].append("parts", {
-                "part": cp.part,
-                "qty": cp.quantity
-            })
+            parts_batches[key] = batch
 
-        # Save all batches (so that the child additions are persisted)
+        # append each part before any submission
+        parts_batches[key].append("parts", {
+            "part": cp.part,
+            "qty": cp.quantity
+        })
+
         for batch in parts_batches.values():
             batch.save()
 
-        # Second pass: submit them now that all child rows are in place
         for batch in parts_batches.values():
+            barcode_value = generate_hash(batch.batch_name, 12)
+            batch.db_set("serial_number_barcode", barcode_value)
             batch.submit()
-    
 
         # 3) Material Receipt for all cut parts
         receipt = frappe.new_doc("Stock Entry")
@@ -249,7 +259,7 @@ class cuttingoperation(Document):
             self.db_set("receipt_entry_name", receipt.name)
 
 
-        # 4) Submit parts batch
+        
         
     def on_cancel(self):
         # 1) Cancel stock entries

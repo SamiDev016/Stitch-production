@@ -58,8 +58,8 @@
   {
    "fieldname": "turbolantouvert",
    "fieldtype": "Select",
-   "label": "turbolantouvert",
-   "options": "Turbolant\nOuvert"
+   "label": "tubulaire/ouvert",
+   "options": "Tubulaire\nOuvert"
   },
   {
    "fieldname": "gsm",
@@ -67,17 +67,15 @@
    "label": "GSM"
   }
  ],
- "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-19 12:10:31.829447",
+ "modified": "2025-06-12 12:55:23.089294",
  "modified_by": "Administrator",
- "module": "Stitch Production",
+ "module": "stitch production",
  "name": "Rolls Receipt",
  "owner": "Administrator",
  "permissions": [],
- "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

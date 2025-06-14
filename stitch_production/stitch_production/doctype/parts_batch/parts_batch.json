@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_x2si",
+  "serial_number_barcode",
   "amended_from",
   "batch_name",
   "parts"
@@ -37,12 +38,18 @@
    "fieldtype": "Table",
    "label": "Parts",
    "options": "Parts"
+  },
+  {
+   "fieldname": "serial_number_barcode",
+   "fieldtype": "Barcode",
+   "label": "Serial Number Barcode",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-11 12:08:42.989351",
+ "modified": "2025-06-14 18:21:45.235947",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parts Batch",
