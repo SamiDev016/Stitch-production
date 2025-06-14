@@ -22,7 +22,14 @@
   "column_break_uxwc",
   "total_hours",
   "section_break_yhka",
-  "workers",
+  "column_break_iczb",
+  "spreading_workers",
+  "column_break_gsnk",
+  "drawing_workers",
+  "cutting_separating_workers_section",
+  "cutting_workers",
+  "column_break_nadi",
+  "separating_workers",
   "section_break_iyys",
   "used_rolls_cost",
   "individual_cost",
@@ -128,13 +135,7 @@
   {
    "fieldname": "section_break_yhka",
    "fieldtype": "Section Break",
-   "label": "Workers COST"
-  },
-  {
-   "fieldname": "workers",
-   "fieldtype": "Table",
-   "label": "Workers",
-   "options": "Worker Cost"
+   "label": "Spreading/Drawing Workers"
   },
   {
    "fieldname": "used_rolls_cost",
@@ -155,13 +156,53 @@
    "fieldtype": "Link",
    "label": "receipt_entry_name",
    "options": "Stock Entry"
+  },
+  {
+   "fieldname": "column_break_iczb",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "column_break_gsnk",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "drawing_workers",
+   "fieldtype": "Table",
+   "label": "Drawing workers",
+   "options": "Drawing Workers"
+  },
+  {
+   "fieldname": "cutting_separating_workers_section",
+   "fieldtype": "Section Break",
+   "label": "Cutting /Separating Workers"
+  },
+  {
+   "fieldname": "cutting_workers",
+   "fieldtype": "Table",
+   "label": "Cutting Workers",
+   "options": "Cutting Workers"
+  },
+  {
+   "fieldname": "column_break_nadi",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "separating_workers",
+   "fieldtype": "Table",
+   "label": "Separating Workers",
+   "options": "Separating Workers"
+  },
+  {
+   "fieldname": "spreading_workers",
+   "fieldtype": "Table",
+   "label": "Spreading workers",
+   "options": "Spreading Workers"
   }
  ],
- "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-29 12:00:15.621177",
+ "modified": "2025-06-14 15:54:31.627209",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",
@@ -182,7 +223,6 @@
    "write": 1
   }
  ],
- "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
