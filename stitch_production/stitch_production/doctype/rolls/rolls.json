@@ -22,7 +22,8 @@
   "serial_number_barcode",
   "used_time",
   "finished",
-  "attache_image"
+  "attache_image",
+  "purchase_receipt_link"
  ],
  "fields": [
   {
@@ -139,12 +140,19 @@
    "fieldtype": "Attach Image",
    "hidden": 1,
    "label": "Attache Image"
+  },
+  {
+   "fieldname": "purchase_receipt_link",
+   "fieldtype": "Link",
+   "label": "PURCHASE RECEIPT LINK",
+   "options": "Purchase Receipt",
+   "read_only": 1
   }
  ],
  "image_field": "attache_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-06-12 12:55:40.005750",
+ "modified": "2025-06-14 19:23:50.337923",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Rolls",

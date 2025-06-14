@@ -13,7 +13,8 @@
   "rolls_details",
   "longeur",
   "turbolantouvert",
-  "gsm"
+  "gsm",
+  "roll_link"
  ],
  "fields": [
   {
@@ -65,12 +66,18 @@
    "fieldname": "gsm",
    "fieldtype": "Data",
    "label": "GSM"
+  },
+  {
+   "fieldname": "roll_link",
+   "fieldtype": "Link",
+   "label": "ROLL LINK",
+   "options": "Rolls"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-12 12:55:23.089294",
+ "modified": "2025-06-14 19:17:19.077877",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Rolls Receipt",

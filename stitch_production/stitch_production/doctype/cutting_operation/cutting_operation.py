@@ -235,6 +235,7 @@ class cuttingoperation(Document):
         for batch in parts_batches.values():
             barcode_value = generate_hash(batch.batch_name, 12)
             batch.db_set("serial_number_barcode", barcode_value)
+            batch.source_operation = self.name
             batch.submit()
 
         # 3) Material Receipt for all cut parts
@@ -260,7 +261,9 @@ class cuttingoperation(Document):
 
 
         
-        
+    def before_cancel(self):
+        # Skip linked document validation so we can cancel children first
+        frappe.flags.ignore_linked_with = True
     def on_cancel(self):
         # 1) Cancel stock entries
         for field in ("stock_entry_name", "receipt_entry_name"):
@@ -292,7 +295,8 @@ class cuttingoperation(Document):
         for b in batches:
             try:
                 pb = frappe.get_doc("Parts Batch", b.name)
-                pb.cancel()
+                pb.cancel(ignore_permissions=True)
             except Exception:
                 frappe.log_error(f"Failed to cancel Parts Batch {b.name}")
+
 

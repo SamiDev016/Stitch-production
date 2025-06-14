@@ -6,10 +6,10 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "finish_good_name",
+  "parent_bom",
   "boms",
   "amended_from",
-  "color"
+  "raw_materials"
  ],
  "fields": [
   {
@@ -17,12 +17,6 @@
    "fieldtype": "Table",
    "label": "BOMs",
    "options": "BOMs fields"
-  },
-  {
-   "fieldname": "finish_good_name",
-   "fieldtype": "Data",
-   "label": "Finish Good Name + Color",
-   "unique": 1
   },
   {
    "fieldname": "amended_from",
@@ -35,19 +29,26 @@
    "search_index": 1
   },
   {
-   "fieldname": "color",
-   "fieldtype": "Data",
-   "label": "Color",
+   "fieldname": "parent_bom",
+   "fieldtype": "Link",
+   "label": "Parent BOM",
+   "options": "BOM",
+   "unique": 1
+  },
+  {
+   "fieldname": "raw_materials",
+   "fieldtype": "Table",
+   "label": "Raw Materials",
+   "options": "Parent Bom Parts",
    "read_only": 1
   }
  ],
- "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-15 13:51:39.035103",
+ "modified": "2025-06-14 23:53:22.248031",
  "modified_by": "Administrator",
- "module": "Stitch Production",
+ "module": "stitch production",
  "name": "Parent BOM",
  "naming_rule": "Expression",
  "owner": "Administrator",
@@ -65,7 +66,6 @@
    "write": 1
   }
  ],
- "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

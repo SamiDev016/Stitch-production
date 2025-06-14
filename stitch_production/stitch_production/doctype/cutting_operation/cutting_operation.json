@@ -68,6 +68,7 @@
    "label": "TOTAL COST"
   },
   {
+   "default": "0.0",
    "fieldname": "individual_cost",
    "fieldtype": "Float",
    "label": "Individual Cost"
@@ -128,6 +129,7 @@
    "fieldtype": "Column Break"
   },
   {
+   "default": "0.0",
    "fieldname": "total_hours",
    "fieldtype": "Float",
    "label": "Total Hours"
@@ -202,7 +204,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-14 15:54:31.627209",
+ "modified": "2025-06-14 23:32:33.456455",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",

@@ -10,7 +10,8 @@
   "serial_number_barcode",
   "amended_from",
   "batch_name",
-  "parts"
+  "parts",
+  "source_operation"
  ],
  "fields": [
   {
@@ -44,12 +45,19 @@
    "fieldtype": "Barcode",
    "label": "Serial Number Barcode",
    "read_only": 1
+  },
+  {
+   "fieldname": "source_operation",
+   "fieldtype": "Link",
+   "label": "Source Operation",
+   "options": "cutting operation",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-14 18:21:45.235947",
+ "modified": "2025-06-14 23:37:40.254345",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parts Batch",
@@ -57,6 +65,7 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -66,6 +75,7 @@
    "report": 1,
    "role": "System Manager",
    "share": 1,
+   "submit": 1,
    "write": 1
   }
  ],
