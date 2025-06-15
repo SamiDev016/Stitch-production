@@ -11,12 +11,12 @@ class cuttingoperation(Document):
         'XL':   'XL',
         'XXL':  'XXL',
         'XXXL': 'XXXL',
-        '6 ans':    '6',
-        '8 ans':    '8',
-        '10 ans':   '10',
-        '12 ans':   '12',
-        '14 ans':   '14',
-        '16 ans':   '16',
+        '6':    '6 ans',
+        '8':    '8 ans',
+        '10':   '10 ans',
+        '12':   '12 ans',
+        '14':   '14 ans',
+        '16':   '16 ans',
     }
     def before_save(self):
         total_ws = total_rolls = 0.0
@@ -125,6 +125,7 @@ class cuttingoperation(Document):
                     color_val = (attr_map.get('color') or
                                  attr_map.get('colour'))
                     size_attr = attr_map.get('size')
+                    frappe.msgprint(f"size_attr: {size_attr}, size_val: {size_val}")
 
                     if color_val == color and size_attr == str(size_val):
                         cp = self.append('cutting_parts', {})
@@ -196,7 +197,6 @@ class cuttingoperation(Document):
         # 2) Create or reuse Parts Batch per operation, BOM, roll, and size
         parts_batches = {}
 
-        # First pass: create (or fetch) batch and append parts
         for cp in self.cutting_parts:
             if not cp.part or (cp.quantity or 0) <= 0:
                 continue
@@ -207,28 +207,29 @@ class cuttingoperation(Document):
             key   = (self.name, bom, roll, size)
             bname = f"{bom}-{roll}-{size}-{self.name}"
 
+            # Create or fetch existing batch
             if key not in parts_batches:
-                # check for an existing Parts Batch with this batch_name
-                existing_name = frappe.db.get_value("Parts Batch",
-                                                    {"batch_name": bname},
-                                                    "name")
+                existing_name = frappe.db.get_value(
+                    "Parts Batch",
+                    {"batch_name": bname},
+                    "name"
+                )
                 if existing_name:
                     batch = frappe.get_doc("Parts Batch", existing_name)
                 else:
-                    batch = frappe.get_doc({
-                        "doctype": "Parts Batch",
-                        "batch_name": bname
-                    })
-                batch.insert()
+                    batch = frappe.new_doc("Parts Batch")
+                    batch.batch_name = bname
+                    batch.insert()
 
-            parts_batches[key] = batch
+                parts_batches[key] = batch
 
-        # append each part before any submission
-        parts_batches[key].append("parts", {
-            "part": cp.part,
-            "qty": cp.quantity
-        })
+            # Append this part to its batch (restored missing line)
+            parts_batches[key].append("parts", {
+                "part": cp.part,
+                "qty": cp.quantity
+            })
 
+        # Persist and submit all batches
         for batch in parts_batches.values():
             batch.save()
 
@@ -258,9 +259,7 @@ class cuttingoperation(Document):
             receipt.insert()
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
-
-
-        
+ 
     def before_cancel(self):
         # Skip linked document validation so we can cancel children first
         frappe.flags.ignore_linked_with = True

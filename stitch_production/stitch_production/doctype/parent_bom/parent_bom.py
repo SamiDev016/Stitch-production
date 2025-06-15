@@ -1,38 +1,50 @@
-from frappe.model.document import Document
 import frappe
-from frappe import _
+from frappe.model.document import Document
 
 class ParentBOM(Document):
-    def on_submit(self):
-        colors = set()
+    def before_save(self):
+        raw_map = {}
 
-        for row in self.boms:
+        for row in self.boms or []:
             if not row.bom:
                 continue
 
-            # Get the linked BOM
             bom_doc = frappe.get_doc("BOM", row.bom)
+            for item in bom_doc.items or []:
+                template = item.item_code
+                quantity = item.qty or 0
+                if not template or quantity <= 0:
+                    continue
 
-            # Get the finished good item (this is a variant)
-            item_code = bom_doc.item
-            if not item_code:
-                frappe.throw(_("BOM {0} does not have a finished good item.").format(row.bom))
+                variants = frappe.get_all(
+                    "Item",
+                    filters={"variant_of": template, "disabled": 0},
+                    fields=["name"]
+                )
+                for v in variants:
+                    part_name = v.name
+                    raw_map[part_name] = raw_map.get(part_name, 0) + quantity
 
-            # Fetch the 'Colour' attribute from Item Variant Attribute
-            item_color = frappe.db.get_value(
-                "Item Variant Attribute",
-                {"parent": item_code, "attribute": "Colour"},
-                "attribute_value"
+        parent_bom_doc = frappe.get_doc("BOM", self.parent_bom)
+        for raw in parent_bom_doc.items or []:
+            if not raw.item_code:
+                continue
+            template_p = raw.item_code
+            quantity_p = raw.qty or 0
+            if not template_p or quantity_p <= 0:
+                continue
+            variants_p = frappe.get_all(
+                "Item",
+                filters={"variant_of" : template_p, "disabled" : 0},
+                fields=["name"]
             )
+            for v in variants_p:
+                part_name_p = v.name
+                raw_map[part_name_p] = raw_map.get(part_name_p, 0) + quantity_p
+    
+        self.set("raw_materials", [])
+        for part, qty in raw_map.items():
+            row = self.append("raw_materials", {})
+            row.part = part
+            row.qty = qty
 
-            if not item_color:
-                frappe.throw(_("Item {0} (from BOM {1}) does not have a Colour attribute.").format(item_code, row.bom))
-
-            colors.add(item_color)
-
-        if len(colors) > 1:
-            frappe.throw(_("All BOMs must have the same 'Colour' for their finished goods."))
-
-        # All colors are the same, assign it to the Parent BOM
-        if colors:
-            self.color = list(colors)[0]

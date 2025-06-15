@@ -1,11 +1,12 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "format:{finish_good_name}",
+ "autoname": "unique_name",
  "creation": "2025-05-15 13:26:10.121360",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "unique_name",
   "parent_bom",
   "boms",
   "amended_from",
@@ -32,8 +33,7 @@
    "fieldname": "parent_bom",
    "fieldtype": "Link",
    "label": "Parent BOM",
-   "options": "BOM",
-   "unique": 1
+   "options": "BOM"
   },
   {
    "fieldname": "raw_materials",
@@ -41,16 +41,22 @@
    "label": "Raw Materials",
    "options": "Parent Bom Parts",
    "read_only": 1
+  },
+  {
+   "fieldname": "unique_name",
+   "fieldtype": "Data",
+   "label": "Unique NAME",
+   "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-14 23:53:22.248031",
+ "modified": "2025-06-15 00:27:22.901502",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parent BOM",
- "naming_rule": "Expression",
+ "naming_rule": "Expression (old style)",
  "owner": "Administrator",
  "permissions": [
   {
