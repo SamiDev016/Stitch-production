@@ -3,6 +3,20 @@ from frappe.model.document import Document
 
 class ParentBOM(Document):
     def before_save(self):
+        pf_color = frappe.db.get_value(
+            "Item Variant Attribute",
+            {"parent": self.produit_finis, "attribute": "Colour"},
+            "attribute_value"
+        )
+        pf_size = frappe.db.get_value(
+            "Item Variant Attribute",
+            {"parent": self.produit_finis, "attribute": "Size"},
+            "attribute_value"
+        )
+
+        if not pf_color or not pf_size:
+            frappe.throw("Produit finis doit avoir à la fois COULEUR et TAILLE")
+
         raw_map = {}
 
         for row in self.boms or []:
@@ -12,8 +26,8 @@ class ParentBOM(Document):
             bom_doc = frappe.get_doc("BOM", row.bom)
             for item in bom_doc.items or []:
                 template = item.item_code
-                quantity = item.qty or 0
-                if not template or quantity <= 0:
+                qty_per_unit = item.qty or 0
+                if not template or qty_per_unit <= 0:
                     continue
 
                 variants = frappe.get_all(
@@ -21,30 +35,24 @@ class ParentBOM(Document):
                     filters={"variant_of": template, "disabled": 0},
                     fields=["name"]
                 )
+
                 for v in variants:
-                    part_name = v.name
-                    raw_map[part_name] = raw_map.get(part_name, 0) + quantity
+                    v_color = frappe.db.get_value(
+                        "Item Variant Attribute",
+                        {"parent": v.name, "attribute": "Colour"},
+                        "attribute_value"
+                    )
+                    v_size = frappe.db.get_value(
+                        "Item Variant Attribute",
+                        {"parent": v.name, "attribute": "Size"},
+                        "attribute_value"
+                    )
 
-        parent_bom_doc = frappe.get_doc("BOM", self.parent_bom)
-        for raw in parent_bom_doc.items or []:
-            if not raw.item_code:
-                continue
-            template_p = raw.item_code
-            quantity_p = raw.qty or 0
-            if not template_p or quantity_p <= 0:
-                continue
-            variants_p = frappe.get_all(
-                "Item",
-                filters={"variant_of" : template_p, "disabled" : 0},
-                fields=["name"]
-            )
-            for v in variants_p:
-                part_name_p = v.name
-                raw_map[part_name_p] = raw_map.get(part_name_p, 0) + quantity_p
-    
+                    if v_color == pf_color and v_size == pf_size:
+                        raw_map[v.name] = raw_map.get(v.name, 0) + qty_per_unit
+
         self.set("raw_materials", [])
-        for part, qty in raw_map.items():
+        for part_name, total_qty in raw_map.items():
             row = self.append("raw_materials", {})
-            row.part = part
-            row.qty = qty
-
+            row.part = part_name
+            row.qty = total_qty

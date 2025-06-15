@@ -1,13 +1,12 @@
 {
  "actions": [],
  "allow_rename": 1,
- "autoname": "unique_name",
+ "autoname": "format:{produit_finis}-{####}",
  "creation": "2025-05-15 13:26:10.121360",
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
-  "unique_name",
-  "parent_bom",
+  "produit_finis",
   "boms",
   "amended_from",
   "raw_materials"
@@ -30,12 +29,6 @@
    "search_index": 1
   },
   {
-   "fieldname": "parent_bom",
-   "fieldtype": "Link",
-   "label": "Parent BOM",
-   "options": "BOM"
-  },
-  {
    "fieldname": "raw_materials",
    "fieldtype": "Table",
    "label": "Raw Materials",
@@ -43,20 +36,21 @@
    "read_only": 1
   },
   {
-   "fieldname": "unique_name",
-   "fieldtype": "Data",
-   "label": "Unique NAME",
+   "fieldname": "produit_finis",
+   "fieldtype": "Link",
+   "label": "Produit finis",
+   "options": "Item",
    "unique": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-15 00:27:22.901502",
+ "modified": "2025-06-15 13:40:39.255936",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parent BOM",
- "naming_rule": "Expression (old style)",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
