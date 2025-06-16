@@ -11,7 +11,8 @@
   "amended_from",
   "batch_name",
   "parts",
-  "source_operation"
+  "source_operation",
+  "source_bom"
  ],
  "fields": [
   {
@@ -52,12 +53,19 @@
    "label": "Source Operation",
    "options": "cutting operation",
    "read_only": 1
+  },
+  {
+   "fieldname": "source_bom",
+   "fieldtype": "Link",
+   "label": "Source BOM",
+   "options": "BOM",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-14 23:37:40.254345",
+ "modified": "2025-06-16 10:49:05.005458",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parts Batch",

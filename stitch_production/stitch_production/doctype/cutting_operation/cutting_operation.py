@@ -67,8 +67,8 @@ class cuttingoperation(Document):
 
         self.used_rolls_cost = total_rolls
         self.total_cost = (total_ws + total_sw + total_dw +
-                           total_cw + total_sew + total_rolls +
-                           (self.individual_cost or 0))
+                        total_cw + total_sew + total_rolls +
+                        (self.individual_cost or 0))
 
         # Update roll warehouses
         for u in self.used_rolls or []:
@@ -79,19 +79,23 @@ class cuttingoperation(Document):
         # Clear existing parts
         self.set('cutting_parts', [])
 
-        # Build map of BOM variants
+        # Build map of BOM variants with qty per variant
         bom_variant_map = {}
         for pb in self.parent_boms or []:
             if not pb.parent_bom:
                 continue
             bom_doc = frappe.get_doc('BOM', pb.parent_bom)
-            variants = []
+            variant_qty_map = []
             for item in bom_doc.items or []:
                 vs = frappe.get_all('Item',
                     filters={'variant_of': item.item_code, 'disabled': 0},
                     fields=['name'])
-                variants += [v.name for v in vs]
-            bom_variant_map[pb.parent_bom] = variants
+                for v in vs:
+                    variant_qty_map.append({
+                        "variant": v.name,
+                        "qty": item.qty or 1
+                    })
+            bom_variant_map[pb.parent_bom] = variant_qty_map
 
         # Generate parts for each roll
         for u in self.used_rolls or []:
@@ -112,7 +116,10 @@ class cuttingoperation(Document):
                 if not bom_link or bom_link not in bom_variant_map:
                     continue
 
-                for variant_code in bom_variant_map[bom_link]:
+                for item in bom_variant_map[bom_link]:
+                    variant_code = item["variant"]
+                    bom_item_qty = item["qty"]
+
                     attrs = frappe.get_all(
                         'Item Variant Attribute',
                         filters={'parent': variant_code},
@@ -122,15 +129,13 @@ class cuttingoperation(Document):
                         a.attribute.strip().lower(): (a.attribute_value or '').strip()
                         for a in attrs
                     }
-                    color_val = (attr_map.get('color') or
-                                 attr_map.get('colour'))
+                    color_val = (attr_map.get('color') or attr_map.get('colour'))
                     size_attr = attr_map.get('size')
-                    frappe.msgprint(f"size_attr: {size_attr}, size_val: {size_val}")
 
                     if color_val == color and size_attr == str(size_val):
                         cp = self.append('cutting_parts', {})
                         cp.part = variant_code
-                        cp.quantity = total_qty
+                        cp.quantity = total_qty * bom_item_qty  # ✅ Corrected logic here
                         cp.warehouse = self.distination_warehouse
                         cp.roll_relation = u.roll
                         cp.parent_bom = bom_link
@@ -145,7 +150,7 @@ class cuttingoperation(Document):
             total_roll_cost = used_qty * rate
 
             parts_for_roll = [cp for cp in (self.cutting_parts or [])
-                              if cp.roll_relation == u.roll]
+                            if cp.roll_relation == u.roll]
             total_parts_qty = sum(cp.quantity for cp in parts_for_roll) or 1
             for cp in parts_for_roll:
                 cp.part_cost = total_roll_cost / total_parts_qty
@@ -219,14 +224,16 @@ class cuttingoperation(Document):
                 else:
                     batch = frappe.new_doc("Parts Batch")
                     batch.batch_name = bname
+                    batch.source_bom = bom  # ✅ set source_bom at creation
                     batch.insert()
 
                 parts_batches[key] = batch
 
-            # Append this part to its batch (restored missing line)
+            # Append this part to its batch
             parts_batches[key].append("parts", {
                 "part": cp.part,
-                "qty": cp.quantity
+                "qty": cp.quantity,
+                "source_bom": bom,  # ✅ also set source_bom in child row
             })
 
         # Persist and submit all batches
@@ -259,6 +266,7 @@ class cuttingoperation(Document):
             receipt.insert()
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
+
  
     def before_cancel(self):
         # Skip linked document validation so we can cancel children first
