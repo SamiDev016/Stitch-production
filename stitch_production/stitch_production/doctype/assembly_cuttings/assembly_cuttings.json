@@ -1,0 +1,31 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-06-15 14:12:37.448995",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "cutting_operation"
+ ],
+ "fields": [
+  {
+   "fieldname": "cutting_operation",
+   "fieldtype": "Link",
+   "label": "cutting operation",
+   "options": "cutting operation"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-06-15 14:12:54.146483",
+ "modified_by": "Administrator",
+ "module": "stitch production",
+ "name": "Assembly Cuttings",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

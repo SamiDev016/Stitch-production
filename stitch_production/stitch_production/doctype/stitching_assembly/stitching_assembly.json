@@ -6,12 +6,34 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_7793",
+  "parent_bom",
+  "main_operation",
+  "main_operation_bom",
+  "batch",
   "amended_from"
  ],
  "fields": [
   {
    "fieldname": "section_break_7793",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "parent_bom",
+   "fieldtype": "Link",
+   "label": "Parent BOM",
+   "options": "Parent BOM"
+  },
+  {
+   "fieldname": "main_operation",
+   "fieldtype": "Link",
+   "label": "Main Operation",
+   "options": "cutting operation"
+  },
+  {
+   "fieldname": "batch",
+   "fieldtype": "Table",
+   "label": "BATCH",
+   "options": "Assemby Batches"
   },
   {
    "fieldname": "amended_from",
@@ -22,12 +44,18 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "main_operation_bom",
+   "fieldtype": "Link",
+   "label": "Main operation BOM",
+   "options": "BOM"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-15 00:29:26.630623",
+ "modified": "2025-06-16 10:08:39.815493",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching Assembly",
