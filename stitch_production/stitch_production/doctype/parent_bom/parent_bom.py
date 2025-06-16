@@ -56,3 +56,9 @@ class ParentBOM(Document):
             row = self.append("raw_materials", {})
             row.part = part_name
             row.qty = total_qty
+
+
+        self.color = pf_color
+        self.size = pf_size
+        
+

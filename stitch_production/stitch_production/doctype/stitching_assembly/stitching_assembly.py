@@ -14,6 +14,8 @@ class StitchingAssembly(Document):
 
         frappe.msgprint(f"cutting_boms: {list(cutting_boms.keys())}")
 
+        # cutting_boms = self.main_operation_bom
+
         parent_boms = {}
         parent_bom_doc = frappe.get_doc("Parent BOM", self.parent_bom)
         for bom in parent_bom_doc.boms or []:
@@ -23,7 +25,15 @@ class StitchingAssembly(Document):
             parent_boms[bom_doc.name] = bom_doc
 
         frappe.msgprint(f"parent_boms: {list(parent_boms.keys())}")
+        remaining_boms = []
+        for bom in parent_boms:
+            if bom not in cutting_boms:
+                remaining_boms.append(bom)
 
+        frappe.msgprint(f"remaining_boms: {remaining_boms}")
+
+
+        #باه نتاكد برك
         missing_boms = []
         for bom in cutting_boms:
             if bom not in parent_boms:
@@ -39,17 +49,99 @@ class StitchingAssembly(Document):
         }):
             main_batches[batch.name] = batch
 
-        frappe.msgprint(f"main_batches: {list(main_batches.keys())}")
+        frappe.msgprint(f"main_batches BEFORE: {list(main_batches.keys())}")
+        #last filter
+        for real_batch in main_batches.copy():
+            real_batch_doc = frappe.get_doc("Parts Batch", real_batch)
+            if real_batch_doc.color != parent_bom_doc.color or real_batch_doc.size != parent_bom_doc.size:
+                main_batches.pop(real_batch)
+        
 
+        frappe.msgprint(f"main_batches AFTER: {list(main_batches.keys())}")
 
+        self.set("main_batches", [])
 
+        for real_batch in main_batches:
+            real_batch_doc = frappe.get_doc("Parts Batch", real_batch)
+            self.append("main_batches", {
+                "batch": real_batch_doc.name,
+            })
+        
 
-        remaining_batches = {}
-        #missing boms
-        for bom in missing_boms:
+        remaining_batches_before = {}
+        #remaining batches , remaining BOMS==
+        for bom in remaining_boms:
             for batch in frappe.get_all("Parts Batch", filters={
                 "source_bom": bom,
             }):
-                remaining_batches[batch.name] = batch
-		
-        frappe.msgprint(f"remaining_batches: {list(remaining_batches.keys())}")
+                remaining_batches_before[batch.name] = batch
+        
+        frappe.msgprint(f"remaining_batches_before: {list(remaining_batches_before.keys())}")
+
+
+        remaining_batches_after = {}
+
+        for bom in remaining_boms:
+            latest_batch = frappe.get_list(
+                "Parts Batch",
+                filters={"source_bom": bom},
+                fields=["name", "color", "size"],
+                order_by="creation desc",
+                limit=1
+            )
+            if latest_batch:
+                batch = latest_batch[0]
+                remaining_batches_after[batch["name"]] = batch
+        for remaining_batch in remaining_batches_after:
+            remaining_batch_doc = frappe.get_doc("Parts Batch", remaining_batch)
+            if remaining_batch_doc.color != parent_bom_doc.color or remaining_batch_doc.size != parent_bom_doc.size:
+                remaining_batches_after.pop(remaining_batch)
+
+        frappe.msgprint(f"remaining_batches_after: {list(remaining_batches_after.keys())}")
+
+        self.set("remaining_batches", [])
+        for remaining_batch in remaining_batches_after:
+            remaining_batch_doc = frappe.get_doc("Parts Batch", remaining_batch)
+            self.append("remaining_batches", {
+                "batch": remaining_batch_doc.name,
+            })
+            frappe.msgprint(f"remaining_batch appended: {remaining_batch_doc.name}")
+
+        
+        num_tshirt_template = ""
+        variant_items = []
+
+        # Step 1: Find the template item (qty == 1)
+        for cutting_bom in cutting_boms:
+            bom_doc = frappe.get_doc("BOM", cutting_bom)
+            for bom_doc_item in bom_doc.items:
+                if bom_doc_item.qty == 1:
+                    num_tshirt_template = bom_doc_item.item_code
+                    break
+            break  # only look in the first BOM
+
+        frappe.msgprint(f"Template Item: {num_tshirt_template}")
+
+        # Step 2: Get all its variants
+        if num_tshirt_template:
+            variant_items = frappe.get_all("Item", filters={
+                "variant_of": num_tshirt_template
+            }, pluck="name")
+
+        frappe.msgprint(f"Variants of {num_tshirt_template}: {variant_items}")
+
+        # Step 3: Loop over batches to find a match
+        for batch in main_batches:
+            batch_doc = frappe.get_doc("Parts Batch", batch)
+            for part in batch_doc.parts:
+                if part.part in variant_items:
+                    self.number_of_finish_goods = part.qty
+                    frappe.msgprint(f"Matched variant '{part.part}' in batch '{batch_doc.name}', qty: {part.qty}")
+                    break
+            if self.number_of_finish_goods:
+                break  # exit early if found
+
+        frappe.msgprint(f"Final number_of_finish_goods: {self.number_of_finish_goods}")
+
+        
+        

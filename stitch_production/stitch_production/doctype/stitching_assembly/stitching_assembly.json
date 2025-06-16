@@ -7,9 +7,11 @@
  "field_order": [
   "section_break_7793",
   "parent_bom",
+  "number_of_finish_goods",
   "main_operation",
   "main_operation_bom",
-  "batch",
+  "main_batches",
+  "remaining_batches",
   "amended_from"
  ],
  "fields": [
@@ -30,12 +32,6 @@
    "options": "cutting operation"
   },
   {
-   "fieldname": "batch",
-   "fieldtype": "Table",
-   "label": "BATCH",
-   "options": "Assemby Batches"
-  },
-  {
    "fieldname": "amended_from",
    "fieldtype": "Link",
    "label": "Amended From",
@@ -48,15 +44,34 @@
   {
    "fieldname": "main_operation_bom",
    "fieldtype": "Link",
-   "hidden": 1,
    "label": "Main operation BOM",
    "options": "BOM"
+  },
+  {
+   "fieldname": "main_batches",
+   "fieldtype": "Table",
+   "label": "Main BATCHS",
+   "options": "Assemby Batches",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remaining_batches",
+   "fieldtype": "Table",
+   "label": "Remaining BATCH",
+   "options": "Assemby Batches",
+   "read_only": 1
+  },
+  {
+   "fieldname": "number_of_finish_goods",
+   "fieldtype": "Float",
+   "label": "Number Of Finish Goos",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-16 11:42:40.043094",
+ "modified": "2025-06-16 15:35:17.344591",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching Assembly",

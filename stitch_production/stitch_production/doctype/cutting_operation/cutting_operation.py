@@ -135,7 +135,7 @@ class cuttingoperation(Document):
                     if color_val == color and size_attr == str(size_val):
                         cp = self.append('cutting_parts', {})
                         cp.part = variant_code
-                        cp.quantity = total_qty * bom_item_qty  # ✅ Corrected logic here
+                        cp.quantity = total_qty * bom_item_qty 
                         cp.warehouse = self.distination_warehouse
                         cp.roll_relation = u.roll
                         cp.parent_bom = bom_link
@@ -207,7 +207,7 @@ class cuttingoperation(Document):
                 continue
 
             bom   = cp.parent_bom
-            roll  = cp.roll_relation
+            roll  = cp.roll_relation      # this is the Roll name (string)
             size  = cp.size_link
             key   = (self.name, bom, roll, size)
             bname = f"{bom}-{roll}-{size}-{self.name}"
@@ -223,17 +223,23 @@ class cuttingoperation(Document):
                     batch = frappe.get_doc("Parts Batch", existing_name)
                 else:
                     batch = frappe.new_doc("Parts Batch")
-                    batch.batch_name = bname
-                    batch.source_bom = bom  # ✅ set source_bom at creation
+                    batch.batch_name  = bname
+                    batch.source_bom  = bom
+
+                    # ← fetch the actual Rolls document so .color works
+                    roll_doc = frappe.get_doc("Rolls", roll)
+                    batch.color      = roll_doc.color
+                    batch.size       = size
+
                     batch.insert()
 
                 parts_batches[key] = batch
 
             # Append this part to its batch
             parts_batches[key].append("parts", {
-                "part": cp.part,
-                "qty": cp.quantity,
-                "source_bom": bom,  # ✅ also set source_bom in child row
+                "part":       cp.part,
+                "qty":        cp.quantity,
+                "source_bom": bom,
             })
 
         # Persist and submit all batches
@@ -266,7 +272,6 @@ class cuttingoperation(Document):
             receipt.insert()
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
-
  
     def before_cancel(self):
         # Skip linked document validation so we can cancel children first
