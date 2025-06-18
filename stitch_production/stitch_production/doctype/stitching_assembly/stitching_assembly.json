@@ -7,11 +7,14 @@
  "field_order": [
   "section_break_7793",
   "parent_bom",
+  "finish_g_warehouse",
   "number_of_finish_goods",
   "main_operation",
   "main_operation_bom",
   "main_batches",
+  "main_parts",
   "remaining_batches",
+  "remainig_parts",
   "amended_from"
  ],
  "fields": [
@@ -66,12 +69,34 @@
    "fieldtype": "Float",
    "label": "Number Of Finish Goos",
    "read_only": 1
+  },
+  {
+   "fieldname": "finish_g_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Finish Good Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
+  },
+  {
+   "fieldname": "main_parts",
+   "fieldtype": "Table",
+   "label": "Main Parts",
+   "options": "Parts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "remainig_parts",
+   "fieldtype": "Table",
+   "label": "Remainig Parts",
+   "options": "Parts",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-16 15:35:17.344591",
+ "modified": "2025-06-16 16:55:18.679112",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching Assembly",
