@@ -6,6 +6,11 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_eeuf",
+  "finish_good",
+  "column_break_jkxw",
+  "finish_good_qty",
+  "section_break_nbvp",
+  "batches",
   "amended_from"
  ],
  "fields": [
@@ -22,12 +27,37 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "finish_good",
+   "fieldtype": "Link",
+   "label": "Finish Good",
+   "options": "Item"
+  },
+  {
+   "fieldname": "batches",
+   "fieldtype": "Table",
+   "label": "Batches",
+   "options": "Assemby Batches"
+  },
+  {
+   "fieldname": "column_break_jkxw",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "finish_good_qty",
+   "fieldtype": "Float",
+   "label": "Finish Good QTY"
+  },
+  {
+   "fieldname": "section_break_nbvp",
+   "fieldtype": "Section Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-18 10:44:39.369753",
+ "modified": "2025-06-18 10:54:22.778596",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching",

@@ -6,7 +6,9 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "batch"
+  "batch",
+  "using_qty",
+  "existing_qty"
  ],
  "fields": [
   {
@@ -14,12 +16,22 @@
    "fieldtype": "Link",
    "label": "BATCH",
    "options": "Parts Batch"
+  },
+  {
+   "fieldname": "using_qty",
+   "fieldtype": "Float",
+   "label": "Using QTY"
+  },
+  {
+   "fieldname": "existing_qty",
+   "fieldtype": "Float",
+   "label": "Existing QTY"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-16 16:51:15.477490",
+ "modified": "2025-06-18 10:52:47.173218",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemby Batches",
