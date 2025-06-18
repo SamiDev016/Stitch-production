@@ -9,6 +9,7 @@
   "finish_good",
   "column_break_jkxw",
   "finish_good_qty",
+  "finish_good_warehouse",
   "section_break_nbvp",
   "batches",
   "amended_from"
@@ -31,8 +32,10 @@
   {
    "fieldname": "finish_good",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Finish Good",
-   "options": "Item"
+   "options": "Item",
+   "reqd": 1
   },
   {
    "fieldname": "batches",
@@ -47,17 +50,28 @@
   {
    "fieldname": "finish_good_qty",
    "fieldtype": "Float",
-   "label": "Finish Good QTY"
+   "in_list_view": 1,
+   "label": "Finish Good QTY",
+   "non_negative": 1,
+   "reqd": 1
   },
   {
    "fieldname": "section_break_nbvp",
    "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "finish_good_warehouse",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Finish Good Warehouse",
+   "options": "Warehouse",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-18 10:54:22.778596",
+ "modified": "2025-06-18 12:23:03.050396",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching",
