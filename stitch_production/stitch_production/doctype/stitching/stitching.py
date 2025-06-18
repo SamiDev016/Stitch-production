@@ -15,6 +15,8 @@ class Stitching(Document):
 				frappe.throw(_("Unfilled fields"))
 			if batch.using_qty <= 0:
 				frappe.throw(_("Unfilled fields"))
+			if batch.existing_qty <= 0:
+				frappe.throw(_("Existing qty cannot be less than or equal to 0"))
 			if batch.using_qty > batch.existing_qty:
 				frappe.throw(_("Using qty cannot be greater than existing qty"))
 	

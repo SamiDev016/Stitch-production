@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:Stitching-{finish_good}-{######}",
  "creation": "2025-06-18 10:44:39.369753",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -71,10 +72,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-18 12:23:03.050396",
+ "modified": "2025-06-18 12:49:01.098808",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
