@@ -7,7 +7,8 @@
  "field_order": [
   "section_break_bpyd",
   "template",
-  "boms"
+  "boms",
+  "amended_from"
  ],
  "fields": [
   {
@@ -18,6 +19,7 @@
    "fieldname": "template",
    "fieldtype": "Link",
    "label": "Template",
+   "link_filters": "[[\"Item\",\"has_variants\",\"=\",1]]",
    "options": "Item"
   },
   {
@@ -25,12 +27,22 @@
    "fieldtype": "Table",
    "label": "BOMs",
    "options": "Parent Boms"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Head  Bom",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-20 21:18:29.536883",
+ "modified": "2025-06-21 09:43:53.434751",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Head  Bom",
