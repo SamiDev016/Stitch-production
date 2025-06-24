@@ -1,19 +1,21 @@
-// JavaScript version of your Python‑style SIZE_MAP
+// JavaScript version of your Python‐style SIZE_MAP
 const SIZE_MAP = {
-    'XS': 'XS',
-    'S': 'S',
-    'M': 'M',
-    'L': 'L',
-    'XL': 'XL',
-    'XXL': 'XXL',
-    'XXXL': 'XXXL',
-    '6': '6 ans',
-    '8': '8 ans',
-    '10': '10 ans',
-    '12': '12 ans',
-    '14': '14 ans',
-    '16': '16 ans'
-  };
+    'XS':     'Extra Small',
+    'S':    'Small',
+    'M':    'Medium',
+    'L':    'Large',
+    'XL':   'Extra Large',
+    'XXL':  '2 Extra Large',
+    'XXXL':  '3 Extra Large',
+    '2':    '2',
+    '4':    '4',
+    '6':    '6',
+    '8':    '8',
+    '10':   '10',
+    '12':   '12',
+    '14':   '14',
+    '16':   '16',
+}
   
   // Compute greatest common divisor
   function gcd(a, b) {
@@ -52,7 +54,7 @@ const SIZE_MAP = {
           fieldtype: 'Select',
           options: Object.keys(SIZE_MAP).map(key => ({
             label: SIZE_MAP[key],
-            value: key
+            value: SIZE_MAP[key]
           })),
           reqd: 1
         },
