@@ -15,7 +15,7 @@
    "fieldname": "size",
    "fieldtype": "Select",
    "label": "Size",
-   "options": "XS\nS\nM\nL\nXXL\nXXXL\n2\n4\n6\n8\n14\n16"
+   "options": "XS\nS\nM\nL\nXL\nXXL\nXXXL\n2\n4\n6\n8\n10\n12\n14\n16"
   },
   {
    "fieldname": "qty",
@@ -32,7 +32,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-18 15:09:53.020001",
+ "modified": "2025-06-26 09:28:28.463788",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Sizes Matrix",

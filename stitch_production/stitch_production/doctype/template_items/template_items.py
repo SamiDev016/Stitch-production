@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class Partsqty(Document):
-	pass 
+class TemplateItems(Document):
+	pass
