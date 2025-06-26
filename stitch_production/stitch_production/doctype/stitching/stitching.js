@@ -20,6 +20,7 @@ const SIZE_MAP = {
   // Compute greatest common divisor
   function gcd(a, b) {
     return b === 0 ? a : gcd(b, a % b);
+    console.log(a, b);
   }
   
   frappe.ui.form.on('Stitching', {
