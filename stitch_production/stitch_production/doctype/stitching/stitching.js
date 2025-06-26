@@ -1,26 +1,6 @@
-// JavaScript version of your Python‐style SIZE_MAP
-const SIZE_MAP = {
-    'XS':     'XS',
-    'S':    'S',
-    'M':    'M',
-    'L':    'L',
-    'XL':   'XL',
-    'XXL':  'XXL',
-    'XXXL':  'XXXL',
-    '2':    '2',
-    '4':    '4',
-    '6':    '6',
-    '8':    '8',
-    '10':   '10',
-    '12':   '12',
-    '14':   '14',
-    '16':   '16',
-}
-  
   // Compute greatest common divisor
   function gcd(a, b) {
     return b === 0 ? a : gcd(b, a % b);
-    console.log(a, b);
   }
   
   frappe.ui.form.on('Stitching', {
@@ -53,10 +33,7 @@ const SIZE_MAP = {
           label: 'Size',
           fieldname: 'size',
           fieldtype: 'Select',
-          options: Object.keys(SIZE_MAP).map(key => ({
-            label: SIZE_MAP[key],
-            value: SIZE_MAP[key]
-          })),
+          options: [], 
           reqd: 1
         },
         {
@@ -126,27 +103,96 @@ const SIZE_MAP = {
     d.fields_dict.bom.$input.on('change', () => {
       const op_name  = d.get_value('operation');
       const bom_name = d.get_value('bom');
-  
+
       d.fields_dict.color.df.options = [];
       d.fields_dict.color.refresh();
-  
+      d.fields_dict.size.df.options = [];
+      d.fields_dict.size.refresh();
+
       if (op_name && bom_name) {
         frappe.db.get_list('Parts Batch', {
           filters: {
             source_operation: op_name,
             source_bom:       bom_name
           },
-          fields: ['color']
+          fields: ['color', 'size']
         }).then(list => {
           const colors = Array.from(new Set(
             list.map(r => r.color).filter(c => c)
           ));
           d.fields_dict.color.df.options = colors;
           d.fields_dict.color.refresh();
+
+          const sizes = Array.from(new Set(
+            list.map(r => r.size).filter(s => s)
+          ));
+          d.fields_dict.size.df.options = sizes;
+          d.fields_dict.size.refresh();
         });
       }
     });
   
     d.show();
   }
-  
+  let stitchingBarcodeDebounce = null;
+
+frappe.ui.form.on('Assemby Batches', {
+  barcode(frm, cdt, cdn) {
+    clearTimeout(stitchingBarcodeDebounce);
+    stitchingBarcodeDebounce = setTimeout(() => {
+      const row = locals[cdt][cdn];
+      let raw = row.barcode || '';
+      console.log('[Assemby Batches] Raw barcode:', raw);
+
+      let bc = raw.replace(/<[^>]*>/g, '').trim();
+      if (!bc) {
+        const wrapper = frm.fields_dict.batches.grid
+          .grid_rows_by_docname[cdn]
+          .fields_dict.barcode?.$wrapper;
+        bc = wrapper?.find('svg').attr('data-barcode-value') || '';
+        console.log('[Assemby Batches] From SVG fallback:', bc);
+      }
+
+      if (!bc) {
+        console.warn('[Assemby Batches] No barcode value found.');
+        return;
+      }
+
+      frappe.db.get_value('Parts Batch', { serial_number_barcode: bc }, 'name')
+        .then(res => {
+          const pb_name = res.message?.name;
+          if (!pb_name) {
+            frappe.msgprint(__('No Parts Batch found with barcode: {0}', [bc]));
+            return;
+          }
+
+          console.log('[Assemby Batches] Found Parts Batch:', pb_name);
+
+          // Set batch field
+          frappe.model.set_value(cdt, cdn, 'batch', pb_name);
+
+          // Get full Parts Batch document
+          frappe.db.get_doc('Parts Batch', pb_name).then(pb_doc => {
+            const parts = pb_doc.parts || [];
+            const qtys = parts.map(p => p.qty).filter(q => q > 0);
+            const existing_qty = qtys.length ? qtys.reduce((a, b) => gcd(a, b)) : 0;
+
+            console.log(`[Assemby Batches] Computed existing_qty: ${existing_qty} from parts:`, qtys);
+
+            frappe.model.set_value(cdt, cdn, 'existing_qty', existing_qty);
+            frm.refresh_field('batches');
+            frappe.show_alert(`✔ Loaded Parts Batch ${pb_name}`, 2);
+          });
+        })
+        .catch(err => {
+          console.error('[Assemby Batches] Barcode lookup error:', err);
+          frappe.msgprint(__('Error loading Parts Batch. See console.'));
+        });
+    }, 300);
+  }
+});
+
+// GCD function (must be global)
+function gcd(a, b) {
+  return b === 0 ? a : gcd(b, a % b);
+}
