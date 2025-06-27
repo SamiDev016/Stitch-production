@@ -1,0 +1,38 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-06-27 15:48:12.835874",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "finish_good",
+  "part"
+ ],
+ "fields": [
+  {
+   "fieldname": "finish_good",
+   "fieldtype": "Link",
+   "label": "Finish Good",
+   "options": "Item"
+  },
+  {
+   "fieldname": "part",
+   "fieldtype": "Link",
+   "label": "Part",
+   "options": "Item"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-06-27 15:48:39.275284",
+ "modified_by": "Administrator",
+ "module": "stitch production",
+ "name": "Assemblying Result",
+ "owner": "Administrator",
+ "permissions": [],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

@@ -1,0 +1,78 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-06-27 15:20:11.540118",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_ztod",
+  "parent_bom",
+  "main_operation",
+  "main_bom",
+  "main_batches",
+  "result"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_ztod",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "parent_bom",
+   "fieldtype": "Link",
+   "label": "Parent Bom",
+   "options": "Parent BOM"
+  },
+  {
+   "fieldname": "main_operation",
+   "fieldtype": "Link",
+   "label": "Main Operation",
+   "options": "cutting operation"
+  },
+  {
+   "fieldname": "main_bom",
+   "fieldtype": "Link",
+   "label": "Main BOM",
+   "options": "BOM"
+  },
+  {
+   "fieldname": "main_batches",
+   "fieldtype": "Table",
+   "label": "Main Batches",
+   "options": "Assembying Parts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "result",
+   "fieldtype": "Table",
+   "label": "Result",
+   "options": "Assemblying Result"
+  }
+ ],
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-06-27 15:54:35.076714",
+ "modified_by": "Administrator",
+ "module": "stitch production",
+ "name": "Assemblying",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
