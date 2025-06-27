@@ -10,6 +10,7 @@
   "serial_number_barcode",
   "amended_from",
   "batch_name",
+  "qty_making",
   "parts",
   "source_operation",
   "source_bom",
@@ -74,12 +75,19 @@
    "fieldtype": "Data",
    "label": "Size",
    "read_only": 1
+  },
+  {
+   "default": "0",
+   "fieldname": "qty_making",
+   "fieldtype": "Float",
+   "label": "Qty Making",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-16 12:13:06.887045",
+ "modified": "2025-06-27 16:54:06.831306",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parts Batch",

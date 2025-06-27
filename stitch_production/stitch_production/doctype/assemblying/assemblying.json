@@ -10,7 +10,9 @@
   "main_operation",
   "main_bom",
   "main_batches",
-  "result"
+  "other_batches",
+  "finish_goods",
+  "amended_from"
  ],
  "fields": [
   {
@@ -43,16 +45,32 @@
    "read_only": 1
   },
   {
-   "fieldname": "result",
+   "fieldname": "other_batches",
    "fieldtype": "Table",
-   "label": "Result",
+   "label": "Other Batches",
    "options": "Assemblying Result"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Assemblying",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "finish_goods",
+   "fieldtype": "Table",
+   "label": "Finish Goods",
+   "options": "Finish Goods"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-27 15:54:35.076714",
+ "modified": "2025-06-27 18:28:01.345249",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",
