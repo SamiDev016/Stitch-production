@@ -8,10 +8,8 @@
  "field_order": [
   "produit_finis",
   "boms",
-  "amended_from",
   "raw_materials",
-  "color",
-  "size"
+  "amended_from"
  ],
  "fields": [
   {
@@ -19,6 +17,20 @@
    "fieldtype": "Table",
    "label": "BOMs",
    "options": "BOMs fields"
+  },
+  {
+   "fieldname": "produit_finis",
+   "fieldtype": "Link",
+   "label": "Produit finis",
+   "link_filters": "[[\"Item\",\"has_variants\",\"=\",1]]",
+   "options": "Item"
+  },
+  {
+   "fieldname": "raw_materials",
+   "fieldtype": "Table",
+   "label": "Raw Materials",
+   "options": "Raw Materials",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -29,38 +41,12 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
-  },
-  {
-   "fieldname": "raw_materials",
-   "fieldtype": "Table",
-   "label": "Raw Materials",
-   "options": "Parent Bom Parts",
-   "read_only": 1
-  },
-  {
-   "fieldname": "produit_finis",
-   "fieldtype": "Link",
-   "label": "Produit finis",
-   "options": "Item",
-   "unique": 1
-  },
-  {
-   "fieldname": "color",
-   "fieldtype": "Data",
-   "label": "Color",
-   "read_only": 1
-  },
-  {
-   "fieldname": "size",
-   "fieldtype": "Data",
-   "label": "Size",
-   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-16 12:29:09.692867",
+ "modified": "2025-06-27 15:00:09.255118",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parent BOM",

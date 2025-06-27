@@ -97,7 +97,7 @@
   {
    "fieldname": "parent_boms",
    "fieldtype": "Table",
-   "label": "Parent Boms",
+   "label": "Cutted Boms",
    "options": "Parent Boms"
   },
   {
@@ -107,7 +107,7 @@
   {
    "fieldname": "size_matrix",
    "fieldtype": "Table",
-   "label": "Size Matrix",
+   "label": "Sizes",
    "options": "Sizes Matrix"
   },
   {
@@ -204,7 +204,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-14 23:32:33.456455",
+ "modified": "2025-06-27 14:38:46.659951",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",
