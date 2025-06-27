@@ -133,3 +133,78 @@ class Assemblying(Document):
                 })
             else:
                 frappe.throw(f"No variant found for color <b>{batch.color}</b> and size <b>{batch.size}</b>.")
+
+
+    def on_submit(self):
+        if not self.finish_goods or not self.other_batches or not self.main_batches:
+            frappe.throw("No finish goods found.")
+
+        company = frappe.defaults.get_user_default("Company")
+
+        # 1) Create Stock Entry
+        issue = frappe.new_doc("Stock Entry")
+        issue.purpose = issue.stock_entry_type = "Material Issue"
+        issue.company = company
+
+        def add_item(item_code, qty, warehouse):
+            uom = frappe.db.get_value("Item", item_code, "stock_uom")
+            issue.append("items", {
+                "item_code": item_code,
+                "qty": qty,
+                "uom": uom,
+                "stock_uom": uom,
+                "conversion_factor": 1,
+                "s_warehouse": warehouse
+            })
+
+        main_consumption = [] 
+        for mb in self.main_batches:
+            mb_doc = frappe.get_doc("Parts Batch", mb.batch)
+            wh = frappe.get_doc("cutting operation", mb_doc.source_operation).distination_warehouse
+
+            qtys = [p.qty for p in mb_doc.parts if p.qty and p.qty > 0]
+            ints = [int(q) for q in qtys if float(q).is_integer()]
+            pgcd = reduce(math.gcd, ints) if ints else 1
+
+            for p in mb_doc.parts:
+                if p.qty and pgcd > 0:
+                    to_consume = (p.qty / pgcd) * mb.parts_qty
+                    add_item(p.part, to_consume, wh)
+                    main_consumption.append((mb.batch, p.part, to_consume))
+
+        other_consumption = [] 
+        for ob in self.other_batches:
+            ob_doc = frappe.get_doc("Parts Batch", ob.batch)
+            wh = frappe.get_doc("cutting operation", ob_doc.source_operation).distination_warehouse
+
+            qtys = [p.qty for p in ob_doc.parts if p.qty and p.qty > 0]
+            ints = [int(q) for q in qtys if float(q).is_integer()]
+            pgcd = reduce(math.gcd, ints) if ints else 1
+
+            for p in ob_doc.parts:
+                if p.qty and pgcd > 0:
+                    to_consume = (p.qty / pgcd) * ob.qty
+                    add_item(p.part, to_consume, wh)
+                    other_consumption.append((ob.batch, p.part, to_consume))
+
+        if issue.items:
+            issue.insert()
+            issue.submit()
+            self.db_set("stock_entry_name", issue.name)
+        else:
+            frappe.throw("No items were added to the Stock Entry.")
+
+        # ↓ Update child table qty via direct DB update
+        for batch_name, part_code, qty_used in main_consumption:
+            pb = frappe.get_doc("Parts Batch", batch_name)
+            for row in pb.parts:
+                if row.part == part_code:
+                    new_qty = (row.qty or 0) - qty_used
+                    frappe.db.set_value("Parts", row.name, "qty", new_qty)
+
+        for batch_name, part_code, qty_used in other_consumption:
+            pb = frappe.get_doc("Parts Batch", batch_name)
+            for row in pb.parts:
+                if row.part == part_code:
+                    new_qty = (row.qty or 0) - qty_used
+                    frappe.db.set_value("Parts", row.name, "qty", new_qty)

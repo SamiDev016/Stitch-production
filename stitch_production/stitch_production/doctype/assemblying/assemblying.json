@@ -12,7 +12,8 @@
   "main_batches",
   "other_batches",
   "finish_goods",
-  "amended_from"
+  "amended_from",
+  "stock_entry_name"
  ],
  "fields": [
   {
@@ -65,12 +66,19 @@
    "fieldtype": "Table",
    "label": "Finish Goods",
    "options": "Finish Goods"
+  },
+  {
+   "fieldname": "stock_entry_name",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "stock_entry_parts",
+   "options": "Stock Entry"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-27 18:28:01.345249",
+ "modified": "2025-06-27 19:35:37.979508",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",
