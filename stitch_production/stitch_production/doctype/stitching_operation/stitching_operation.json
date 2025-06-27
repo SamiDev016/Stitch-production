@@ -6,6 +6,8 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_bjhn",
+  "assembled_parts",
+  "finish_goods",
   "amended_from"
  ],
  "fields": [
@@ -22,13 +24,25 @@
    "print_hide": 1,
    "read_only": 1,
    "search_index": 1
+  },
+  {
+   "fieldname": "assembled_parts",
+   "fieldtype": "Table",
+   "label": "Assembled Parts",
+   "options": "Assembled Scan"
+  },
+  {
+   "fieldname": "finish_goods",
+   "fieldtype": "Table",
+   "label": "Finish Goods",
+   "options": "Finish Goods",
+   "read_only": 1
   }
  ],
- "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-05-29 11:19:05.910803",
+ "modified": "2025-06-27 21:59:23.932380",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching Operation",
@@ -48,7 +62,6 @@
    "write": 1
   }
  ],
- "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

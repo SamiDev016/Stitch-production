@@ -3,6 +3,11 @@ from frappe.model.document import Document
 import math
 from functools import reduce
 
+
+def generate_barcode(name, index):
+    return f"{name}-{str(index).zfill(2)}"
+
+
 class Assemblying(Document):
     def before_save(self):
         batch_names = frappe.get_all(
@@ -107,7 +112,7 @@ class Assemblying(Document):
 
         frappe.msgprint(f"Variants: {variants}")
 
-        for batch in self.main_batches:
+        for idx, batch in enumerate(self.main_batches):
             color = batch.color.strip().lower()
             size = batch.size.strip().lower()
             matched_variant = None
@@ -127,13 +132,16 @@ class Assemblying(Document):
                     break
 
             if matched_variant:
+                barcode = generate_barcode(self.name, idx)
                 self.append("finish_goods", {
                     "item": matched_variant,
-                    "qty": batch.parts_qty
+                    "qty": batch.parts_qty,
+                    "barcode": barcode
                 })
             else:
                 frappe.throw(f"No variant found for color <b>{batch.color}</b> and size <b>{batch.size}</b>.")
 
+        #generate barcode for each finish goods and put it in barcode
 
     def on_submit(self):
         if not self.finish_goods or not self.other_batches or not self.main_batches:

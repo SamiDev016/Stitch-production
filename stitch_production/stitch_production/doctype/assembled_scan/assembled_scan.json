@@ -1,40 +1,27 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-06-27 18:21:06.812053",
+ "creation": "2025-06-27 21:57:47.450356",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "item",
-  "qty",
   "barcode"
  ],
  "fields": [
   {
-   "fieldname": "item",
-   "fieldtype": "Link",
-   "label": "Item",
-   "options": "Item"
-  },
-  {
-   "fieldname": "qty",
-   "fieldtype": "Int",
-   "label": "QTY"
-  },
-  {
    "fieldname": "barcode",
    "fieldtype": "Barcode",
-   "label": "Barcode"
+   "label": "barcode"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-27 21:48:00.905317",
+ "modified": "2025-06-27 21:58:04.173082",
  "modified_by": "Administrator",
  "module": "stitch production",
- "name": "Finish Goods",
+ "name": "Assembled Scan",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
