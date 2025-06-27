@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:{parent_bom}-{YY}-{MM}-{###}",
  "creation": "2025-06-27 15:20:11.540118",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -49,7 +50,8 @@
    "fieldname": "other_batches",
    "fieldtype": "Table",
    "label": "Other Batches",
-   "options": "Assemblying Result"
+   "options": "Assemblying Result",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -65,7 +67,8 @@
    "fieldname": "finish_goods",
    "fieldtype": "Table",
    "label": "Finish Goods",
-   "options": "Finish Goods"
+   "options": "Finish Goods",
+   "read_only": 1
   },
   {
    "fieldname": "stock_entry_name",
@@ -78,10 +81,11 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-27 19:35:37.979508",
+ "modified": "2025-06-27 20:16:12.759412",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
