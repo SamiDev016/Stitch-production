@@ -45,6 +45,8 @@ class StitchingOperation(Document):
         stock_entry = frappe.new_doc("Stock Entry")
         stock_entry.purpose = stock_entry.stock_entry_type = "Material Receipt"
         stock_entry.company = company
+        #allow valuation rate to be set
+        stock_entry.allow_valuation_rate = 1
 
         def add_item(item_code, qty, warehouse):
             uom = frappe.db.get_value("Item", item_code, "stock_uom")
@@ -54,7 +56,8 @@ class StitchingOperation(Document):
                 "uom": uom,
                 "stock_uom": uom,
                 "conversion_factor": 1,
-                "t_warehouse": warehouse
+                "t_warehouse": warehouse,
+                "allow_zero_valuation_rate": 1
             })
 
         for fg in self.finish_goods:
@@ -94,3 +97,4 @@ class StitchingOperation(Document):
 
             except Exception as e:
                 frappe.throw(f"Unable to cancel Stock Entry {self.stock_entry_name}: {e}")
+

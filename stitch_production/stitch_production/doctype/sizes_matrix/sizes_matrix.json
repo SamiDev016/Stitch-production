@@ -6,17 +6,17 @@
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "size",
   "qty",
   "bom_link",
-  "size2"
+  "size"
  ],
  "fields": [
   {
    "fieldname": "size",
-   "fieldtype": "Select",
+   "fieldtype": "Link",
    "label": "Size",
-   "options": "XS\nS\nM\nL\nXL\nXXL\nXXXL\n2\n4\n6\n8\n10\n12\n14\n16"
+   "link_filters": "[[\"Item Attribute Value\",\"parent\",\"=\",\"Size\"]]",
+   "options": "Item Attribute Value"
   },
   {
    "fieldname": "qty",
@@ -28,24 +28,18 @@
    "fieldtype": "Link",
    "label": "BOM LINK",
    "options": "BOM"
-  },
-  {
-   "fieldname": "size2",
-   "fieldtype": "Link",
-   "label": "Size2",
-   "link_filters": "[[\"Item Attribute Value\",\"parent\",\"=\",\"Size\"]]",
-   "options": "Item Attribute Value"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-26 12:31:34.679034",
+ "modified": "2025-06-28 11:06:35.918059",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Sizes Matrix",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
