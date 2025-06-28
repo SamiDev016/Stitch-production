@@ -7,8 +7,10 @@
  "field_order": [
   "section_break_bjhn",
   "assembled_parts",
+  "distination_warehouse",
   "finish_goods",
-  "amended_from"
+  "amended_from",
+  "stock_entry_name"
  ],
  "fields": [
   {
@@ -35,14 +37,27 @@
    "fieldname": "finish_goods",
    "fieldtype": "Table",
    "label": "Finish Goods",
-   "options": "Finish Goods",
+   "options": "Finish Goods"
+  },
+  {
+   "fieldname": "distination_warehouse",
+   "fieldtype": "Link",
+   "label": "Distination Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "stock_entry_name",
+   "fieldtype": "Link",
+   "hidden": 1,
+   "label": "Stock entry name",
+   "options": "Stock Entry",
    "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-27 21:59:23.932380",
+ "modified": "2025-06-28 10:16:26.752667",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching Operation",
