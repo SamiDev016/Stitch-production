@@ -7,7 +7,9 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_ztod",
+  "special_assembly",
   "parent_bom",
+  "custom_bom",
   "main_operation",
   "main_bom",
   "main_batches",
@@ -76,12 +78,24 @@
    "hidden": 1,
    "label": "stock_entry_parts",
    "options": "Stock Entry"
+  },
+  {
+   "default": "0",
+   "fieldname": "special_assembly",
+   "fieldtype": "Check",
+   "label": "Special Assembly"
+  },
+  {
+   "fieldname": "custom_bom",
+   "fieldtype": "Link",
+   "label": "Custom Bom",
+   "options": "Custom BOM"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-27 20:16:12.759412",
+ "modified": "2025-06-28 14:50:38.044634",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",

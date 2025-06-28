@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:{special_item}-{##}",
  "creation": "2025-06-28 12:42:14.444468",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -8,7 +9,7 @@
   "section_break_rdig",
   "amended_from",
   "special_item",
-  "parts"
+  "boms"
  ],
  "fields": [
   {
@@ -34,19 +35,20 @@
    "placeholder": "Tshirt Black and White"
   },
   {
-   "fieldname": "parts",
+   "fieldname": "boms",
    "fieldtype": "Table",
-   "label": "Parts",
+   "label": "BOMS",
    "options": "Custom Bom Parts"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-28 14:28:10.661396",
+ "modified": "2025-06-28 15:11:23.520308",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Custom BOM",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
