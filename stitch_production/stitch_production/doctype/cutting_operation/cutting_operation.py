@@ -9,17 +9,15 @@ class cuttingoperation(Document):
         total_sw = total_dw = total_cw = total_sew = 0.0
         total_cost_bom = 0
         for b in self.parent_boms or []:
-            total_cost_bom += b.cost_bom
+            total_cost_bom += (b.cost_bom or 0)
         
         if total_cost_bom != 100:
             frappe.throw("Total cost of BOMs should be 100%")
         
-        # Calculate workstation cost
         if self.workstation:
             ws = frappe.get_doc("Workstation", self.workstation)
             total_ws = ws.hour_rate * (self.total_hours or 0)
 
-        # Workers cost
         for section, total_var in [
             (self.spreading_workers, 'total_sw'),
             (self.drawing_workers, 'total_dw'),
@@ -33,7 +31,6 @@ class cuttingoperation(Document):
                 rate = (emp.ctc or 0) / 22 / 8
                 locals()[total_var] += rate * (w.total_hours or 0)
 
-        # Rolls cost
         for u in self.used_rolls or []:
             if u.roll:
                 rolls = frappe.get_doc("Rolls", u.roll)
@@ -44,18 +41,14 @@ class cuttingoperation(Document):
             total_ws + total_sw + total_dw + total_cw + total_sew +
             total_rolls + (self.individual_cost or 0)
         )
-        #operation cost will be total cost - rolls cost
         self.operation_cost = self.total_cost - self.used_rolls_cost
 
-        # Update roll warehouses
         for u in self.used_rolls or []:
             if u.roll:
                 u.roll_warehouse = frappe.db.get_value("Rolls", u.roll, "warehouse")
 
-        # Clear existing parts
         self.set('cutting_parts', [])
 
-        # Build map of BOM variants with qty per variant
         bom_variant_map = {}
         for pb in self.parent_boms or []:
             if not pb.parent_bom:
@@ -73,7 +66,6 @@ class cuttingoperation(Document):
                     })
             bom_variant_map[pb.parent_bom] = variant_qty_map
 
-        # Generate parts for each roll
         for u in self.used_rolls or []:
             lap = u.lap or 0
             color = (u.color or '').strip()
@@ -186,22 +178,16 @@ class cuttingoperation(Document):
             bname = f"{bom}-{roll}-{size}-{self.name}"
 
             if key not in parts_batches:
-                existing_name = frappe.db.get_value(
-                    "Parts Batch",
-                    {"batch_name": bname},
-                    "name"
-                )
+                existing_name = frappe.db.get_value("Parts Batch", {"batch_name": bname}, "name")
                 if existing_name:
                     batch = frappe.get_doc("Parts Batch", existing_name)
                 else:
                     batch = frappe.new_doc("Parts Batch")
                     batch.batch_name = bname
                     batch.source_bom = bom
-
                     roll_doc = frappe.get_doc("Rolls", roll)
                     batch.color = roll_doc.color
                     batch.size = size
-
                     batch.insert()
 
                 parts_batches[key] = batch
@@ -226,6 +212,7 @@ class cuttingoperation(Document):
 
             bom_doc = frappe.get_doc("BOM", bom_name)
             bom_total_cost = self.total_cost * (bom_percent / 100.0)
+            cost_per_batch = bom_total_cost / len(batches)
 
             part_cost_map = {}
             total_part_percent = 0
@@ -240,10 +227,12 @@ class cuttingoperation(Document):
                 batch.cost = 0
                 for part_row in batch.parts:
                     part_code = part_row.part
-                    part_percent = part_cost_map.get(part_code, 0)
+                    template_code = frappe.db.get_value("Item", part_code, "variant_of")
+                    part_percent = part_cost_map.get(template_code, 0)
+                    qty = part_row.qty or 1
                     if part_percent > 0 and total_part_percent > 0:
-                        part_total_cost = (bom_total_cost * (part_percent / total_part_percent))
-                        cost_per_one = part_total_cost / (part_row.qty or 1)
+                        part_total_cost = cost_per_batch * (part_percent / total_part_percent)
+                        cost_per_one = part_total_cost / qty
                         part_row.cost_per_one = cost_per_one
                         batch.cost += part_total_cost
                 batch.save()
