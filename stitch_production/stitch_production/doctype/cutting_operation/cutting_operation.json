@@ -33,6 +33,7 @@
   "section_break_iyys",
   "used_rolls_cost",
   "individual_cost",
+  "operation_cost",
   "total_cost",
   "amended_from"
  ],
@@ -82,7 +83,7 @@
   {
    "fieldname": "total_cost",
    "fieldtype": "Float",
-   "label": "Total Cost",
+   "label": "Total Cost (Operation + Rolls)",
    "read_only": 1
   },
   {
@@ -200,12 +201,19 @@
    "fieldtype": "Table",
    "label": "Spreading workers",
    "options": "Spreading Workers"
+  },
+  {
+   "default": "0.0",
+   "fieldname": "operation_cost",
+   "fieldtype": "Float",
+   "label": "Operation Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-28 11:38:37.735474",
+ "modified": "2025-06-29 16:00:32.338583",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",
@@ -226,7 +234,6 @@
    "write": 1
   }
  ],
- "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

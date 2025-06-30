@@ -1,37 +1,37 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-05-15 13:59:58.048550",
+ "creation": "2025-06-30 09:38:34.338728",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
  "field_order": [
-  "parent_bom",
-  "cost_bom"
+  "worker",
+  "total_hours"
  ],
  "fields": [
   {
-   "fieldname": "parent_bom",
+   "fieldname": "worker",
    "fieldtype": "Link",
-   "label": "Parent bom",
-   "options": "BOM"
+   "label": "Worker",
+   "options": "Employee"
   },
   {
-   "fieldname": "cost_bom",
-   "fieldtype": "Percent",
-   "label": "Cost %"
+   "fieldname": "total_hours",
+   "fieldtype": "Float",
+   "label": "Total Hours"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-30 09:05:34.942758",
+ "modified": "2025-06-30 09:38:58.739980",
  "modified_by": "Administrator",
  "module": "stitch production",
- "name": "Parent Boms",
+ "name": "Assemblying Workers Cost",
  "owner": "Administrator",
  "permissions": [],
- "sort_field": "creation",
+ "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
 }

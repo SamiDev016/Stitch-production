@@ -16,7 +16,11 @@
   "other_batches",
   "finish_goods",
   "amended_from",
-  "stock_entry_name"
+  "stock_entry_name",
+  "assemblying_cost_tab",
+  "workers",
+  "individual_cost",
+  "total_cost"
  ],
  "fields": [
   {
@@ -92,12 +96,34 @@
    "fieldtype": "Link",
    "label": "Custom Bom",
    "options": "Custom BOM"
+  },
+  {
+   "fieldname": "assemblying_cost_tab",
+   "fieldtype": "Tab Break",
+   "label": "Assemblying Cost"
+  },
+  {
+   "fieldname": "workers",
+   "fieldtype": "Table",
+   "label": "Workers",
+   "options": "Assemblying Workers Cost"
+  },
+  {
+   "fieldname": "individual_cost",
+   "fieldtype": "Float",
+   "label": "Individual Cost"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Float",
+   "label": "Total Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-29 14:40:25.251879",
+ "modified": "2025-06-30 09:43:18.546110",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",

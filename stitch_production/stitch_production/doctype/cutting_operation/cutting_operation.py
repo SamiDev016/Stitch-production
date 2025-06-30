@@ -7,7 +7,13 @@ class cuttingoperation(Document):
     def before_save(self):
         total_ws = total_rolls = 0.0
         total_sw = total_dw = total_cw = total_sew = 0.0
-
+        total_cost_bom = 0
+        for b in self.parent_boms or []:
+            total_cost_bom += b.cost_bom
+        
+        if total_cost_bom != 100:
+            frappe.throw("Total cost of BOMs should be 100%")
+        
         # Calculate workstation cost
         if self.workstation:
             ws = frappe.get_doc("Workstation", self.workstation)
@@ -38,6 +44,8 @@ class cuttingoperation(Document):
             total_ws + total_sw + total_dw + total_cw + total_sew +
             total_rolls + (self.individual_cost or 0)
         )
+        #operation cost will be total cost - rolls cost
+        self.operation_cost = self.total_cost - self.used_rolls_cost
 
         # Update roll warehouses
         for u in self.used_rolls or []:
@@ -77,7 +85,6 @@ class cuttingoperation(Document):
                     continue
                 size_doc = frappe.get_doc("Item Attribute Value", sm.size)
                 size_val = (size_doc.attribute_value or '').strip()
-                frappe.msgprint(size_val)
 
                 qty_per = sm.qty or 0
                 total_qty = lap * qty_per
@@ -166,15 +173,16 @@ class cuttingoperation(Document):
             r.save()
 
         parts_batches = {}
+        bom_cost_map = {b.parent_bom: b.cost_bom for b in self.parent_boms if b.parent_bom}
 
         for cp in self.cutting_parts:
             if not cp.part or (cp.quantity or 0) <= 0:
                 continue
 
-            bom   = cp.parent_bom
-            roll  = cp.roll_relation
-            size  = cp.size_link
-            key   = (self.name, bom, roll, size)
+            bom = cp.parent_bom
+            roll = cp.roll_relation
+            size = cp.size_link
+            key = (self.name, bom, roll, size)
             bname = f"{bom}-{roll}-{size}-{self.name}"
 
             if key not in parts_batches:
@@ -187,25 +195,58 @@ class cuttingoperation(Document):
                     batch = frappe.get_doc("Parts Batch", existing_name)
                 else:
                     batch = frappe.new_doc("Parts Batch")
-                    batch.batch_name  = bname
-                    batch.source_bom  = bom
+                    batch.batch_name = bname
+                    batch.source_bom = bom
 
                     roll_doc = frappe.get_doc("Rolls", roll)
-                    batch.color      = roll_doc.color
-                    batch.size       = size
+                    batch.color = roll_doc.color
+                    batch.size = size
 
                     batch.insert()
 
                 parts_batches[key] = batch
 
             parts_batches[key].append("parts", {
-                "part":       cp.part,
-                "qty":        cp.quantity,
+                "part": cp.part,
+                "qty": cp.quantity,
                 "source_bom": bom,
             })
 
-        for batch in parts_batches.values():
-            batch.save()
+        bom_to_batches = {}
+        for key, batch in parts_batches.items():
+            bom = key[1]
+            if bom not in bom_to_batches:
+                bom_to_batches[bom] = []
+            bom_to_batches[bom].append(batch)
+
+        for bom_name, batches in bom_to_batches.items():
+            bom_percent = bom_cost_map.get(bom_name, 0)
+            if not (bom_percent and batches):
+                continue
+
+            bom_doc = frappe.get_doc("BOM", bom_name)
+            bom_total_cost = self.total_cost * (bom_percent / 100.0)
+
+            part_cost_map = {}
+            total_part_percent = 0
+            for item in bom_doc.items:
+                part_code = item.item_code
+                part_percent = item.custom_cost_percent or 0
+                if part_percent > 0:
+                    part_cost_map[part_code] = part_percent
+                    total_part_percent += part_percent
+
+            for batch in batches:
+                batch.cost = 0
+                for part_row in batch.parts:
+                    part_code = part_row.part
+                    part_percent = part_cost_map.get(part_code, 0)
+                    if part_percent > 0 and total_part_percent > 0:
+                        part_total_cost = (bom_total_cost * (part_percent / total_part_percent))
+                        cost_per_one = part_total_cost / (part_row.qty or 1)
+                        part_row.cost_per_one = cost_per_one
+                        batch.cost += part_total_cost
+                batch.save()
 
         for batch in parts_batches.values():
             barcode_value = generate_hash(batch.batch_name, 12)
@@ -232,7 +273,7 @@ class cuttingoperation(Document):
             receipt.insert()
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
- 
+
     def before_cancel(self):
         frappe.flags.ignore_linked_with = True
     def on_cancel(self):

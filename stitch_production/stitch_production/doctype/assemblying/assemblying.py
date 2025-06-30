@@ -16,6 +16,20 @@ class Assemblying(Document):
             self.handle_special_assembly()
 
     def handle_normal_assembly(self):
+        total_cost = 0.0
+        individual_cost = self.individual_cost or 0.0
+
+        for w in self.workers or []:
+            if not w.worker:
+                continue
+            emp = frappe.get_doc("Employee", w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            total_cost += rate * (w.total_hours or 0)
+
+        self.total_cost = total_cost + individual_cost
+
+
+
         batch_names = frappe.get_all(
             "Parts Batch",
             filters={
@@ -149,6 +163,18 @@ class Assemblying(Document):
                 frappe.throw(f"No variant found for color <b>{batch.color}</b> and size <b>{batch.size}</b>.")
 
     def handle_special_assembly(self):
+        total_cost = 0.0
+        individual_cost = self.individual_cost or 0.0
+
+        for w in self.workers or []:
+            if not w.worker:
+                continue
+            emp = frappe.get_doc("Employee", w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            total_cost += rate * (w.total_hours or 0)
+
+        self.total_cost = total_cost + individual_cost
+
         main_color = None
         
         for row in frappe.get_doc("Custom BOM", self.custom_bom).boms:
