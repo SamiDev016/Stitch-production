@@ -16,20 +16,7 @@ class Assemblying(Document):
             self.handle_special_assembly()
 
     def handle_normal_assembly(self):
-        total_cost = 0.0
-        individual_cost = self.individual_cost or 0.0
-
-        for w in self.workers or []:
-            if not w.worker:
-                continue
-            emp = frappe.get_doc("Employee", w.worker)
-            rate = (emp.ctc or 0) / 22 / 8
-            total_cost += rate * (w.total_hours or 0)
-
-        self.total_cost = total_cost + individual_cost
-
-
-
+        
         batch_names = frappe.get_all(
             "Parts Batch",
             filters={
@@ -63,7 +50,7 @@ class Assemblying(Document):
 
         p_doc = frappe.get_doc("Parent BOM", self.parent_bom)
         other_boms = [b.bom for b in p_doc.boms if b.bom != self.main_bom]
-        frappe.msgprint(f"Other BOMs: {other_boms}")
+        # frappe.msgprint(f"Other BOMs: {other_boms}")
 
         for main_batch in self.main_batches:
             color = main_batch.color
@@ -71,7 +58,7 @@ class Assemblying(Document):
             required_qty = main_batch.parts_qty
             main_batch_name = main_batch.batch
 
-            frappe.msgprint(f"→ Matching for {main_batch_name} (Needed {required_qty})")
+            # frappe.msgprint(f"→ Matching for {main_batch_name} (Needed {required_qty})")
 
             for bom in other_boms:
                 accumulated_qty = 0
@@ -111,7 +98,7 @@ class Assemblying(Document):
                             "qty": take_qty
                         })
 
-                frappe.msgprint(f"  → {bom}: {selected}")
+                # frappe.msgprint(f"  → {bom}: {selected}")
 
                 if accumulated_qty < required_qty:
                     frappe.throw(
@@ -131,7 +118,7 @@ class Assemblying(Document):
             fields=["name", "item_code"]
         )
 
-        frappe.msgprint(f"Variants: {variants}")
+        # frappe.msgprint(f"Variants: {variants}")
 
         for idx, batch in enumerate(self.main_batches):
             color = batch.color.strip().lower()
@@ -162,8 +149,9 @@ class Assemblying(Document):
             else:
                 frappe.throw(f"No variant found for color <b>{batch.color}</b> and size <b>{batch.size}</b>.")
 
-    def handle_special_assembly(self):
+
         total_cost = 0.0
+        self.parts_cost = 0.0
         individual_cost = self.individual_cost or 0.0
 
         for w in self.workers or []:
@@ -173,17 +161,79 @@ class Assemblying(Document):
             rate = (emp.ctc or 0) / 22 / 8
             total_cost += rate * (w.total_hours or 0)
 
-        self.total_cost = total_cost + individual_cost
+        parts_cost = 0.0
+
+        # MAIN BATCH COST CALCULATION AND STORING
+        for batch in self.main_batches:
+            batch_doc = frappe.get_doc("Parts Batch", batch.batch)
+            pgcd = reduce(math.gcd, [int(p.qty) for p in batch_doc.parts if p.qty and float(p.qty).is_integer()])
+            if not pgcd:
+                continue
+
+            total_batch_cost = 0.0
+            for p in batch_doc.parts:
+                if not p.qty or not p.cost_per_one:
+                    continue
+
+                unit_ratio = p.qty / pgcd
+                used_qty = unit_ratio * batch.parts_qty
+                cost = used_qty * p.cost_per_one
+                total_batch_cost += cost
+
+                #frappe.msgprint(f"[MAIN] Part {p.part}: qty {used_qty}, unit cost {p.cost_per_one}, total = {cost}")
+
+            batch.cost = total_batch_cost
+            parts_cost += total_batch_cost
+            #frappe.msgprint(f"[MAIN BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
+
+        # OTHER BATCH COST CALCULATION AND STORING
+        for batch in self.other_batches:
+            batch_doc = frappe.get_doc("Parts Batch", batch.batch)
+            pgcd = reduce(math.gcd, [int(p.qty) for p in batch_doc.parts if p.qty and float(p.qty).is_integer()])
+            if not pgcd:
+                continue
+
+            total_batch_cost = 0.0
+            for p in batch_doc.parts:
+                if not p.qty or not p.cost_per_one:
+                    continue
+
+                unit_ratio = p.qty / pgcd
+                used_qty = unit_ratio * batch.qty
+                cost = used_qty * p.cost_per_one
+                total_batch_cost += cost
+
+                #frappe.msgprint(f"[OTHER] Part {p.part}: qty {used_qty}, unit cost {p.cost_per_one}, total = {cost}")
+
+            batch.cost = total_batch_cost
+            parts_cost += total_batch_cost
+            #frappe.msgprint(f"[OTHER BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
+
+        self.parts_cost = parts_cost
+        self.total_cost = total_cost + individual_cost + parts_cost
+
+
+    def handle_special_assembly(self):
+        total_cost = 0.0
+        self.parts_cost = 0.0
+        individual_cost = self.individual_cost or 0.0
+
+        for w in self.workers or []:
+            if not w.worker:
+                continue
+            emp = frappe.get_doc("Employee", w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            total_cost += rate * (w.total_hours or 0)
 
         main_color = None
-        
         for row in frappe.get_doc("Custom BOM", self.custom_bom).boms:
             if row.bom == self.main_bom:
                 main_color = row.color
                 break
+
         if not main_color:
             frappe.throw(f"Color for BOM {self.main_bom} not found in custom_bom {self.custom_bom}")
-        
+
         batch_names = frappe.get_all(
             "Parts Batch",
             filters={
@@ -212,21 +262,21 @@ class Assemblying(Document):
                 "size": pb["size"],
                 "parts_qty": pgcd
             })
-        
+
         if not self.custom_bom:
             frappe.throw("Custom BOM not set")
-        
+
         c_bom = frappe.get_doc("Custom BOM", self.custom_bom)
         other_boms = [b.bom for b in c_bom.boms if b.bom != self.main_bom]
-        frappe.msgprint(f"Other BOMs: {other_boms}")
-        
+        #frappe.msgprint(f"Other BOMs: {other_boms}")
+
         for main_batch in self.main_batches:
             color = main_batch.color
             size = main_batch.size
             required_qty = main_batch.parts_qty
             main_batch_name = main_batch.batch
 
-            frappe.msgprint(f"→ Matching for {main_batch_name} (Needed {required_qty})")
+            #frappe.msgprint(f"→ Matching for {main_batch_name} (Needed {required_qty})")
 
             for bom in other_boms:
                 bom_color = None
@@ -263,6 +313,7 @@ class Assemblying(Document):
                     if pgcd > 0:
                         take_qty = min(pgcd, required_qty - accumulated_qty)
                         accumulated_qty += take_qty
+
                         selected.append({
                             "batch": ob.batch_name,
                             "bom": bom,
@@ -275,7 +326,7 @@ class Assemblying(Document):
                             "qty": take_qty
                         })
 
-                frappe.msgprint(f"  → {bom}: {selected}")
+                #frappe.msgprint(f"  → {bom}: {selected}")
 
                 if accumulated_qty < required_qty:
                     frappe.throw(
@@ -294,7 +345,7 @@ class Assemblying(Document):
             },
             fields=["name", "item_code"]
         )
-        frappe.msgprint(f"Variants: {variants}")
+        #frappe.msgprint(f"Variants: {variants}")
 
         for idx, batch in enumerate(self.main_batches):
             size = batch.size.strip().lower()
@@ -323,6 +374,62 @@ class Assemblying(Document):
             else:
                 frappe.throw(f"No variant found for size <b>{batch.size}</b>.")
 
+        parts_cost = 0.0
+
+        # MAIN BATCH COSTS
+        for batch in self.main_batches:
+            batch_doc = frappe.get_doc("Parts Batch", batch.batch)
+            pgcd = reduce(math.gcd, [int(p.qty) for p in batch_doc.parts if p.qty and float(p.qty).is_integer()])
+            if not pgcd:
+                continue
+
+            total_batch_cost = 0.0
+            for p in batch_doc.parts:
+                if not p.qty or not p.cost_per_one:
+                    continue
+
+                unit_ratio = p.qty / pgcd
+                used_qty = unit_ratio * batch.parts_qty
+                cost = used_qty * p.cost_per_one
+                total_batch_cost += cost
+
+                #frappe.msgprint(
+                #    f"[MAIN] Part <b>{p.part}</b>: qty per pgcd = {p.qty}, "
+                #    f"used_qty = {used_qty}, cost_per_one = {p.cost_per_one}, cost = {cost}"
+                #)
+
+            batch.cost = total_batch_cost
+            parts_cost += total_batch_cost
+            #frappe.msgprint(f"[MAIN BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
+
+        # OTHER BATCH COSTS
+        for batch in self.other_batches:
+            batch_doc = frappe.get_doc("Parts Batch", batch.batch)
+            pgcd = reduce(math.gcd, [int(p.qty) for p in batch_doc.parts if p.qty and float(p.qty).is_integer()])
+            if not pgcd:
+                continue
+
+            total_batch_cost = 0.0
+            for p in batch_doc.parts:
+                if not p.qty or not p.cost_per_one:
+                    continue
+
+                unit_ratio = p.qty / pgcd
+                used_qty = unit_ratio * batch.qty
+                cost = used_qty * p.cost_per_one
+                total_batch_cost += cost
+
+                #frappe.msgprint(
+                #    f"[OTHER] Part <b>{p.part}</b>: qty per pgcd = {p.qty}, "
+                #    f"used_qty = {used_qty}, cost_per_one = {p.cost_per_one}, cost = {cost}"
+                #)
+
+            batch.cost = total_batch_cost
+            parts_cost += total_batch_cost
+            #frappe.msgprint(f"[OTHER BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
+
+        self.parts_cost = parts_cost
+        self.total_cost = total_cost + individual_cost + parts_cost
 
 
     def on_submit(self):

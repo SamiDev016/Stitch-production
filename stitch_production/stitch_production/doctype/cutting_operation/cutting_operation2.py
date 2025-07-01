@@ -6,25 +6,19 @@ class cuttingoperation(Document):
 
     def before_save(self):
         total_ws = total_rolls = 0.0
-        totals = {
-            'total_sw': 0.0,
-            'total_dw': 0.0,
-            'total_cw': 0.0,
-            'total_sew': 0.0
-        }
-
+        total_sw = total_dw = total_cw = total_sew = 0.0
         total_cost_bom = 0
         for b in self.parent_boms or []:
             total_cost_bom += (b.cost_bom or 0)
-
+        
         if total_cost_bom != 100:
             frappe.throw("Total cost of BOMs should be 100%")
-
+        
         if self.workstation:
             ws = frappe.get_doc("Workstation", self.workstation)
             total_ws = ws.hour_rate * (self.total_hours or 0)
 
-        for section, total_key in [
+        for section, total_var in [
             (self.spreading_workers, 'total_sw'),
             (self.drawing_workers, 'total_dw'),
             (self.cutting_workers, 'total_cw'),
@@ -35,12 +29,7 @@ class cuttingoperation(Document):
                     continue
                 emp = frappe.get_doc("Employee", w.worker)
                 rate = (emp.ctc or 0) / 22 / 8
-                totals[total_key] += rate * (w.total_hours or 0)
-
-        total_sw = totals['total_sw']
-        total_dw = totals['total_dw']
-        total_cw = totals['total_cw']
-        total_sew = totals['total_sew']
+                locals()[total_var] += rate * (w.total_hours or 0)
 
         for u in self.used_rolls or []:
             if u.roll:

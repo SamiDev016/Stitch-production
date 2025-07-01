@@ -9,7 +9,8 @@
   "batch",
   "color",
   "size",
-  "parts_qty"
+  "parts_qty",
+  "cost"
  ],
  "fields": [
   {
@@ -36,13 +37,18 @@
    "fieldtype": "Int",
    "in_list_view": 1,
    "label": "Parts QTY"
+  },
+  {
+   "fieldname": "cost",
+   "fieldtype": "Float",
+   "label": "cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-30 17:57:38.944852",
- "modified_by": "stitch@half-ware.com",
+ "modified": "2025-07-01 12:20:38.955329",
+ "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assembying Parts",
  "owner": "Administrator",
