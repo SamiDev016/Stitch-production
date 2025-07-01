@@ -17,28 +17,33 @@
   {
    "fieldname": "item",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Item",
    "options": "Item"
   },
   {
    "fieldname": "qty",
    "fieldtype": "Int",
+   "in_list_view": 1,
    "label": "QTY"
   },
   {
    "fieldname": "barcode",
    "fieldtype": "Barcode",
+   "in_list_view": 1,
    "label": "Barcode"
   },
   {
    "fieldname": "operation",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Operation",
    "options": "Assemblying"
   },
   {
    "fieldname": "stock_entry_name",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "stock_entry_name",
    "options": "Stock Entry"
   },
@@ -47,6 +52,7 @@
    "default": "0",
    "fieldname": "is_stitched",
    "fieldtype": "Check",
+   "in_list_view": 1,
    "label": "Is Stitched",
    "options": "0",
    "read_only": 1
@@ -55,12 +61,13 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-28 10:35:03.530179",
- "modified_by": "Administrator",
+ "modified": "2025-06-30 17:58:18.570332",
+ "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Finish Goods",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

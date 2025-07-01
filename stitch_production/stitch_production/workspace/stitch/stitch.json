@@ -1,0 +1,113 @@
+{
+ "app": "erpnext",
+ "charts": [],
+ "content": "[{\"id\":\"dpdGDXbpwP\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h4\\\">Stitch Production</span>\",\"col\":12}},{\"id\":\"pm5UzYwOs9\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Buy Rolls\",\"col\":6}},{\"id\":\"bc8xAc8GC8\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Rolls\",\"col\":6}},{\"id\":\"_2X7OA3Yki\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Boms\",\"col\":4}},{\"id\":\"XbbA6AO-TY\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Parent Boms\",\"col\":4}},{\"id\":\"os7y63GuTC\",\"type\":\"quick_list\",\"data\":{\"quick_list_name\":\"Custom Boms\",\"col\":4}},{\"id\":\"MkCvcljk93\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\">Cutting Operations</span>\",\"col\":12}},{\"id\":\"6z6TXWkLGO\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Create New Cutting Operation\",\"col\":6}},{\"id\":\"eS3SMJglxP\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Cuttings\",\"col\":6}},{\"id\":\"3etz764Ua3\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\">Assemblying Operations</span>\",\"col\":12}},{\"id\":\"PiMYHPFqQM\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Create New Assemblying\",\"col\":6}},{\"id\":\"E_l7-wDH3T\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Assemblyings\",\"col\":6}},{\"id\":\"CS22hq05KR\",\"type\":\"header\",\"data\":{\"text\":\"<span class=\\\"h1\\\">Stitching Operation</span>\",\"col\":12}},{\"id\":\"yhV0p_NdtD\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"Create New Stitching Operation\",\"col\":6}},{\"id\":\"ayRdp-DXzy\",\"type\":\"shortcut\",\"data\":{\"shortcut_name\":\"All Stitchings\",\"col\":6}}]",
+ "creation": "2025-06-28 15:56:47.500664",
+ "custom_blocks": [],
+ "docstatus": 0,
+ "doctype": "Workspace",
+ "for_user": "",
+ "hide_custom": 0,
+ "icon": "grid",
+ "idx": 0,
+ "indicator_color": "green",
+ "is_hidden": 0,
+ "label": "Stitch",
+ "link_type": "DocType",
+ "links": [],
+ "modified": "2025-06-28 17:40:50.346178",
+ "modified_by": "Administrator",
+ "module": "stitch production",
+ "name": "Stitch",
+ "number_cards": [],
+ "owner": "Administrator",
+ "parent_page": "",
+ "public": 1,
+ "quick_lists": [
+  {
+   "document_type": "BOM",
+   "label": "Boms",
+   "quick_list_filter": "[]"
+  },
+  {
+   "document_type": "Parent BOM",
+   "label": "Parent Boms",
+   "quick_list_filter": "[]"
+  },
+  {
+   "document_type": "Custom BOM",
+   "label": "Custom Boms",
+   "quick_list_filter": "[]"
+  }
+ ],
+ "roles": [],
+ "sequence_id": 44.0,
+ "shortcuts": [
+  {
+   "color": "Grey",
+   "doc_view": "New",
+   "label": "Create New Cutting Operation",
+   "link_to": "cutting operation",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "New",
+   "label": "Create New Assemblying",
+   "link_to": "Assemblying",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Red",
+   "doc_view": "List",
+   "label": "All Cuttings",
+   "link_to": "cutting operation",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "New",
+   "label": "Buy Rolls",
+   "link_to": "Purchase Receipt",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "All Rolls",
+   "link_to": "Rolls",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "All Assemblyings",
+   "link_to": "Assemblying",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "New",
+   "label": "Create New Stitching Operation",
+   "link_to": "Stitching Operation",
+   "stats_filter": "[]",
+   "type": "DocType"
+  },
+  {
+   "color": "Grey",
+   "doc_view": "List",
+   "label": "All Stitchings",
+   "link_to": "Stitching Operation",
+   "stats_filter": "[]",
+   "type": "DocType"
+  }
+ ],
+ "title": "Stitch",
+ "type": "Workspace"
+}

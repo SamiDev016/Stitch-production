@@ -18,23 +18,27 @@
   {
    "fieldname": "part",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Part",
    "options": "Item"
   },
   {
    "fieldname": "quantity",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Quantity"
   },
   {
    "fieldname": "warehouse",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Warehouse",
    "options": "Warehouse"
   },
   {
    "fieldname": "roll_relation",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "roll",
    "options": "Rolls",
    "read_only": 1
@@ -42,6 +46,7 @@
   {
    "fieldname": "batch_number",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "batch_number",
    "options": "Batch",
    "read_only": 1
@@ -49,6 +54,7 @@
   {
    "fieldname": "parent_bom",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "parent_bom",
    "options": "BOM",
    "read_only": 1
@@ -56,18 +62,20 @@
   {
    "fieldname": "size_link",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "size"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-14 18:04:24.462130",
- "modified_by": "Administrator",
+ "modified": "2025-06-30 17:55:39.195556",
+ "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Cutting Parts",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

@@ -12,6 +12,7 @@
   {
    "fieldname": "bom",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "BOM",
    "options": "BOM"
   }
@@ -20,9 +21,9 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-05-15 13:27:33.967310",
- "modified_by": "Administrator",
- "module": "Stitch Production",
+ "modified": "2025-06-30 18:00:20.976567",
+ "modified_by": "stitch@half-ware.com",
+ "module": "stitch production",
  "name": "BOMs fields",
  "owner": "Administrator",
  "permissions": [],

@@ -17,34 +17,41 @@
   {
    "fieldname": "roll",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Roll",
+   "link_filters": "[[\"Rolls\",\"weight\",\">\",0]]",
    "options": "Rolls"
   },
   {
    "fieldname": "used_qty",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Used QTY"
   },
   {
    "fieldname": "lap",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Lap"
   },
   {
    "fieldname": "roll_barcode",
    "fieldtype": "Barcode",
+   "in_list_view": 1,
    "label": "Roll Barcode"
   },
   {
    "fetch_from": "roll.color",
    "fieldname": "color",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Color",
    "read_only": 1
   },
   {
    "fieldname": "roll_warehouse",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "roll_warehouse",
    "options": "Warehouse",
    "read_only": 1
@@ -53,12 +60,13 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-03 10:55:59.007165",
- "modified_by": "Administrator",
+ "modified": "2025-06-30 17:55:07.873418",
+ "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Cutting Rolls",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
