@@ -84,7 +84,6 @@ class cuttingoperation(Document):
                 continue
 
             for sm in self.size_matrix or []:
-                index = 1
                 if not sm.size:
                     continue
                 size_doc = frappe.get_doc("Item Attribute Value", sm.size)
@@ -92,7 +91,6 @@ class cuttingoperation(Document):
 
                 qty_per = sm.qty or 0
                 total_qty = lap * qty_per
-                frappe.msgprint(f"total qty {total_qty}")
                 if total_qty <= 0:
                     continue
 
@@ -124,7 +122,6 @@ class cuttingoperation(Document):
                         cp.roll_relation = u.roll
                         cp.parent_bom = bom_link
                         cp.size_link = sm.size
-                        cp.batch_qty = total_qty
 
         for u in self.used_rolls or []:
             if not u.roll:
@@ -190,7 +187,6 @@ class cuttingoperation(Document):
             size = cp.size_link
             key = (self.name, bom, roll, size)
             bname = f"{bom}-{roll}-{size}-{self.name}"
-            pgcd_qty = cp.batch_qty
 
             if key not in parts_batches:
                 existing_name = frappe.db.get_value("Parts Batch", {"batch_name": bname}, "name")
@@ -203,7 +199,6 @@ class cuttingoperation(Document):
                     roll_doc = frappe.get_doc("Rolls", roll)
                     batch.color = roll_doc.color
                     batch.size = size
-                    batch.pgcd_qty = pgcd_qty
                     batch.insert()
 
                 parts_batches[key] = batch
@@ -220,18 +215,15 @@ class cuttingoperation(Document):
             if bom not in bom_to_batches:
                 bom_to_batches[bom] = []
             bom_to_batches[bom].append(batch)
-        total_pgcd_qty = 0
+
         for bom_name, batches in bom_to_batches.items():
-            total_pgcd_qty = sum(batch.pgcd_qty for batch in batches)
             bom_percent = bom_cost_map.get(bom_name, 0)
             if not (bom_percent and batches):
                 continue
 
             bom_doc = frappe.get_doc("BOM", bom_name)
             bom_total_cost = self.total_cost * (bom_percent / 100.0)
-
-            
-            
+            cost_per_batch = bom_total_cost / len(batches)
 
             part_cost_map = {}
             total_part_percent = 0
@@ -244,13 +236,6 @@ class cuttingoperation(Document):
 
             for batch in batches:
                 batch.cost = 0
-
-                frappe.msgprint(f"Total_qty: {total_pgcd_qty}")
-                cost_per_batch = batch.pgcd_qty / total_pgcd_qty * bom_total_cost 
-                frappe.msgprint(f"Cost per batch {batch.pgcd_qty} / {total_pgcd_qty} * {bom_total_cost} = {cost_per_batch}")
-
-                batch.cost = cost_per_batch
-                frappe.msgprint(f"Cost per batch: {batch.cost}")
                 for part_row in batch.parts:
                     part_code = part_row.part
                     template_code = frappe.db.get_value("Item", part_code, "variant_of")
@@ -260,6 +245,7 @@ class cuttingoperation(Document):
                         part_total_cost = cost_per_batch * (part_percent / total_part_percent)
                         cost_per_one = part_total_cost / qty
                         part_row.cost_per_one = cost_per_one
+                        batch.cost += part_total_cost
                 batch.save()
 
         for batch in parts_batches.values():

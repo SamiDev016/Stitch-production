@@ -10,6 +10,7 @@
   "serial_number_barcode",
   "amended_from",
   "batch_name",
+  "pgcd_qty",
   "cost",
   "parts",
   "source_operation",
@@ -53,6 +54,7 @@
   {
    "fieldname": "source_operation",
    "fieldtype": "Link",
+   "in_list_view": 1,
    "label": "Source Operation",
    "options": "cutting operation",
    "read_only": 1
@@ -67,27 +69,36 @@
   {
    "fieldname": "color",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Color",
    "read_only": 1
   },
   {
    "fieldname": "size",
    "fieldtype": "Data",
+   "in_list_view": 1,
    "label": "Size",
    "read_only": 1
   },
   {
    "fieldname": "cost",
    "fieldtype": "Float",
+   "in_list_view": 1,
    "label": "Cost",
    "options": "0.0",
    "read_only": 1
+  },
+  {
+   "default": "0.0",
+   "fieldname": "pgcd_qty",
+   "fieldtype": "Float",
+   "label": "PGCD Qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-29 16:00:11.079338",
+ "modified": "2025-07-02 12:25:46.135096",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parts Batch",
@@ -109,6 +120,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

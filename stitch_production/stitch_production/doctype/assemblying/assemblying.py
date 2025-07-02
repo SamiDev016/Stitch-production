@@ -164,6 +164,7 @@ class Assemblying(Document):
         parts_cost = 0.0
 
         # MAIN BATCH COST CALCULATION AND STORING
+        #cost_per_one
         for batch in self.main_batches:
             batch_doc = frappe.get_doc("Parts Batch", batch.batch)
             pgcd = reduce(math.gcd, [int(p.qty) for p in batch_doc.parts if p.qty and float(p.qty).is_integer()])
@@ -208,6 +209,11 @@ class Assemblying(Document):
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
             #frappe.msgprint(f"[OTHER BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
+
+        for p in self.finish_goods:
+            if not p.item:
+                continue
+            
 
         self.parts_cost = parts_cost
         self.total_cost = total_cost + individual_cost + parts_cost

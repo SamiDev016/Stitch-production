@@ -9,7 +9,8 @@
   "section_break_rdig",
   "amended_from",
   "special_item",
-  "boms"
+  "boms",
+  "raw_materials"
  ],
  "fields": [
   {
@@ -39,12 +40,18 @@
    "fieldtype": "Table",
    "label": "BOMS",
    "options": "Custom Bom Parts"
+  },
+  {
+   "fieldname": "raw_materials",
+   "fieldtype": "Table",
+   "label": "Raw Materials",
+   "options": "Raw Materials"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-28 15:11:23.520308",
+ "modified": "2025-07-02 11:39:03.060213",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Custom BOM",
@@ -65,6 +72,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

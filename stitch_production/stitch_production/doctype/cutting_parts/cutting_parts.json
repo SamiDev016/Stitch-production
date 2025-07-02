@@ -12,7 +12,9 @@
   "roll_relation",
   "batch_number",
   "parent_bom",
-  "size_link"
+  "size_link",
+  "batch_link",
+  "batch_qty"
  ],
  "fields": [
   {
@@ -64,13 +66,25 @@
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "size"
+  },
+  {
+   "default": "0.0",
+   "fieldname": "batch_link",
+   "fieldtype": "Float",
+   "label": "batch_link"
+  },
+  {
+   "default": "0.0",
+   "fieldname": "batch_qty",
+   "fieldtype": "Float",
+   "label": "batch_qty"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-30 17:55:39.195556",
- "modified_by": "stitch@half-ware.com",
+ "modified": "2025-07-02 12:20:08.002648",
+ "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Cutting Parts",
  "owner": "Administrator",
