@@ -11,6 +11,7 @@
   "amended_from",
   "batch_name",
   "pgcd_qty",
+  "cost_per_unit",
   "cost",
   "parts",
   "source_operation",
@@ -93,12 +94,17 @@
    "fieldname": "pgcd_qty",
    "fieldtype": "Float",
    "label": "PGCD Qty"
+  },
+  {
+   "fieldname": "cost_per_unit",
+   "fieldtype": "Currency",
+   "label": "Cost Per Unit"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-02 12:25:46.135096",
+ "modified": "2025-07-02 13:27:15.101962",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Parts Batch",

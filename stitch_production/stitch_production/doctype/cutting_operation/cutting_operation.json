@@ -14,6 +14,7 @@
   "used_rolls",
   "distination_warehouse",
   "cutting_parts",
+  "stock_entry_transfer",
   "stock_entry_name",
   "receipt_entry_name",
   "costs_tab",
@@ -72,7 +73,7 @@
    "default": "0.0",
    "fieldname": "individual_cost",
    "fieldtype": "Float",
-   "label": "Individual Cost"
+   "label": "Extra Cost"
   },
   {
    "fieldname": "cutting_parts",
@@ -149,16 +150,13 @@
   {
    "fieldname": "stock_entry_name",
    "fieldtype": "Link",
-   "hidden": 1,
-   "label": "stock_entry_name",
-   "options": "Stock Entry",
-   "read_only": 1
+   "label": "Stock Entry - Issue Raw Materials",
+   "options": "Stock Entry"
   },
   {
    "fieldname": "receipt_entry_name",
    "fieldtype": "Link",
-   "hidden": 1,
-   "label": "receipt_entry_name",
+   "label": "Stock Entry - Receipt Parts",
    "options": "Stock Entry"
   },
   {
@@ -208,12 +206,18 @@
    "fieldtype": "Float",
    "label": "Operation Cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "stock_entry_transfer",
+   "fieldtype": "Link",
+   "label": "Stock Entry - Transfer Raw Materials",
+   "options": "Stock Entry"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-06-29 16:00:32.338583",
+ "modified": "2025-07-02 14:19:04.143191",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",
@@ -234,6 +238,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

@@ -244,12 +244,14 @@ class cuttingoperation(Document):
 
             for batch in batches:
                 batch.cost = 0
+                batch.cost_per_unit = 0
 
                 frappe.msgprint(f"Total_qty: {total_pgcd_qty}")
                 cost_per_batch = batch.pgcd_qty / total_pgcd_qty * bom_total_cost 
                 frappe.msgprint(f"Cost per batch {batch.pgcd_qty} / {total_pgcd_qty} * {bom_total_cost} = {cost_per_batch}")
 
                 batch.cost = cost_per_batch
+                batch.cost_per_unit = cost_per_batch / batch.pgcd_qty
                 frappe.msgprint(f"Cost per batch: {batch.cost}")
                 for part_row in batch.parts:
                     part_code = part_row.part
