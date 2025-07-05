@@ -8,7 +8,8 @@
  "field_order": [
   "batch",
   "qty",
-  "cost"
+  "cost",
+  "finish_good_index"
  ],
  "fields": [
   {
@@ -29,12 +30,18 @@
    "fieldname": "cost",
    "fieldtype": "Currency",
    "label": "Cost"
+  },
+  {
+   "fieldname": "finish_good_index",
+   "fieldtype": "Data",
+   "label": "finish_good_index",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-05 12:05:44.708610",
+ "modified": "2025-07-05 13:23:20.660950",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying Result",
