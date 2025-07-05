@@ -92,7 +92,6 @@ class cuttingoperation(Document):
 
                 qty_per = sm.qty or 0
                 total_qty = lap * qty_per
-                frappe.msgprint(f"total qty {total_qty}")
                 if total_qty <= 0:
                     continue
 
@@ -289,6 +288,16 @@ class cuttingoperation(Document):
             receipt.insert()
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
+
+        # created batches will go to child table self.batches_result
+        self.set("batches_result", [])
+        for batch in parts_batches.values():
+            self.append("batches_result",{
+                "batch":batch.name,
+                "color":batch.color,
+                "size":batch.size,
+                "cost":batch.cost,
+            })
 
     def before_cancel(self):
         frappe.flags.ignore_linked_with = True

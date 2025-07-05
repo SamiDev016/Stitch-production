@@ -14,7 +14,7 @@
   "used_rolls",
   "distination_warehouse",
   "cutting_parts",
-  "batches",
+  "batches_result",
   "stock_entry_transfer",
   "stock_entry_name",
   "receipt_entry_name",
@@ -218,7 +218,7 @@
    "read_only": 1
   },
   {
-   "fieldname": "batches",
+   "fieldname": "batches_result",
    "fieldtype": "Table",
    "label": "Batches",
    "options": "Batches Results",
@@ -228,7 +228,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-05 09:47:41.085325",
+ "modified": "2025-07-05 09:51:19.320992",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",
