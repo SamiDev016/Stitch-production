@@ -21,17 +21,20 @@
   "costs_tab",
   "section_break_vzgq",
   "workstation",
+  "workstation_net_rate",
   "column_break_uxwc",
   "total_hours",
+  "workstation_total_cost",
   "section_break_yhka",
   "column_break_iczb",
   "spreading_workers",
+  "total_spreading_workers_cost",
   "column_break_gsnk",
   "drawing_workers",
+  "total_drawing_workers_cost",
   "cutting_separating_workers_section",
   "cutting_workers",
-  "column_break_nadi",
-  "separating_workers",
+  "total_cutting_workers_cost",
   "section_break_iyys",
   "used_rolls_cost",
   "individual_cost",
@@ -179,23 +182,13 @@
   {
    "fieldname": "cutting_separating_workers_section",
    "fieldtype": "Section Break",
-   "label": "Cutting /Separating Workers"
+   "label": "Cutting Workers"
   },
   {
    "fieldname": "cutting_workers",
    "fieldtype": "Table",
    "label": "Cutting Workers",
    "options": "Cutting Workers"
-  },
-  {
-   "fieldname": "column_break_nadi",
-   "fieldtype": "Column Break"
-  },
-  {
-   "fieldname": "separating_workers",
-   "fieldtype": "Table",
-   "label": "Separating Workers",
-   "options": "Separating Workers"
   },
   {
    "fieldname": "spreading_workers",
@@ -223,12 +216,42 @@
    "label": "Batches",
    "options": "Batches Results",
    "read_only": 1
+  },
+  {
+   "fieldname": "workstation_net_rate",
+   "fieldtype": "Currency",
+   "label": "Workstation Net rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "workstation_total_cost",
+   "fieldtype": "Currency",
+   "label": "Workstation Total Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_spreading_workers_cost",
+   "fieldtype": "Currency",
+   "label": "Total Spreading workers Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_drawing_workers_cost",
+   "fieldtype": "Currency",
+   "label": "Total Drawing Workers Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "total_cutting_workers_cost",
+   "fieldtype": "Currency",
+   "label": "Total Cutting Workers Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-05 09:51:19.320992",
+ "modified": "2025-07-05 11:08:29.097125",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",

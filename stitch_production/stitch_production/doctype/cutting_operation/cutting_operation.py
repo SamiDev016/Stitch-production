@@ -5,13 +5,13 @@ from frappe.utils import generate_hash
 class cuttingoperation(Document):
 
     def before_save(self):
-        total_ws = total_rolls = 0.0
-        totals = {
-            'total_sw': 0.0,
-            'total_dw': 0.0,
-            'total_cw': 0.0,
-            'total_sew': 0.0
-        }
+        total_ws = 0.0
+        total_rolls = 0.0
+        workstation_net_rate = 0.0
+        total_spreading_workers_cost = 0.0
+        total_drawing_workers_cost = 0.0
+        total_cutting_workers_cost = 0.0
+        
 
         total_cost_bom = 0
         for b in self.parent_boms or []:
@@ -23,24 +23,34 @@ class cuttingoperation(Document):
         if self.workstation:
             ws = frappe.get_doc("Workstation", self.workstation)
             total_ws = ws.hour_rate * (self.total_hours or 0)
+            workstation_net_rate = ws.hour_rate
+        self.workstation_net_rate = workstation_net_rate
+        self.workstation_total_cost = total_ws
 
-        for section, total_key in [
-            (self.spreading_workers, 'total_sw'),
-            (self.drawing_workers, 'total_dw'),
-            (self.cutting_workers, 'total_cw'),
-            (self.separating_workers, 'total_sew'),
-        ]:
-            for w in section or []:
-                if not w.worker:
-                    continue
-                emp = frappe.get_doc("Employee", w.worker)
-                rate = (emp.ctc or 0) / 22 / 8
-                totals[total_key] += rate * (w.total_hours or 0)
+        for spreading_w in self.spreading_workers:
+            emp = frappe.get_doc("Employee", spreading_w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            spreading_w.hourly_rate = rate
+            spreading_w.employee_cost = rate * (spreading_w.total_hours or 0)
+            total_spreading_workers_cost += rate * (spreading_w.total_hours or 0)
+        
+        self.total_spreading_workers_cost = total_spreading_workers_cost
 
-        total_sw = totals['total_sw']
-        total_dw = totals['total_dw']
-        total_cw = totals['total_cw']
-        total_sew = totals['total_sew']
+        for drawing_w in self.drawing_workers:
+            emp = frappe.get_doc("Employee", drawing_w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            drawing_w.hourly_rate = rate
+            drawing_w.employee_cost = rate * (drawing_w.total_hours or 0)
+            total_drawing_workers_cost += rate * (drawing_w.total_hours or 0)
+        self.total_drawing_workers_cost = total_drawing_workers_cost
+
+        for cutting_w in self.cutting_workers:
+            emp = frappe.get_doc("Employee", cutting_w.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            cutting_w.hourly_rate = rate
+            cutting_w.employee_cost = rate * (cutting_w.total_hours or 0)
+            total_cutting_workers_cost += rate * (cutting_w.total_hours or 0)
+        self.total_cutting_workers_cost = total_cutting_workers_cost
 
         for u in self.used_rolls or []:
             if u.roll:
@@ -49,10 +59,14 @@ class cuttingoperation(Document):
 
         self.used_rolls_cost = total_rolls
         self.total_cost = (
-            total_ws + total_sw + total_dw + total_cw + total_sew +
-            total_rolls + (self.individual_cost or 0)
+            total_ws + total_spreading_workers_cost + total_drawing_workers_cost + total_cutting_workers_cost + total_rolls + (self.individual_cost or 0)
         )
         self.operation_cost = self.total_cost - self.used_rolls_cost
+
+
+
+
+        
 
         for u in self.used_rolls or []:
             if u.roll:
@@ -245,13 +259,10 @@ class cuttingoperation(Document):
                 batch.cost = 0
                 batch.cost_per_unit = 0
 
-                frappe.msgprint(f"Total_qty: {total_pgcd_qty}")
                 cost_per_batch = batch.pgcd_qty / total_pgcd_qty * bom_total_cost 
-                frappe.msgprint(f"Cost per batch {batch.pgcd_qty} / {total_pgcd_qty} * {bom_total_cost} = {cost_per_batch}")
 
                 batch.cost = cost_per_batch
                 batch.cost_per_unit = cost_per_batch / batch.pgcd_qty
-                frappe.msgprint(f"Cost per batch: {batch.cost}")
                 for part_row in batch.parts:
                     part_code = part_row.part
                     template_code = frappe.db.get_value("Item", part_code, "variant_of")
