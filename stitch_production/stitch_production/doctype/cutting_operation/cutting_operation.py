@@ -303,12 +303,14 @@ class cuttingoperation(Document):
         # created batches will go to child table self.batches_result
         self.set("batches_result", [])
         for batch in parts_batches.values():
+            frappe.msgprint("Starting filling parts batch result")
             self.append("batches_result",{
                 "batch":batch.name,
                 "color":batch.color,
                 "size":batch.size,
                 "cost":batch.cost,
             })
+            frappe.msgprint("Finishing filling parts batch result")
 
     def before_cancel(self):
         frappe.flags.ignore_linked_with = True

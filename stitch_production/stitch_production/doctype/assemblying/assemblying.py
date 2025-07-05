@@ -144,24 +144,35 @@ class Assemblying(Document):
                 self.append("finish_goods", {
                     "item": matched_variant,
                     "qty": batch.parts_qty,
-                    "barcode": barcode
+                    "barcode": barcode,
+                    "color": color,
+                    "size": size
                 })
             else:
                 frappe.throw(f"No variant found for color <b>{batch.color}</b> and size <b>{batch.size}</b>.")
 
 
         total_cost = 0.0
+        total_cost_without_parts = 0.0
         self.parts_cost = 0.0
         individual_cost = self.individual_cost or 0.0
+        workers_total_cost = 0.0
 
         for w in self.workers or []:
             if not w.worker:
                 continue
             emp = frappe.get_doc("Employee", w.worker)
             rate = (emp.ctc or 0) / 22 / 8
+            w.hourly_rate = rate
+            w.employee_cost = rate * (w.total_hours or 0)
+            workers_total_cost += rate * (w.total_hours or 0)
             total_cost += rate * (w.total_hours or 0)
+            total_cost_without_parts += rate * (w.total_hours or 0)
 
         parts_cost = 0.0
+        total_cost_without_parts += individual_cost
+        self.total_cost_without_parts = total_cost_without_parts
+        self.workers_total_cost = workers_total_cost
 
         # MAIN BATCH COST CALCULATION AND STORING
         #cost_per_one
@@ -209,7 +220,23 @@ class Assemblying(Document):
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
             #frappe.msgprint(f"[OTHER BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
-
+        
+        for fg in self.finish_goods:
+            color = fg.color.strip().lower()
+            size = fg.size.strip().lower()
+            cost = 0.0
+            for mb in self.main_batches:
+                if mb.color.strip().lower() == color and mb.size.strip().lower() == size:
+                    cost += mb.cost
+            for ob in self.other_batches:
+                ob_doc = frappe.get_doc("Parts Batch", {"batch_name": ob.batch})
+                if ob_doc.color.strip().lower() == color and ob_doc.size.strip().lower() == size:
+                    cost += ob.cost
+            fg.cost = cost
+            fg.cost_per_one = cost / fg.qty
+            total_qty = sum(fgg.qty for fgg in self.finish_goods)
+            fg.cost_per_one_adding_assemblying = fg.cost_per_one + (self.total_cost_without_parts / total_qty)
+            fg.total_finish_good_adding_assemblying = fg.cost_per_one_adding_assemblying * fg.qty
         for p in self.finish_goods:
             if not p.item:
                 continue
@@ -433,6 +460,8 @@ class Assemblying(Document):
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
             #frappe.msgprint(f"[OTHER BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
+        
+        
 
         self.parts_cost = parts_cost
         self.total_cost = total_cost + individual_cost + parts_cost

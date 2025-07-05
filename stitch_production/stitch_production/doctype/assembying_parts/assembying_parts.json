@@ -40,20 +40,19 @@
   },
   {
    "fieldname": "cost",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "cost"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-01 12:20:38.955329",
+ "modified": "2025-07-05 12:05:31.087155",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assembying Parts",
  "owner": "Administrator",
  "permissions": [],
- "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

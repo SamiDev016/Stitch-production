@@ -19,8 +19,10 @@
   "stock_entry_name",
   "assemblying_cost_tab",
   "workers",
+  "workers_total_cost",
   "individual_cost",
   "parts_cost",
+  "total_cost_without_parts",
   "total_cost"
  ],
  "fields": [
@@ -112,7 +114,7 @@
   {
    "fieldname": "individual_cost",
    "fieldtype": "Float",
-   "label": "Individual Cost"
+   "label": "Extra Cost"
   },
   {
    "fieldname": "total_cost",
@@ -125,12 +127,24 @@
    "fieldtype": "Float",
    "label": "Parts Cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "total_cost_without_parts",
+   "fieldtype": "Currency",
+   "label": "Total cost without parts",
+   "read_only": 1
+  },
+  {
+   "fieldname": "workers_total_cost",
+   "fieldtype": "Currency",
+   "label": "Workers Total Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-01 11:10:18.837558",
+ "modified": "2025-07-05 12:40:02.167429",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",
@@ -151,7 +165,6 @@
    "write": 1
   }
  ],
- "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

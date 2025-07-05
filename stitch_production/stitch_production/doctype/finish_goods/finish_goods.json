@@ -12,7 +12,12 @@
   "operation",
   "stock_entry_name",
   "is_stitched",
-  "cost_per_one"
+  "cost",
+  "cost_per_one",
+  "color",
+  "size",
+  "cost_per_one_adding_assemblying",
+  "total_finish_good_adding_assemblying"
  ],
  "fields": [
   {
@@ -59,21 +64,45 @@
    "read_only": 1
   },
   {
+   "fieldname": "color",
+   "fieldtype": "Data",
+   "label": "Color"
+  },
+  {
+   "fieldname": "size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "cost",
+   "fieldtype": "Currency",
+   "label": "Total Finish Good Cost"
+  },
+  {
    "fieldname": "cost_per_one",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Cost Per One"
+  },
+  {
+   "fieldname": "cost_per_one_adding_assemblying",
+   "fieldtype": "Currency",
+   "label": "Cost per one adding assemblying"
+  },
+  {
+   "fieldname": "total_finish_good_adding_assemblying",
+   "fieldtype": "Currency",
+   "label": "Total finish good adding assemblying"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-01 15:36:21.073700",
+ "modified": "2025-07-05 12:22:09.464504",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Finish Goods",
  "owner": "Administrator",
  "permissions": [],
- "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []
