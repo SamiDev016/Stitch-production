@@ -14,6 +14,7 @@
   "used_rolls",
   "distination_warehouse",
   "cutting_parts",
+  "batches",
   "stock_entry_transfer",
   "stock_entry_name",
   "receipt_entry_name",
@@ -151,13 +152,15 @@
    "fieldname": "stock_entry_name",
    "fieldtype": "Link",
    "label": "Stock Entry - Issue Raw Materials",
-   "options": "Stock Entry"
+   "options": "Stock Entry",
+   "read_only": 1
   },
   {
    "fieldname": "receipt_entry_name",
    "fieldtype": "Link",
    "label": "Stock Entry - Receipt Parts",
-   "options": "Stock Entry"
+   "options": "Stock Entry",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_iczb",
@@ -211,13 +214,21 @@
    "fieldname": "stock_entry_transfer",
    "fieldtype": "Link",
    "label": "Stock Entry - Transfer Raw Materials",
-   "options": "Stock Entry"
+   "options": "Stock Entry",
+   "read_only": 1
+  },
+  {
+   "fieldname": "batches",
+   "fieldtype": "Table",
+   "label": "Batches",
+   "options": "Batches Results",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-02 14:19:04.143191",
+ "modified": "2025-07-05 09:47:41.085325",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",
@@ -238,7 +249,6 @@
    "write": 1
   }
  ],
- "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []
