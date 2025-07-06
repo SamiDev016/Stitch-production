@@ -7,7 +7,9 @@
  "engine": "InnoDB",
  "field_order": [
   "worker",
-  "total_hours"
+  "total_hours",
+  "hourly_rate",
+  "employee_cost"
  ],
  "fields": [
   {
@@ -20,12 +22,24 @@
    "fieldname": "total_hours",
    "fieldtype": "Float",
    "label": "Total Hours"
+  },
+  {
+   "fieldname": "hourly_rate",
+   "fieldtype": "Currency",
+   "label": "Hourly Rate",
+   "read_only": 1
+  },
+  {
+   "fieldname": "employee_cost",
+   "fieldtype": "Currency",
+   "label": "Employee Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-03 13:04:12.805588",
+ "modified": "2025-07-07 00:30:34.032239",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Separating Workers",

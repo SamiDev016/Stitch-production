@@ -39,6 +39,17 @@ class StitchingOperation(Document):
                         })
                         break
 
+        for ws in self.stitching_workers:
+            emp = frappe.get_doc("Employee", ws.worker)
+            rate = (emp.ctc or 0) / 22 / 8
+            ws.hourly_rate = rate
+            ws.employee_cost = rate * (ws.total_hours or 0)
+        
+        self.total_workers_cost = sum(ws.employee_cost for ws in self.stitching_workers)
+        frappe.msgprint(f"Total finish goods cost: {sum(fg.total_finish_good_adding_assemblying for fg in self.finish_goods)}")
+        self.total_cost = self.total_workers_cost + (self.extra_cost or 0) + sum(fg.total_finish_good_adding_assemblying for fg in self.finish_goods)
+
+            
     def on_submit(self):
         if not self.finish_goods or not self.distination_warehouse:
             frappe.throw(_("No Finish Goods found or no distination warehouse"))

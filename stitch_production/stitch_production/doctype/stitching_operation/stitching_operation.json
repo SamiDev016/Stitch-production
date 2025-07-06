@@ -11,7 +11,12 @@
   "distination_warehouse",
   "finish_goods",
   "amended_from",
-  "stock_entry_name"
+  "stock_entry_name",
+  "cost_tab",
+  "stitching_workers",
+  "total_workers_cost",
+  "extra_cost",
+  "total_cost"
  ],
  "fields": [
   {
@@ -53,12 +58,40 @@
    "label": "Stock entry name",
    "options": "Stock Entry",
    "read_only": 1
+  },
+  {
+   "fieldname": "cost_tab",
+   "fieldtype": "Tab Break",
+   "label": "Cost"
+  },
+  {
+   "fieldname": "stitching_workers",
+   "fieldtype": "Table",
+   "label": "Stitching Workers",
+   "options": "Stitching Workers"
+  },
+  {
+   "fieldname": "total_workers_cost",
+   "fieldtype": "Currency",
+   "label": "Total Workers Cost",
+   "read_only": 1
+  },
+  {
+   "fieldname": "extra_cost",
+   "fieldtype": "Currency",
+   "label": "Extra Cost"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Currency",
+   "label": "Total Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-06 23:08:48.850953",
+ "modified": "2025-07-07 00:28:59.169960",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching Operation",

@@ -28,18 +28,20 @@
   {
    "fieldname": "hourly_rate",
    "fieldtype": "Float",
-   "label": "Hourly Rate"
+   "label": "Hourly Rate",
+   "read_only": 1
   },
   {
    "fieldname": "employee_cost",
    "fieldtype": "Currency",
-   "label": "Employee Cost"
+   "label": "Employee Cost",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-05 10:17:35.968413",
+ "modified": "2025-07-07 00:29:23.984555",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Cutting Workers",

@@ -1,7 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
- "creation": "2025-06-03 13:02:15.559329",
+ "creation": "2025-07-07 00:26:29.239340",
  "doctype": "DocType",
  "editable_grid": 1,
  "engine": "InnoDB",
@@ -15,19 +15,17 @@
   {
    "fieldname": "worker",
    "fieldtype": "Link",
-   "in_list_view": 1,
-   "label": "Worker",
+   "label": "worker",
    "options": "Employee"
   },
   {
    "fieldname": "total_hours",
    "fieldtype": "Float",
-   "in_list_view": 1,
    "label": "Total Hours"
   },
   {
    "fieldname": "hourly_rate",
-   "fieldtype": "Float",
+   "fieldtype": "Currency",
    "label": "Hourly Rate",
    "read_only": 1
   },
@@ -41,10 +39,10 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-07 00:29:35.657626",
+ "modified": "2025-07-07 00:29:11.783728",
  "modified_by": "Administrator",
  "module": "stitch production",
- "name": "Drawing Workers",
+ "name": "Stitching Workers",
  "owner": "Administrator",
  "permissions": [],
  "sort_field": "modified",
