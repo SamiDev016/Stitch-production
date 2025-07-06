@@ -163,6 +163,7 @@ class cuttingoperation(Document):
         issue = frappe.new_doc("Stock Entry")
         issue.purpose = issue.stock_entry_type = "Material Issue"
         issue.company = company
+        
 
         for u in self.used_rolls:
             if not u.roll or (u.used_qty or 0) <= 0:
@@ -287,20 +288,29 @@ class cuttingoperation(Document):
         for cp in self.cutting_parts:
             if not cp.part or (cp.quantity or 0) <= 0:
                 continue
+            cost_per_one = 0
+            for batch in parts_batches.values():
+                for part_row in batch.parts:
+                    if part_row.part == cp.part:
+                        cost_per_one = part_row.cost_per_one or 0
+                        break
+            frappe.msgprint(f"Cost per one: {cost_per_one} for part {cp.part}")
             receipt.append("items", {
                 "item_code": cp.part,
                 "qty": cp.quantity,
                 "uom": frappe.db.get_value("Item", cp.part, "stock_uom"),
                 "t_warehouse": cp.warehouse,
-                "allow_zero_valuation_rate": 1
+                "allow_zero_valuation_rate": 1,
+                "basic_rate": cost_per_one,
+                "valuation_rate": cost_per_one,
+                "set_basic_rate_manually": 1
             })
 
         if receipt.items:
             receipt.insert()
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
-
-        # created batches will go to child table self.batches_result
+        
         self.set("batches_result", [])
         for batch in parts_batches.values():
             frappe.msgprint("Starting filling parts batch result")
