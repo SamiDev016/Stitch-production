@@ -507,10 +507,10 @@ class Assemblying(Document):
         company = frappe.defaults.get_user_default("Company")
 
         issue = frappe.new_doc("Stock Entry")
-        issue.purpose = issue.stock_entry_type = "Material Issue"
+        issue.purpose = issue.stock_entry_type = "Material Transfer"  # Changed from Material Issue
         issue.company = company
 
-        def add_item(item_code, qty, warehouse):
+        def add_item(item_code, qty, from_warehouse, to_warehouse):
             uom = frappe.db.get_value("Item", item_code, "stock_uom")
             issue.append("items", {
                 "item_code": item_code,
@@ -518,13 +518,15 @@ class Assemblying(Document):
                 "uom": uom,
                 "stock_uom": uom,
                 "conversion_factor": 1,
-                "s_warehouse": warehouse
+                "s_warehouse": from_warehouse,
+                "t_warehouse": to_warehouse
             })
 
         main_consumption = []
         for mb in self.main_batches:
             mb_doc = frappe.get_doc("Parts Batch", mb.batch)
-            wh = frappe.get_doc("cutting operation", mb_doc.source_operation).distination_warehouse
+            source_wh = frappe.get_doc("cutting operation", mb_doc.source_operation).distination_warehouse
+            dest_wh = self.distination_warehouse  # New destination for transfer
 
             qtys = [p.qty for p in mb_doc.parts if p.qty and p.qty > 0]
             ints = [int(q) for q in qtys if float(q).is_integer()]
@@ -533,13 +535,14 @@ class Assemblying(Document):
             for p in mb_doc.parts:
                 if p.qty and pgcd > 0:
                     to_consume = (p.qty / pgcd) * mb.parts_qty
-                    add_item(p.part, to_consume, wh)
+                    add_item(p.part, to_consume, source_wh, dest_wh)
                     main_consumption.append((mb.batch, p.part, to_consume))
 
         other_consumption = []
         for ob in self.other_batches:
             ob_doc = frappe.get_doc("Parts Batch", ob.batch)
-            wh = frappe.get_doc("cutting operation", ob_doc.source_operation).distination_warehouse
+            source_wh = frappe.get_doc("cutting operation", ob_doc.source_operation).distination_warehouse
+            dest_wh = self.distination_warehouse  # New destination for transfer
 
             qtys = [p.qty for p in ob_doc.parts if p.qty and p.qty > 0]
             ints = [int(q) for q in qtys if float(q).is_integer()]
@@ -548,7 +551,7 @@ class Assemblying(Document):
             for p in ob_doc.parts:
                 if p.qty and pgcd > 0:
                     to_consume = (p.qty / pgcd) * ob.qty
-                    add_item(p.part, to_consume, wh)
+                    add_item(p.part, to_consume, source_wh, dest_wh)
                     other_consumption.append((ob.batch, p.part, to_consume))
 
         if issue.items:

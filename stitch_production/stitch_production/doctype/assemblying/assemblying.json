@@ -8,6 +8,7 @@
  "field_order": [
   "section_break_ztod",
   "special_assembly",
+  "distination_warehouse",
   "parent_bom",
   "custom_bom",
   "main_operation",
@@ -139,12 +140,18 @@
    "fieldtype": "Currency",
    "label": "Workers Total Cost",
    "read_only": 1
+  },
+  {
+   "fieldname": "distination_warehouse",
+   "fieldtype": "Link",
+   "label": "Distination Warehouse",
+   "options": "Warehouse"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-05 12:40:02.167429",
+ "modified": "2025-07-06 21:09:50.582870",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",

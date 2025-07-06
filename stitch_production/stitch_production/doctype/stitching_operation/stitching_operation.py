@@ -31,7 +31,11 @@ class StitchingOperation(Document):
                             "item": fg.item,
                             "qty": fg.qty,
                             "barcode": fg.barcode,
-                            "operation": asm_doc.name
+                            "operation": asm_doc.name,
+                            "cost_per_one_adding_assemblying": fg.cost_per_one_adding_assemblying,
+                            "total_finish_good_adding_assemblying": fg.total_finish_good_adding_assemblying,
+                            "cost": fg.cost,
+                            "cost_per_one": fg.cost_per_one
                         })
                         break
 
@@ -48,20 +52,25 @@ class StitchingOperation(Document):
         #allow valuation rate to be set
         stock_entry.allow_valuation_rate = 1
 
-        def add_item(item_code, qty, warehouse):
+        def add_item(item_code, qty, warehouse, rate):
             uom = frappe.db.get_value("Item", item_code, "stock_uom")
             stock_entry.append("items", {
                 "item_code": item_code,
                 "qty": qty,
+                "basic_rate": rate,
                 "uom": uom,
                 "stock_uom": uom,
                 "conversion_factor": 1,
                 "t_warehouse": warehouse,
-                "allow_zero_valuation_rate": 1
+                "allow_zero_valuation_rate": 1,
+                "valuation_rate": rate,
+                "set_basic_rate_manually": 1
+
             })
 
         for fg in self.finish_goods:
-            add_item(fg.item, fg.qty, self.distination_warehouse)
+            frappe.msgprint(f"Adding item {fg.item} with rate {fg.cost_per_one_adding_assemblying}")
+            add_item(fg.item, fg.qty, self.distination_warehouse, fg.cost_per_one_adding_assemblying)
 
         if stock_entry.items:
             stock_entry.insert()
@@ -71,7 +80,6 @@ class StitchingOperation(Document):
         for fg in self.finish_goods:
             fg.db_set("stock_entry_name", stock_entry.name)
 
-            # ✅ Set is_stitched = 1 in child row inside Assemblying
             asm_doc = frappe.get_doc("Assemblying", fg.operation)
             for row in asm_doc.finish_goods:
                 if clean_barcode(row.barcode) == clean_barcode(fg.barcode):
@@ -97,4 +105,5 @@ class StitchingOperation(Document):
 
             except Exception as e:
                 frappe.throw(f"Unable to cancel Stock Entry {self.stock_entry_name}: {e}")
+
 
