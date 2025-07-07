@@ -46,8 +46,22 @@ class StitchingOperation(Document):
             ws.employee_cost = rate * (ws.total_hours or 0)
         
         self.total_workers_cost = sum(ws.employee_cost for ws in self.stitching_workers)
-        frappe.msgprint(f"Total finish goods cost: {sum(fg.total_finish_good_adding_assemblying for fg in self.finish_goods)}")
         self.total_cost = self.total_workers_cost + (self.extra_cost or 0) + sum(fg.total_finish_good_adding_assemblying for fg in self.finish_goods)
+        added_cost = 0.0
+
+        if not self.finish_goods:
+            frappe.msgprint("No Finish Goods found", raise_exception=1)
+            return
+        
+        fg_qty = sum(fg.qty for fg in self.finish_goods)
+        added_cost = (self.extra_cost + self.total_workers_cost) / fg_qty
+        
+        for fg in self.finish_goods:
+            fg.cost_per_one_adding_assemblying += added_cost
+            fg.total_finish_good_adding_assemblying += fg.qty * added_cost
+            fg.cost += fg.qty * added_cost
+            fg.cost_per_one += added_cost
+        
 
             
     def on_submit(self):
@@ -80,7 +94,6 @@ class StitchingOperation(Document):
             })
 
         for fg in self.finish_goods:
-            frappe.msgprint(f"Adding item {fg.item} with rate {fg.cost_per_one_adding_assemblying}")
             add_item(fg.item, fg.qty, self.distination_warehouse, fg.cost_per_one_adding_assemblying)
 
         if stock_entry.items:
@@ -107,7 +120,6 @@ class StitchingOperation(Document):
                 for fg in self.finish_goods:
                     fg.db_set("stock_entry_name", None)
 
-                    # ✅ Revert is_stitched = 0 in child row inside Assemblying
                     asm_doc = frappe.get_doc("Assemblying", fg.operation)
                     for row in asm_doc.finish_goods:
                         if clean_barcode(row.barcode) == clean_barcode(fg.barcode):
@@ -116,5 +128,4 @@ class StitchingOperation(Document):
 
             except Exception as e:
                 frappe.throw(f"Unable to cancel Stock Entry {self.stock_entry_name}: {e}")
-
 
