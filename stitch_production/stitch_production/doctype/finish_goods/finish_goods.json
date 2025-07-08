@@ -17,7 +17,8 @@
   "color",
   "size",
   "cost_per_one_adding_assemblying",
-  "total_finish_good_adding_assemblying"
+  "total_finish_good_adding_assemblying",
+  "finish_good_index"
  ],
  "fields": [
   {
@@ -92,17 +93,23 @@
    "fieldname": "total_finish_good_adding_assemblying",
    "fieldtype": "Currency",
    "label": "Total finish good adding assemblying"
+  },
+  {
+   "fieldname": "finish_good_index",
+   "fieldtype": "Data",
+   "label": "idx"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-05 12:22:09.464504",
- "modified_by": "Administrator",
+ "modified": "2025-07-08 13:53:22.636803",
+ "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Finish Goods",
  "owner": "Administrator",
  "permissions": [],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": []

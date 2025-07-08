@@ -10,7 +10,7 @@ def clean_barcode(value):
 
 class StitchingOperation(Document):
     def before_save(self):
-        self.finish_goods = []
+        self.set("finish_goods", [])
 
         for row in self.assembled_parts:
             if not row.barcode:
@@ -40,6 +40,8 @@ class StitchingOperation(Document):
                         break
 
         for ws in self.stitching_workers:
+            if not ws.worker:
+                continue
             emp = frappe.get_doc("Employee", ws.worker)
             rate = (emp.ctc or 0) / 22 / 8
             ws.hourly_rate = rate
@@ -62,6 +64,50 @@ class StitchingOperation(Document):
             fg.cost += fg.qty * added_cost
             fg.cost_per_one += added_cost
         
+        fg_map = {}
+
+        for fg in self.finish_goods:
+            if not fg.operation:
+                frappe.msgprint(f"Finish good {fg.barcode or fg.item} has no operation linked.")
+                continue
+
+            ass_doc = frappe.get_doc("Assemblying", fg.operation)
+            matched_fg = next((fgg for fgg in ass_doc.finish_goods if clean_barcode(fgg.barcode) == clean_barcode(fg.barcode)), None)
+
+            if not matched_fg:
+                frappe.msgprint(f"No matching finish good in Assemblying for barcode {fg.barcode}")
+                continue
+
+            finish_index = matched_fg.finish_good_index
+
+            fg_map[fg.barcode] = []
+
+            for mb in ass_doc.main_batches:
+                if mb.finish_good_index == finish_index:
+                    fg_map[fg.barcode].append({
+                        "batch": mb.batch,
+                        "qty": mb.parts_qty,
+                        "source": "main"
+                    })
+
+            for ob in ass_doc.other_batches:
+                if ob.finish_good_index == finish_index:
+                    fg_map[fg.barcode].append({
+                        "batch": ob.batch,
+                        "qty": ob.qty,
+                        "source": "other",
+                    })
+
+        frappe.msgprint(f"FG Map:\n{frappe.as_json(fg_map)}")
+        self.set("used_parts_batches", [])
+        for barcode, batches in fg_map.items():
+            for entry in batches:
+                self.append("used_parts_batches", {
+                    "batch": entry["batch"],
+                    "qty": entry["qty"],
+                })
+
+        
 
             
     def on_submit(self):
@@ -74,7 +120,6 @@ class StitchingOperation(Document):
         stock_entry = frappe.new_doc("Stock Entry")
         stock_entry.purpose = stock_entry.stock_entry_type = "Material Receipt"
         stock_entry.company = company
-        #allow valuation rate to be set
         stock_entry.allow_valuation_rate = 1
 
         def add_item(item_code, qty, warehouse, rate):

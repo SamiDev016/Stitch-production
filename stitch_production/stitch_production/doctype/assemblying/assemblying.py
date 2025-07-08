@@ -32,7 +32,7 @@ class Assemblying(Document):
         self.set("main_batches", [])
         self.set("other_batches", [])
 
-        for pb in batch_names:
+        for idx, pb in enumerate(batch_names):
             batch_doc = frappe.get_doc("Parts Batch", pb["name"])
             qtys = [p.qty for p in batch_doc.parts if p.qty and p.qty > 0.0]
             qtys_int = [int(q) for q in qtys if float(q).is_integer()]
@@ -42,7 +42,8 @@ class Assemblying(Document):
                 "batch": pb["batch_name"],
                 "color": pb["color"],
                 "size": pb["size"],
-                "parts_qty": pgcd
+                "parts_qty": pgcd,
+                "finish_good_index": idx
             })
 
         if not self.parent_bom:
@@ -50,15 +51,12 @@ class Assemblying(Document):
 
         p_doc = frappe.get_doc("Parent BOM", self.parent_bom)
         other_boms = [b.bom for b in p_doc.boms if b.bom != self.main_bom]
-        # frappe.msgprint(f"Other BOMs: {other_boms}")
 
         for main_batch in self.main_batches:
             color = main_batch.color
             size = main_batch.size
             required_qty = main_batch.parts_qty
             main_batch_name = main_batch.batch
-
-            # frappe.msgprint(f"→ Matching for {main_batch_name} (Needed {required_qty})")
 
             for bom in other_boms:
                 accumulated_qty = 0
@@ -95,10 +93,9 @@ class Assemblying(Document):
 
                         self.append("other_batches", {
                             "batch": ob.batch_name,
-                            "qty": take_qty
+                            "qty": take_qty,
+                            "finish_good_index": main_batch.finish_good_index
                         })
-
-                # frappe.msgprint(f"  → {bom}: {selected}")
 
                 if accumulated_qty < required_qty:
                     frappe.throw(
@@ -118,9 +115,9 @@ class Assemblying(Document):
             fields=["name", "item_code"]
         )
 
-        # frappe.msgprint(f"Variants: {variants}")
+        fg_idx = 0
 
-        for idx, batch in enumerate(self.main_batches):
+        for batch in self.main_batches:
             color = batch.color.strip().lower()
             size = batch.size.strip().lower()
             matched_variant = None
@@ -140,16 +137,19 @@ class Assemblying(Document):
                     break
 
             if matched_variant:
-                barcode = generate_barcode(self.name, idx)
+                barcode = generate_barcode(self.name, fg_idx)
                 self.append("finish_goods", {
                     "item": matched_variant,
                     "qty": batch.parts_qty,
                     "barcode": barcode,
                     "color": color,
-                    "size": size
+                    "size": size,
+                    "finish_good_index": fg_idx
                 })
+                
             else:
                 frappe.throw(f"No variant found for color <b>{batch.color}</b> and size <b>{batch.size}</b>.")
+            fg_idx += 1
 
 
         total_cost = 0.0
@@ -174,8 +174,6 @@ class Assemblying(Document):
         self.total_cost_without_parts = total_cost_without_parts
         self.workers_total_cost = workers_total_cost
 
-        # MAIN BATCH COST CALCULATION AND STORING
-        #cost_per_one
         for batch in self.main_batches:
             batch_doc = frappe.get_doc("Parts Batch", batch.batch)
             pgcd = reduce(math.gcd, [int(p.qty) for p in batch_doc.parts if p.qty and float(p.qty).is_integer()])
@@ -192,13 +190,9 @@ class Assemblying(Document):
                 cost = used_qty * p.cost_per_one
                 total_batch_cost += cost
 
-                #frappe.msgprint(f"[MAIN] Part {p.part}: qty {used_qty}, unit cost {p.cost_per_one}, total = {cost}")
-
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
-            #frappe.msgprint(f"[MAIN BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
 
-        # OTHER BATCH COST CALCULATION AND STORING
         for batch in self.other_batches:
             batch_doc = frappe.get_doc("Parts Batch", batch.batch)
             pgcd = reduce(math.gcd, [int(p.qty) for p in batch_doc.parts if p.qty and float(p.qty).is_integer()])
@@ -215,11 +209,8 @@ class Assemblying(Document):
                 cost = used_qty * p.cost_per_one
                 total_batch_cost += cost
 
-                #frappe.msgprint(f"[OTHER] Part {p.part}: qty {used_qty}, unit cost {p.cost_per_one}, total = {cost}")
-
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
-            #frappe.msgprint(f"[OTHER BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
         
         for fg in self.finish_goods:
             color = fg.color.strip().lower()
@@ -314,15 +305,12 @@ class Assemblying(Document):
 
         c_bom = frappe.get_doc("Custom BOM", self.custom_bom)
         other_boms = [b.bom for b in c_bom.boms if b.bom != self.main_bom]
-        #frappe.msgprint(f"Other BOMs: {other_boms}")
 
         for main_batch in self.main_batches:
             color = main_batch.color
             size = main_batch.size
             required_qty = main_batch.parts_qty
             main_batch_name = main_batch.batch
-
-            #frappe.msgprint(f"→ Matching for {main_batch_name} (Needed {required_qty})")
 
             for bom in other_boms:
                 bom_color = None
@@ -373,8 +361,6 @@ class Assemblying(Document):
                             "finish_good_index": main_batch.finish_good_index
                         })
 
-                #frappe.msgprint(f"  → {bom}: {selected}")
-
                 if accumulated_qty < required_qty:
                     frappe.throw(
                         f"Not enough parts for BOM <b>{bom}</b> with color <b>{bom_color}</b> and size <b>{size}</b> "
@@ -392,7 +378,6 @@ class Assemblying(Document):
             },
             fields=["name", "item_code"]
         )
-        #frappe.msgprint(f"Variants: {variants}")
 
         for idx, batch in enumerate(self.main_batches):
             size = batch.size.strip().lower()
@@ -416,7 +401,8 @@ class Assemblying(Document):
                 self.append("finish_goods", {
                     "item": matched_variant,
                     "qty": batch.parts_qty,
-                    "barcode": barcode
+                    "barcode": barcode,
+                    "idx": idx
                 })
             else:
                 frappe.throw(f"No variant found for size <b>{batch.size}</b>.")
@@ -440,16 +426,9 @@ class Assemblying(Document):
                 cost = used_qty * p.cost_per_one
                 total_batch_cost += cost
 
-                #frappe.msgprint(
-                #    f"[MAIN] Part <b>{p.part}</b>: qty per pgcd = {p.qty}, "
-                #    f"used_qty = {used_qty}, cost_per_one = {p.cost_per_one}, cost = {cost}"
-                #)
-
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
-            #frappe.msgprint(f"[MAIN BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
 
-        # OTHER BATCH COSTS
         for batch in self.other_batches:
             batch_doc = frappe.get_doc("Parts Batch", batch.batch)
             pgcd = reduce(math.gcd, [int(p.qty) for p in batch_doc.parts if p.qty and float(p.qty).is_integer()])
@@ -561,16 +540,44 @@ class Assemblying(Document):
         else:
             frappe.throw("No items were added to the Stock Entry.")
 
+        # ✅ Reserve main parts and decrease qty
         for batch_name, part_code, qty_used in main_consumption:
             pb = frappe.get_doc("Parts Batch", batch_name)
             for row in pb.parts:
                 if row.part == part_code:
-                    new_qty = (row.qty or 0) - qty_used
-                    frappe.db.set_value("Parts", row.name, "qty", new_qty)
+                    old_reserved = row.reserved_qty or 0
+                    old_qty = row.qty or 0
+                    available_qty = old_qty - old_reserved
 
+                    if available_qty < qty_used:
+                        frappe.throw(f"Not enough available qty for part {part_code} in batch {batch_name}. Needed: {qty_used}, Available: {available_qty}")
+
+                    new_reserved = old_reserved + qty_used
+                    new_qty = old_qty - qty_used
+
+                    frappe.db.set_value("Parts", row.name, {
+                        "reserved_qty": new_reserved,
+                        "qty": new_qty
+                    })
+
+        # ✅ Reserve other parts and decrease qty
         for batch_name, part_code, qty_used in other_consumption:
             pb = frappe.get_doc("Parts Batch", batch_name)
             for row in pb.parts:
                 if row.part == part_code:
-                    new_qty = (row.qty or 0) - qty_used
-                    frappe.db.set_value("Parts", row.name, "qty", new_qty)
+                    old_reserved = row.reserved_qty or 0
+                    old_qty = row.qty or 0
+                    available_qty = old_qty - old_reserved
+
+                    if available_qty < qty_used:
+                        frappe.throw(f"Not enough available qty for part {part_code} in batch {batch_name}. Needed: {qty_used}, Available: {available_qty}")
+
+                    new_reserved = old_reserved + qty_used
+                    new_qty = old_qty - qty_used
+
+                    frappe.db.set_value("Parts", row.name, {
+                        "reserved_qty": new_reserved,
+                        "qty": new_qty
+                    })
+
+
