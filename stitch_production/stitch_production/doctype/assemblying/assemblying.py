@@ -445,14 +445,8 @@ class Assemblying(Document):
                 cost = used_qty * p.cost_per_one
                 total_batch_cost += cost
 
-                #frappe.msgprint(
-                #    f"[OTHER] Part <b>{p.part}</b>: qty per pgcd = {p.qty}, "
-                #    f"used_qty = {used_qty}, cost_per_one = {p.cost_per_one}, cost = {cost}"
-                #)
-
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
-            #frappe.msgprint(f"[OTHER BATCH] {batch.batch} → Total Cost: {total_batch_cost}")
         
         for idx, fg in enumerate(self.finish_goods):
             cost = 0.0
@@ -486,7 +480,7 @@ class Assemblying(Document):
         company = frappe.defaults.get_user_default("Company")
 
         issue = frappe.new_doc("Stock Entry")
-        issue.purpose = issue.stock_entry_type = "Material Transfer"  # Changed from Material Issue
+        issue.purpose = issue.stock_entry_type = "Material Transfer"  
         issue.company = company
 
         def add_item(item_code, qty, from_warehouse, to_warehouse):
@@ -505,7 +499,7 @@ class Assemblying(Document):
         for mb in self.main_batches:
             mb_doc = frappe.get_doc("Parts Batch", mb.batch)
             source_wh = frappe.get_doc("cutting operation", mb_doc.source_operation).distination_warehouse
-            dest_wh = self.distination_warehouse  # New destination for transfer
+            dest_wh = self.distination_warehouse
 
             qtys = [p.qty for p in mb_doc.parts if p.qty and p.qty > 0]
             ints = [int(q) for q in qtys if float(q).is_integer()]
@@ -540,7 +534,6 @@ class Assemblying(Document):
         else:
             frappe.throw("No items were added to the Stock Entry.")
 
-        # ✅ Reserve main parts and decrease qty
         for batch_name, part_code, qty_used in main_consumption:
             pb = frappe.get_doc("Parts Batch", batch_name)
             for row in pb.parts:
@@ -560,7 +553,6 @@ class Assemblying(Document):
                         "qty": new_qty
                     })
 
-        # ✅ Reserve other parts and decrease qty
         for batch_name, part_code, qty_used in other_consumption:
             pb = frappe.get_doc("Parts Batch", batch_name)
             for row in pb.parts:

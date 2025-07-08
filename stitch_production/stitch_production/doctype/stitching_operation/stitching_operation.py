@@ -1,6 +1,7 @@
 import frappe
 from frappe.model.document import Document
 import re
+import math
 
 def clean_barcode(value):
     if not value:
@@ -84,27 +85,31 @@ class StitchingOperation(Document):
 
             for mb in ass_doc.main_batches:
                 if mb.finish_good_index == finish_index:
+                    warehouse = ass_doc.distination_warehouse
                     fg_map[fg.barcode].append({
                         "batch": mb.batch,
                         "qty": mb.parts_qty,
-                        "source": "main"
+                        "source": "main",
+                        "warehouse": warehouse
                     })
 
             for ob in ass_doc.other_batches:
                 if ob.finish_good_index == finish_index:
+                    warehouse = ass_doc.distination_warehouse
                     fg_map[fg.barcode].append({
                         "batch": ob.batch,
                         "qty": ob.qty,
                         "source": "other",
+                        "warehouse": warehouse
                     })
 
-        frappe.msgprint(f"FG Map:\n{frappe.as_json(fg_map)}")
         self.set("used_parts_batches", [])
         for barcode, batches in fg_map.items():
             for entry in batches:
                 self.append("used_parts_batches", {
                     "batch": entry["batch"],
                     "qty": entry["qty"],
+                    "warehouse": entry["warehouse"]
                 })
 
         
@@ -154,6 +159,86 @@ class StitchingOperation(Document):
                 if clean_barcode(row.barcode) == clean_barcode(fg.barcode):
                     row.is_stitched = 1
             asm_doc.save()
+
+        
+        issue_entry = frappe.new_doc("Stock Entry")
+        issue_entry.purpose = issue_entry.stock_entry_type = "Material Issue"
+        issue_entry.company = company
+        issue_entry.allow_valuation_rate = 1
+
+        def issue_part(part_code, qty, warehouse, rate):
+            uom = frappe.db.get_value("Item", part_code, "stock_uom")
+            issue_entry.append("items", {
+                "item_code": part_code,
+                "qty": qty,
+                "uom": uom,
+                "stock_uom": uom,
+                "conversion_factor": 1,
+                "s_warehouse": warehouse,
+                "allow_zero_valuation_rate": 1,
+                "valuation_rate": rate,
+                "set_basic_rate_manually": 1,
+                "basic_rate": rate,
+            })
+
+        # Issue parts for each used batch
+        for batch in self.used_parts_batches:
+            if not batch.batch:
+                continue
+
+            pb_doc = frappe.get_doc("Parts Batch", batch.batch)
+            if not pb_doc.parts:
+                continue
+
+            batch_qty = batch.qty
+
+            reserved_qtys = [int(p.reserved_qty) for p in pb_doc.parts if p.reserved_qty and float(p.reserved_qty).is_integer()]
+            pgcd = math.gcd(*reserved_qtys) if reserved_qtys else 1
+
+            if pgcd <= 0:
+                frappe.msgprint(f"Invalid PGCD for batch {batch.batch}")
+                continue
+
+            for part in pb_doc.parts:
+                if not part.part or not part.reserved_qty or not part.cost_per_one:
+                    continue
+
+                per_unit_reserved = part.reserved_qty / pgcd
+                used_qty = per_unit_reserved * batch_qty
+
+                if used_qty <= 0:
+                    continue
+
+                if (part.reserved_qty or 0) < used_qty:
+                    frappe.throw(f"Not enough reserved qty for part {part.part} in batch {batch.batch}. Needed: {used_qty}, Reserved: {part.reserved_qty}")
+
+
+                warehouse = batch.warehouse
+
+                frappe.msgprint(f"Issuing {used_qty} of {part.part} from {warehouse}")
+                frappe.msgprint(f"cost per one: {part.cost_per_one}")
+
+                issue_part(part.part, used_qty, warehouse, part.cost_per_one)
+
+                for p in pb_doc.parts:
+                    if p.part == part.part:
+                        p.reserved_qty -= used_qty
+                        if p.reserved_qty < 0:
+                            p.reserved_qty = 0
+                        if p.qty:
+                            p.qty -= used_qty
+                            if p.qty < 0:
+                                p.qty = 0
+
+                pb_doc.save()
+
+        issue_entry.insert()
+        issue_entry.submit()
+
+        self.db_set("issue_entry_name", issue_entry.name)
+        
+
+
 
     def on_cancel(self):
         if self.stock_entry_name:
