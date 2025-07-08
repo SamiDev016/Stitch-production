@@ -101,8 +101,9 @@ class cuttingoperation(Document):
                 index = 1
                 if not sm.size:
                     continue
-                size_doc = frappe.get_doc("Item Attribute Value", sm.size)
-                size_val = (size_doc.attribute_value or '').strip()
+                #size_doc = frappe.get_doc("Item Attribute Value", sm.size)
+                size_doc = frappe.get_doc("Size", sm.size)
+                size_val = size_doc.size
 
                 qty_per = sm.qty or 0
                 total_qty = lap * qty_per

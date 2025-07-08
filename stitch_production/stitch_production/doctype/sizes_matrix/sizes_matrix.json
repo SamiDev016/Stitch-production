@@ -8,16 +8,15 @@
  "field_order": [
   "qty",
   "bom_link",
-  "size"
+  "size",
+  "size2"
  ],
  "fields": [
   {
    "fieldname": "size",
    "fieldtype": "Link",
-   "in_list_view": 1,
    "label": "Size",
-   "link_filters": "[[\"Item Attribute Value\",\"parent\",\"=\",\"Size\"]]",
-   "options": "Item Attribute Value"
+   "options": "Size"
   },
   {
    "fieldname": "qty",
@@ -31,18 +30,25 @@
    "in_list_view": 1,
    "label": "BOM LINK",
    "options": "BOM"
+  },
+  {
+   "fieldname": "size2",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Size2",
+   "link_filters": "[[\"Item Attribute Value\",\"parent\",\"=\",\"Size\"]]",
+   "options": "Item Attribute Value"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-30 17:54:40.993951",
- "modified_by": "stitch@half-ware.com",
+ "modified": "2025-07-08 10:57:10.649342",
+ "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Sizes Matrix",
  "owner": "Administrator",
  "permissions": [],
- "row_format": "Dynamic",
  "sort_field": "creation",
  "sort_order": "DESC",
  "states": []

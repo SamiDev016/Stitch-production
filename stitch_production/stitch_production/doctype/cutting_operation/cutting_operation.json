@@ -214,8 +214,7 @@
    "fieldname": "batches_result",
    "fieldtype": "Table",
    "label": "Batches",
-   "options": "Batches Results",
-   "read_only": 1
+   "options": "Batches Results"
   },
   {
    "fieldname": "workstation_net_rate",
@@ -251,7 +250,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-05 11:08:29.097125",
+ "modified": "2025-07-08 09:56:33.648018",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",
