@@ -467,10 +467,10 @@ class Assemblying(Document):
                 "uom": uom,
                 "stock_uom": uom,
                 "conversion_factor": 1,
-                "allow_zero_valuation_rate": 1,
                 "valuation_rate": float(rate),
-                "set_basic_rate_manually": 1,
                 "basic_rate": float(rate),
+                "set_basic_rate_manually": 1,
+                "allow_zero_valuation_rate": 1,
                 "s_warehouse": from_warehouse,
                 "t_warehouse": to_warehouse
             })

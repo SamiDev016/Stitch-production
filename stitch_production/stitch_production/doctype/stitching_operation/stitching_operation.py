@@ -179,6 +179,7 @@ class StitchingOperation(Document):
                 "valuation_rate": rate,
                 "set_basic_rate_manually": 1,
                 "basic_rate": rate,
+                "allow_alternative_item_rate": 1,
             })
 
         # Issue parts for each used batch
@@ -190,28 +191,20 @@ class StitchingOperation(Document):
             if not pb_doc.parts:
                 continue
 
-            batch_qty = batch.qty
-
-            reserved_qtys = [int(p.reserved_qty) for p in pb_doc.parts if p.reserved_qty and float(p.reserved_qty).is_integer()]
-            pgcd = math.gcd(*reserved_qtys) if reserved_qtys else 1
-
-            if pgcd <= 0:
-                frappe.msgprint(f"Invalid PGCD for batch {batch.batch}")
-                continue
+            batch_qty = batch.qty  # how many FG we're stitching
 
             for part in pb_doc.parts:
-                if not part.part or not part.reserved_qty or not part.cost_per_one:
+                if not part.part or not part.reserved_qty or not part.cost_per_one or not part.qty_of_finished_goods:
                     continue
 
-                per_unit_reserved = part.reserved_qty / pgcd
-                used_qty = per_unit_reserved * batch_qty
+                per_unit_qty = part.reserved_qty / part.qty_of_finished_goods
+                used_qty = per_unit_qty * batch_qty
 
                 if used_qty <= 0:
                     continue
 
                 if (part.reserved_qty or 0) < used_qty:
                     frappe.throw(f"Not enough reserved qty for part {part.part} in batch {batch.batch}. Needed: {used_qty}, Reserved: {part.reserved_qty}")
-
 
                 warehouse = batch.warehouse
 
@@ -230,7 +223,8 @@ class StitchingOperation(Document):
                             if p.qty < 0:
                                 p.qty = 0
 
-                pb_doc.save()
+            pb_doc.save()
+
 
         issue_entry.insert()
         issue_entry.submit()
@@ -258,4 +252,5 @@ class StitchingOperation(Document):
 
             except Exception as e:
                 frappe.throw(f"Unable to cancel Stock Entry {self.stock_entry_name}: {e}")
+
 
