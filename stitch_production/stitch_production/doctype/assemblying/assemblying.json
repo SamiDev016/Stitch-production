@@ -18,6 +18,7 @@
   "finish_goods",
   "amended_from",
   "stock_entry_name",
+  "_consumed_qty_map_json",
   "assemblying_cost_tab",
   "workers",
   "workers_total_cost",
@@ -146,12 +147,18 @@
    "fieldtype": "Link",
    "label": "Distination Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "_consumed_qty_map_json",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "_consumed_qty_map_json"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-09 11:31:46.287941",
+ "modified": "2025-07-09 13:17:40.334357",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Assemblying",

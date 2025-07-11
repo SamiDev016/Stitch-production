@@ -90,6 +90,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "default": "0.0",
    "fieldname": "pgcd_qty",
    "fieldtype": "Float",
@@ -104,7 +105,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-08 13:13:48.425909",
+ "modified": "2025-07-09 13:01:15.383579",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Parts Batch",

@@ -227,6 +227,7 @@ class cuttingoperation(Document):
                 "part": cp.part,
                 "qty": cp.quantity,
                 "source_bom": bom,
+                "qty_of_finished_goods": pgcd_qty
             })
 
         bom_to_batches = {}

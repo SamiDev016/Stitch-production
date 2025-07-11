@@ -2,6 +2,8 @@ import frappe
 from frappe.model.document import Document
 import math
 from functools import reduce
+from decimal import Decimal, ROUND_HALF_UP
+import json
 
 
 def generate_barcode(name, index):
@@ -16,7 +18,6 @@ class Assemblying(Document):
             self.handle_special_assembly()
 
     def handle_normal_assembly(self):
-        frappe.msgprint("🔄 Starting normal assembly handling...")
 
         batch_names = frappe.get_all(
             "Parts Batch",
@@ -35,8 +36,6 @@ class Assemblying(Document):
             qtys = [p.qty for p in batch_doc.parts if p.qty and p.qty > 0.0]
             qtys_int = [int(q) for q in qtys if float(q).is_integer()]
             pgcd = reduce(math.gcd, qtys_int) if qtys_int else 0
-
-            frappe.msgprint(f"📦 Main Batch: {pb['batch_name']} | PGCD: {pgcd}")
 
             self.append("main_batches", {
                 "batch": pb["batch_name"],
@@ -58,7 +57,6 @@ class Assemblying(Document):
             required_qty = main_batch.parts_qty
             main_batch_name = main_batch.batch
 
-            frappe.msgprint(f"🔎 Processing main batch {main_batch_name} | Needed Qty: {required_qty}")
 
             for bom in other_boms:
                 accumulated_qty = 0
@@ -79,11 +77,8 @@ class Assemblying(Document):
                     qtys_int = [int(q) for q in qtys if float(q).is_integer()]
                     pgcd = reduce(math.gcd, qtys_int) if qtys_int else 0
 
-                    frappe.msgprint(f"📄 Other Batch: {ob.batch_name} | PGCD: {pgcd}")
-
                     if pgcd > 0:
                         take_qty = min(pgcd, required_qty - accumulated_qty)
-                        frappe.msgprint(f"✅ Using {take_qty} from {ob.batch_name} for BOM {bom}")
 
                         accumulated_qty += take_qty
                         selected.append({
@@ -145,7 +140,6 @@ class Assemblying(Document):
                     "size": size,
                     "finish_good_index": fg_idx
                 })
-                frappe.msgprint(f"🎯 Matched Variant: {matched_variant} | Qty: {batch.parts_qty}")
             else:
                 frappe.throw(f"No variant found for color <b>{batch.color}</b> and size <b>{batch.size}</b>.")
             fg_idx += 1
@@ -190,8 +184,6 @@ class Assemblying(Document):
                 cost = used_qty * p.cost_per_one
                 total_batch_cost += cost
 
-                frappe.msgprint(f"💰 Part: {p.part} | Qty: {p.qty} | Reserved: {p.reserved_qty} | PGCD: {pgcd} | Unit Ratio: {unit_ratio} | Used: {used_qty} | Cost: {cost}")
-
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
 
@@ -217,6 +209,7 @@ class Assemblying(Document):
             fg.total_finish_good_adding_assemblying = fg.cost_per_one_adding_assemblying * fg.qty
 
         self.total_cost = total_cost + individual_cost + parts_cost
+
 
     def handle_special_assembly(self):
         total_cost = 0.0
@@ -464,18 +457,20 @@ class Assemblying(Document):
         issue.purpose = issue.stock_entry_type = "Material Transfer"
         issue.company = company
 
+        consumed_map = {}
+
         def add_item(item_code, qty, from_warehouse, to_warehouse, rate):
             uom = frappe.db.get_value("Item", item_code, "stock_uom")
             issue.append("items", {
                 "item_code": item_code,
-                "qty": qty,
+                "qty": float(qty),
                 "uom": uom,
                 "stock_uom": uom,
                 "conversion_factor": 1,
                 "allow_zero_valuation_rate": 1,
-                "valuation_rate": rate,
+                "valuation_rate": float(rate),
                 "set_basic_rate_manually": 1,
-                "basic_rate": rate,
+                "basic_rate": float(rate),
                 "s_warehouse": from_warehouse,
                 "t_warehouse": to_warehouse
             })
@@ -487,46 +482,57 @@ class Assemblying(Document):
                 source_wh = frappe.get_doc("cutting operation", pb.source_operation).distination_warehouse
                 dest_wh = self.distination_warehouse
 
-                qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
-                ints = [int(q) for q in qtys if float(q).is_integer()]
-                pgcd = reduce(math.gcd, ints) if ints else 1
-
-                if pgcd <= 0:
-                    continue
-
-                multiplier = b.parts_qty if is_main else b.qty
+                multiplier = Decimal(str(b.parts_qty if is_main else b.qty))
 
                 for p in pb.parts:
-                    if p.qty:
-                        to_consume = (p.qty / pgcd) * multiplier
-                        consumptions.append((b.batch, p.part, to_consume, source_wh, dest_wh, p.cost_per_one, p.name))
+                    if not p.qty or not p.qty_of_finished_goods:
+                        continue
+
+                    part_key = p.name
+                    base_qty = Decimal(str(p.qty))
+                    fg_qty = Decimal(str(p.qty_of_finished_goods))
+
+                    if fg_qty <= 0:
+                        frappe.throw(f"❌ Invalid 'qty_of_finished_goods' for part {p.part} in batch {b.batch}")
+
+                    qty_per_unit = base_qty / fg_qty
+                    to_consume = qty_per_unit * multiplier
+                    to_consume = to_consume.quantize(Decimal('0.00001'), rounding=ROUND_HALF_UP)
+
+                    cost = Decimal(str(p.cost_per_one or 0))
+                    consumptions.append((b.batch, p.part, to_consume, source_wh, dest_wh, cost, part_key))
             return consumptions
+
 
         main_consumption = process_batches(self.main_batches, True)
         other_consumption = process_batches(self.other_batches, False)
+        all_consumption = main_consumption + other_consumption
 
-        def reserve_and_update(consumption_list):
-            for batch_name, part_code, qty_used, _, _, _, part_rowname in consumption_list:
-                pb = frappe.get_doc("Parts Batch", batch_name)
-                for row in pb.parts:
-                    if row.part == part_code:
-                        old_qty = row.qty or 0
-                        old_reserved = row.reserved_qty or 0
-                        available_qty = old_qty - old_reserved
+        for batch_name, part_code, qty_used, _, _, _, part_rowname in all_consumption:
+            pb = frappe.get_doc("Parts Batch", batch_name)
+            for row in pb.parts:
+                if row.part == part_code:
+                    old_qty = Decimal(str(row.qty or 0))
+                    old_reserved = Decimal(str(row.reserved_qty or 0))
+                    available_qty = old_qty - old_reserved
 
-                        if available_qty < qty_used:
-                            continue
+                    if available_qty < qty_used:
+                        continue
 
-                        frappe.db.set_value("Parts", row.name, {
-                            "qty": old_qty - qty_used,
-                            "reserved_qty": old_reserved + qty_used
-                        })
-                        break
+                    new_qty = (old_qty - qty_used).quantize(Decimal('0.00001'))
+                    new_reserved = (old_reserved + qty_used).quantize(Decimal('0.00001'))
 
-        reserve_and_update(main_consumption)
-        reserve_and_update(other_consumption)
+                    frappe.db.set_value("Parts", row.name, {
+                        "qty": float(new_qty),
+                        "reserved_qty": float(new_reserved)
+                    })
 
-        for batch_name, part_code, qty_used, source_wh, dest_wh, cost, _ in main_consumption + other_consumption:
+                    consumed_map[row.name] = float(qty_used)
+                    break
+
+        self.db_set("_consumed_qty_map_json", json.dumps(consumed_map))
+
+        for batch_name, part_code, qty_used, source_wh, dest_wh, cost, _ in all_consumption:
             add_item(part_code, qty_used, source_wh, dest_wh, cost)
 
         if not issue.items:
@@ -535,6 +541,13 @@ class Assemblying(Document):
         issue.insert()
         issue.submit()
         self.db_set("stock_entry_name", issue.name)
+
+        for b in self.main_batches + self.other_batches:
+            pb = frappe.get_doc("Parts Batch", b.batch)
+            qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
+            ints = [int(q) for q in qtys if float(q).is_integer()]
+            pgcd = reduce(math.gcd, ints) if ints else 0
+            frappe.db.set_value("Parts Batch", pb.name, "pgcd_qty", pgcd)
 
     def on_cancel(self):
         if self.stock_entry_name:
@@ -545,37 +558,32 @@ class Assemblying(Document):
             except Exception as e:
                 frappe.throw(f"Could not cancel Stock Entry {self.stock_entry_name}: {e}")
 
-        def restore_parts(batches, is_main):
+        try:
+            consumed_map = json.loads(self._consumed_qty_map_json)
+        except Exception:
+            consumed_map = {}
+
+        def restore_parts(batches):
             for b in batches:
                 pb = frappe.get_doc("Parts Batch", b.batch)
 
-                qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
-                ints = [int(q) for q in qtys if float(q).is_integer()]
-                pgcd = reduce(math.gcd, ints) if ints else 1
-                if pgcd <= 0:
-                    continue
-
-                multiplier = b.parts_qty if is_main else b.qty
-
                 for row in pb.parts:
-                    if not row.qty and not row.reserved_qty:
-                        continue
+                    key = row.name
+                    used = Decimal(str(consumed_map.get(key, 0)))
 
-                    to_restore = (row.qty + row.reserved_qty) / pgcd * multiplier if pgcd else 0
+                    old_qty = Decimal(str(row.qty or 0))
+                    old_reserved = Decimal(str(row.reserved_qty or 0))
 
-                    old_qty = row.qty or 0
-                    old_reserved = row.reserved_qty or 0
+                    new_qty = (old_qty + used).quantize(Decimal('0.00001'))
+                    new_reserved = max((old_reserved - used).quantize(Decimal('0.00001')), Decimal(0))
 
-                    new_qty = old_qty + to_restore
-                    new_reserved = max(old_reserved - to_restore, 0)
-
-                    frappe.db.set_value("Parts", row.name, {
-                        "qty": new_qty,
-                        "reserved_qty": new_reserved
+                    frappe.db.set_value("Parts", key, {
+                        "qty": float(new_qty),
+                        "reserved_qty": float(new_reserved)
                     })
 
-        restore_parts(self.main_batches, True)
-        restore_parts(self.other_batches, False)
+        restore_parts(self.main_batches)
+        restore_parts(self.other_batches)
 
         self.db_set("stock_entry_name", None)
-
+        self.db_set("_consumed_qty_map_json", None)
