@@ -83,7 +83,8 @@
    "fieldname": "cutting_parts",
    "fieldtype": "Table",
    "label": "Cutting Parts",
-   "options": "Cutting Parts"
+   "options": "Cutting Parts",
+   "read_only": 1
   },
   {
    "fieldname": "total_cost",
@@ -214,7 +215,8 @@
    "fieldname": "batches_result",
    "fieldtype": "Table",
    "label": "Batches",
-   "options": "Batches Results"
+   "options": "Batches Results",
+   "read_only": 1
   },
   {
    "fieldname": "workstation_net_rate",
@@ -250,7 +252,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-08 11:48:43.004635",
+ "modified": "2025-07-12 15:42:03.130223",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "cutting operation",

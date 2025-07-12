@@ -45,7 +45,8 @@
    "fieldname": "finish_goods",
    "fieldtype": "Table",
    "label": "Finish Goods",
-   "options": "Finish Goods"
+   "options": "Finish Goods",
+   "read_only": 1
   },
   {
    "fieldname": "distination_warehouse",
@@ -94,7 +95,8 @@
    "fieldname": "used_parts_batches",
    "fieldtype": "Table",
    "label": "Used Parts Batches",
-   "options": "Used Parts Batches"
+   "options": "Used Parts Batches",
+   "read_only": 1
   },
   {
    "fieldname": "issue_entry_name",
@@ -108,7 +110,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-08 23:31:14.904464",
+ "modified": "2025-07-12 15:41:26.018102",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Stitching Operation",
@@ -116,6 +118,7 @@
  "owner": "Administrator",
  "permissions": [
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -124,6 +127,7 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1
