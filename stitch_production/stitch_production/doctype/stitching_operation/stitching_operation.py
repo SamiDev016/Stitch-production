@@ -178,59 +178,53 @@ class StitchingOperation(Document):
                 "allow_zero_valuation_rate": 1,
                 "valuation_rate": rate,
                 "set_basic_rate_manually": 1,
-                "basic_rate": rate,
-                "allow_alternative_item_rate": 1,
+                "basic_rate": rate
             })
 
-        # Issue parts for each used batch
-        for batch in self.used_parts_batches:
-            if not batch.batch:
-                continue
+        for fg in self.finish_goods:
+            operation_name = fg.operation
+            fg_qty = fg.qty
 
-            pb_doc = frappe.get_doc("Parts Batch", batch.batch)
-            if not pb_doc.parts:
-                continue
+            if not operation_name:
+                frappe.throw(f"Missing operation for Finish Good: {fg.item}")
 
-            batch_qty = batch.qty  # how many FG we're stitching
-
-            for part in pb_doc.parts:
-                if not part.part or not part.reserved_qty or not part.cost_per_one or not part.qty_of_finished_goods:
+            for used_batch in self.used_parts_batches:
+                if not used_batch.batch:
                     continue
 
-                per_unit_qty = part.reserved_qty / part.qty_of_finished_goods
-                used_qty = per_unit_qty * batch_qty
-
-                if used_qty <= 0:
+                pb_doc = frappe.get_doc("Parts Batch", used_batch.batch)
+                if not pb_doc.parts:
                     continue
 
-                if (part.reserved_qty or 0) < used_qty:
-                    frappe.throw(f"Not enough reserved qty for part {part.part} in batch {batch.batch}. Needed: {used_qty}, Reserved: {part.reserved_qty}")
+                warehouse = used_batch.warehouse
 
-                warehouse = batch.warehouse
+                for reserve in pb_doc.batches_reserves:
+                    if reserve.operation != operation_name:
+                        continue
 
-                frappe.msgprint(f"Issuing {used_qty} of {part.part} from {warehouse}")
-                frappe.msgprint(f"cost per one: {part.cost_per_one}")
+                    part_code = reserve.part
+                    reserved_qty = reserve.reserved_qty or 0
 
-                issue_part(part.part, used_qty, warehouse, part.cost_per_one)
+                    if not part_code or reserved_qty <= 0:
+                        continue
 
-                for p in pb_doc.parts:
-                    if p.part == part.part:
-                        p.reserved_qty -= used_qty
-                        if p.reserved_qty < 0:
-                            p.reserved_qty = 0
-                        if p.qty:
-                            p.qty -= used_qty
-                            if p.qty < 0:
-                                p.qty = 0
+                    part_row = next((p for p in pb_doc.parts if p.part == part_code), None)
+                    if not part_row:
+                        frappe.throw(f"Part {part_code} not found in parts table for batch {pb_doc.name}")
 
-            pb_doc.save()
+                    if not part_row.cost_per_one:
+                        frappe.throw(f"Missing cost per one for part {part_code} in batch {pb_doc.name}")
 
+                    issue_part(part_code, reserved_qty, warehouse, part_row.cost_per_one)
 
-        issue_entry.insert()
-        issue_entry.submit()
+                    reserve.reserved_qty = 0
 
-        self.db_set("issue_entry_name", issue_entry.name)
-        
+                pb_doc.save()
+        if issue_entry.items:
+            issue_entry.insert()
+            issue_entry.submit()
+            self.db_set("issue_entry_name", issue_entry.name)
+
 
 
 
@@ -252,5 +246,4 @@ class StitchingOperation(Document):
 
             except Exception as e:
                 frappe.throw(f"Unable to cancel Stock Entry {self.stock_entry_name}: {e}")
-
 

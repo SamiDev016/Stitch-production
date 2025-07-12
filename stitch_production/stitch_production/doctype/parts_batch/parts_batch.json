@@ -14,6 +14,7 @@
   "cost_per_unit",
   "cost",
   "parts",
+  "batches_reserves",
   "source_operation",
   "source_bom",
   "color",
@@ -100,12 +101,20 @@
    "fieldname": "cost_per_unit",
    "fieldtype": "Currency",
    "label": "Cost Per Unit"
+  },
+  {
+   "allow_on_submit": 1,
+   "fieldname": "batches_reserves",
+   "fieldtype": "Table",
+   "label": "Batches Reserves",
+   "options": "Batches Reserves",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-09 13:01:15.383579",
+ "modified": "2025-07-12 11:05:02.272963",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Parts Batch",

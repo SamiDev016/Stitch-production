@@ -515,26 +515,54 @@ class Assemblying(Document):
         other_consumption = process_batches(self.other_batches, False)
         all_consumption = main_consumption + other_consumption
         
+# for batch_name, part_code, qty_used, _, _, _, part_rowname in all_consumption:
+#             pb = frappe.get_doc("Parts Batch", batch_name)
+#             for row in pb.parts:
+#                 if row.part == part_code:
+#                     old_qty = row.qty or 0
+#                     old_reserved = row.reserved_qty or 0
+                    
+#                     #available_qty = old_qty - old_reserved
 
+#                     # if available_qty < qty_used:
+#                     #     continue
+
+#                     new_qty = (old_qty - qty_used)
+#                     new_reserved = (old_reserved + qty_used)
+
+#                     frappe.db.set_value("Parts", row.name, {
+#                         "qty": float(new_qty),
+#                         "reserved_qty": float(new_reserved)
+#                     })
+
+#                     consumed_map[row.name] = float(qty_used)
+#                     break
         for batch_name, part_code, qty_used, _, _, _, part_rowname in all_consumption:
             pb = frappe.get_doc("Parts Batch", batch_name)
             for row in pb.parts:
                 if row.part == part_code:
                     old_qty = row.qty or 0
-                    old_reserved = row.reserved_qty or 0
-                    #available_qty = old_qty - old_reserved
+                    new_qty = old_qty - qty_used
 
-                    # if available_qty < qty_used:
-                    #     continue
+                    row.qty = float(new_qty)
 
-                    new_qty = (old_qty - qty_used)
-                    new_reserved = (old_reserved + qty_used)
 
-                    frappe.db.set_value("Parts", row.name, {
-                        "qty": float(new_qty),
-                        "reserved_qty": float(new_reserved)
-                    })
+                    # ✅ Add new reserve entry (if not already added for this operation)
+                    already_reserved = False
+                    for reserve in pb.batches_reserves:
+                        if reserve.part == row.part and reserve.operation == self.name:
+                            reserve.reserved_qty += qty_used
+                            already_reserved = True
+                            break
 
+                    if not already_reserved:
+                        pb.append("batches_reserves", {
+                            "part": row.part,
+                            "operation": self.name,
+                            "reserved_qty": qty_used
+                        })
+
+                    pb.save(ignore_permissions=True)
                     consumed_map[row.name] = float(qty_used)
                     break
 
