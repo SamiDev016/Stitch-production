@@ -482,45 +482,53 @@ class Assemblying(Document):
                 source_wh = frappe.get_doc("cutting operation", pb.source_operation).distination_warehouse
                 dest_wh = self.distination_warehouse
 
-                multiplier = Decimal(str(b.parts_qty if is_main else b.qty))
+                finish_qty = b.parts_qty if is_main else b.qty
+                # multiplier = float(multiplier)
 
                 for p in pb.parts:
                     if not p.qty or not p.qty_of_finished_goods:
-                        continue
-
+                        frappe.throw(f"Invalid 'qty' or 'qty_of_finished_goods' for part {p.part} in batch {b.batch}")
+                    #front black S
                     part_key = p.name
-                    base_qty = Decimal(str(p.qty))
-                    fg_qty = Decimal(str(p.qty_of_finished_goods))
+                    # base_qty = float(p.qty)
+                    #100
+                    base_qty = p.qty
+                    # fg_qty = float(p.qty_of_finished_goods or 1)
+                    #2
+                    fg_qty = p.qty_of_finished_goods
 
                     if fg_qty <= 0:
-                        frappe.throw(f"❌ Invalid 'qty_of_finished_goods' for part {p.part} in batch {b.batch}")
+                        frappe.throw(f"Invalid 'qty_of_finished_goods' for part {p.part} in batch {b.batch}")
 
-                    qty_per_unit = base_qty / fg_qty
-                    to_consume = qty_per_unit * multiplier
-                    to_consume = to_consume.quantize(Decimal('0.00001'), rounding=ROUND_HALF_UP)
+                    # qty_per_unit = base_qty / fg_qty
+                    # to_consume = qty_per_unit * finish_qty
+                    to_consume = finish_qty * fg_qty
 
-                    cost = Decimal(str(p.cost_per_one or 0))
+                    cost = p.cost_per_one or 0
                     consumptions.append((b.batch, p.part, to_consume, source_wh, dest_wh, cost, part_key))
             return consumptions
+
+
 
 
         main_consumption = process_batches(self.main_batches, True)
         other_consumption = process_batches(self.other_batches, False)
         all_consumption = main_consumption + other_consumption
+        
 
         for batch_name, part_code, qty_used, _, _, _, part_rowname in all_consumption:
             pb = frappe.get_doc("Parts Batch", batch_name)
             for row in pb.parts:
                 if row.part == part_code:
-                    old_qty = Decimal(str(row.qty or 0))
-                    old_reserved = Decimal(str(row.reserved_qty or 0))
-                    available_qty = old_qty - old_reserved
+                    old_qty = row.qty or 0
+                    old_reserved = row.reserved_qty or 0
+                    #available_qty = old_qty - old_reserved
 
-                    if available_qty < qty_used:
-                        continue
+                    # if available_qty < qty_used:
+                    #     continue
 
-                    new_qty = (old_qty - qty_used).quantize(Decimal('0.00001'))
-                    new_reserved = (old_reserved + qty_used).quantize(Decimal('0.00001'))
+                    new_qty = (old_qty - qty_used)
+                    new_reserved = (old_reserved + qty_used)
 
                     frappe.db.set_value("Parts", row.name, {
                         "qty": float(new_qty),
@@ -532,7 +540,7 @@ class Assemblying(Document):
 
         self.db_set("_consumed_qty_map_json", json.dumps(consumed_map))
 
-        for batch_name, part_code, qty_used, source_wh, dest_wh, cost, _ in all_consumption:
+        for batch_name, part_code, qty_used, source_wh, dest_wh, cost, part_rowname in all_consumption:
             add_item(part_code, qty_used, source_wh, dest_wh, cost)
 
         if not issue.items:

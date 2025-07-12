@@ -222,12 +222,27 @@ class cuttingoperation(Document):
                     batch.insert()
 
                 parts_batches[key] = batch
+            bom_fg_qty = 1
+            try:
+                bom_doc = frappe.get_doc("BOM", bom)
+                cp_template = frappe.db.get_value("Item", cp.part, "variant_of") or cp.part
+
+                for item in bom_doc.items:
+                    item_template = frappe.db.get_value("Item", item.item_code, "variant_of") or item.item_code
+
+                    if cp_template == item_template:
+                        bom_fg_qty = item.qty or 1
+                        break
+                else:
+                    frappe.msgprint(f"❌ No matching item found in BOM {bom} for part {cp.part} (template: {cp_template})")
+            except Exception as e:
+                frappe.msgprint(f"⚠️ Could not fetch BOM {bom} or part {cp.part}. Error: {str(e)}")
 
             parts_batches[key].append("parts", {
                 "part": cp.part,
                 "qty": cp.quantity,
                 "source_bom": bom,
-                "qty_of_finished_goods": pgcd_qty
+                "qty_of_finished_goods": bom_fg_qty
             })
 
         bom_to_batches = {}
@@ -245,9 +260,6 @@ class cuttingoperation(Document):
 
             bom_doc = frappe.get_doc("BOM", bom_name)
             bom_total_cost = self.total_cost * (bom_percent / 100.0)
-
-            
-            
 
             part_cost_map = {}
             total_part_percent = 0
