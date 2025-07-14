@@ -229,6 +229,7 @@ class StitchingOperation(Document):
 
 
     def on_cancel(self):
+        # Cancel Stock Entry for Finished Goods (Material Receipt)
         if self.stock_entry_name:
             try:
                 stock_entry = frappe.get_doc("Stock Entry", self.stock_entry_name)
@@ -238,11 +239,46 @@ class StitchingOperation(Document):
                 for fg in self.finish_goods:
                     fg.db_set("stock_entry_name", None)
 
-                    asm_doc = frappe.get_doc("Assemblying", fg.operation)
-                    for row in asm_doc.finish_goods:
-                        if clean_barcode(row.barcode) == clean_barcode(fg.barcode):
-                            row.is_stitched = 0
-                    asm_doc.save()
+                    if fg.operation:
+                        asm_doc = frappe.get_doc("Assemblying", fg.operation)
+                        for row in asm_doc.finish_goods:
+                            if clean_barcode(row.barcode) == clean_barcode(fg.barcode):
+                                row.is_stitched = 0
+                        asm_doc.save()
 
             except Exception as e:
-                frappe.throw(f"Unable to cancel Stock Entry {self.stock_entry_name}: {e}")
+                frappe.throw(f"❌ Failed to cancel Stock Entry {self.stock_entry_name}: {e}")
+
+        # Cancel Stock Entry for Issued Parts (Material Issue)
+        if self.issue_entry_name:
+            try:
+                issue_entry = frappe.get_doc("Stock Entry", self.issue_entry_name)
+                if issue_entry.docstatus == 1:
+                    issue_entry.cancel()
+            except Exception as e:
+                frappe.throw(f"❌ Failed to cancel Issue Entry {self.issue_entry_name}: {e}")
+
+        for fg in self.finish_goods:
+            if not fg.operation:
+                continue
+
+            for used in self.used_parts_batches:
+                if not used.batch:
+                    continue
+
+                pb_doc = frappe.get_doc("Parts Batch", used.batch)
+
+                for part_row in pb_doc.parts:
+                    if not part_row.part or not part_row.qty_of_finished_goods:
+                        continue
+                        
+                    restore_amount = used.qty * part_row.qty_of_finished_goods
+
+                    for reserve in pb_doc.batches_reserves:
+                        if reserve.part == part_row.part and reserve.operation == fg.operation:
+                            reserve.reserved_qty += restore_amount
+
+                pb_doc.save()
+
+        self.db_set("stock_entry_name", None)
+        self.db_set("issue_entry_name", None)
