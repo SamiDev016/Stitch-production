@@ -4,10 +4,20 @@ import math
 from functools import reduce
 from decimal import Decimal, ROUND_HALF_UP
 import json
+import random
 
 
-def generate_barcode(name, index):
-    return f"{name}-{str(index).zfill(2)}"
+# def generate_barcode(name, index):
+#     return f"{name}-{str(index).zfill(2)}"
+
+
+
+
+
+def generate_barcode(index):
+    random_part = ''.join([str(random.randint(0, 9)) for _ in range(8)])
+    index_part = str(index).zfill(2)
+    return f"{random_part}{index_part}"
 
 
 class Assemblying(Document):
@@ -142,7 +152,7 @@ class Assemblying(Document):
                     break
 
             if matched_variant:
-                barcode = generate_barcode(self.name, fg_idx)
+                barcode = generate_barcode(fg_idx)
                 self.append("finish_goods", {
                     "item": matched_variant,
                     "qty": batch.parts_qty,
@@ -382,12 +392,13 @@ class Assemblying(Document):
                     break
 
             if matched_variant:
-                barcode = generate_barcode(self.name, idx)
+                barcode = generate_barcode(idx)
                 self.append("finish_goods", {
                     "item": matched_variant,
                     "qty": batch.parts_qty,
                     "barcode": barcode,
-                    "idx": idx
+                    "size": batch.size,
+                    "finish_good_index": idx
                 })
             else:
                 frappe.throw(f"No variant found for size <b>{batch.size}</b>.")

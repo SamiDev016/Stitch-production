@@ -2,12 +2,19 @@ import frappe
 from frappe.model.document import Document
 import re
 import math
+import unicodedata
 
 def clean_barcode(value):
     if not value:
         return ""
+
     value = re.sub(r"<[^>]*>", "", value)
-    return value.replace("\n", "").replace("\r", "").replace("\u00a0", "").strip().lower()
+    value = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode('ascii')
+    value = value.replace("\u00a0", " ")
+    value = value.replace("\n", " ").replace("\r", " ")
+    value = re.sub(r"\s+", " ", value)
+
+    return value.strip().lower()
 
 class StitchingOperation(Document):
     def before_save(self):
@@ -104,6 +111,7 @@ class StitchingOperation(Document):
                     })
 
         self.set("used_parts_batches", [])
+        
         for barcode, batches in fg_map.items():
             for entry in batches:
                 self.append("used_parts_batches", {
@@ -111,10 +119,16 @@ class StitchingOperation(Document):
                     "qty": entry["qty"],
                     "warehouse": entry["warehouse"]
                 })
+                
+        
 
         
 
-            
+    def before_submit(self):
+        if not self.used_parts_batches:
+            frappe.throw(_("No Used Parts Batches found"))
+            return
+
     def on_submit(self):
         if not self.finish_goods or not self.distination_warehouse:
             frappe.throw(_("No Finish Goods found or no distination warehouse"))
