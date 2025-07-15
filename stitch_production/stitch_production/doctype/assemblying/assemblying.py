@@ -117,7 +117,7 @@ class Assemblying(Document):
 
                 if accumulated_qty < required_qty:
                     frappe.throw(
-                        f"❌ Not enough parts for BOM <b>{bom}</b> with color <b>{color}</b> and size <b>{size}</b>. "
+                        f"Not enough parts for BOM <b>{bom}</b> with color <b>{color}</b> and size <b>{size}</b>. "
                         f"Needed: {required_qty}, Found: {accumulated_qty} for main batch <b>{main_batch_name}</b>"
                     )
 
@@ -476,25 +476,17 @@ class Assemblying(Document):
                 dest_wh = self.distination_warehouse
 
                 finish_qty = b.parts_qty if is_main else b.qty
-                # multiplier = float(multiplier)
 
                 for p in pb.parts:
                     if not p.qty or not p.qty_of_finished_goods:
                         frappe.throw(f"Invalid 'qty' or 'qty_of_finished_goods' for part {p.part} in batch {b.batch}")
-                    #front black S
                     part_key = p.name
-                    # base_qty = float(p.qty)
-                    #100
                     base_qty = p.qty
-                    # fg_qty = float(p.qty_of_finished_goods or 1)
-                    #2
                     fg_qty = p.qty_of_finished_goods
 
                     if fg_qty <= 0:
                         frappe.throw(f"Invalid 'qty_of_finished_goods' for part {p.part} in batch {b.batch}")
 
-                    # qty_per_unit = base_qty / fg_qty
-                    # to_consume = qty_per_unit * finish_qty
                     to_consume = finish_qty * fg_qty
 
                     cost = p.cost_per_one or 0
@@ -518,7 +510,6 @@ class Assemblying(Document):
                     row.qty = float(new_qty)
 
 
-                    # ✅ Add new reserve entry (if not already added for this operation)
                     already_reserved = False
                     for reserve in pb.batches_reserves:
                         if reserve.part == row.part and reserve.operation == self.name:

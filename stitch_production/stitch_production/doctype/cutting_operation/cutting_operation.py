@@ -234,9 +234,9 @@ class cuttingoperation(Document):
                         bom_fg_qty = item.qty or 1
                         break
                 else:
-                    frappe.msgprint(f"❌ No matching item found in BOM {bom} for part {cp.part} (template: {cp_template})")
+                    frappe.msgprint(f"❌ No matching item found in BOM {bom} for part {cp.part} (template: {cp_template})" , alert=True)
             except Exception as e:
-                frappe.msgprint(f"⚠️ Could not fetch BOM {bom} or part {cp.part}. Error: {str(e)}")
+                frappe.msgprint(f"⚠️ Could not fetch BOM {bom} or part {cp.part}. Error: {str(e)}" , alert=True)
 
             parts_batches[key].append("parts", {
                 "part": cp.part,
@@ -308,7 +308,6 @@ class cuttingoperation(Document):
                     if part_row.part == cp.part:
                         cost_per_one = part_row.cost_per_one or 0
                         break
-            frappe.msgprint(f"Cost per one: {cost_per_one} for part {cp.part}")
             receipt.append("items", {
                 "item_code": cp.part,
                 "qty": cp.quantity,
@@ -327,14 +326,13 @@ class cuttingoperation(Document):
         
         self.set("batches_result", [])
         for batch in parts_batches.values():
-            frappe.msgprint("Starting filling parts batch result")
+            frappe.msgprint("Filling Result Parts Batch")
             self.append("batches_result",{
                 "batch":batch.name,
                 "color":batch.color,
                 "size":batch.size,
                 "cost":batch.cost,
             })
-            frappe.msgprint("Finishing filling parts batch result")
 
     def before_cancel(self):
         frappe.flags.ignore_linked_with = True

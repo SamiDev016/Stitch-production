@@ -76,14 +76,14 @@ class StitchingOperation(Document):
 
         for fg in self.finish_goods:
             if not fg.operation:
-                frappe.msgprint(f"Finish good {fg.barcode or fg.item} has no operation linked.")
+                frappe.msgprint(f"Finish good {fg.barcode or fg.item} has no operation linked." , raise_exception=1)
                 continue
 
             ass_doc = frappe.get_doc("Assemblying", fg.operation)
             matched_fg = next((fgg for fgg in ass_doc.finish_goods if clean_barcode(fgg.barcode) == clean_barcode(fg.barcode)), None)
 
             if not matched_fg:
-                frappe.msgprint(f"No matching finish good in Assemblying for barcode {fg.barcode}")
+                frappe.msgprint(f"No matching finish good in Assemblying for barcode {fg.barcode}", raise_exception=1)
                 continue
 
             finish_index = matched_fg.finish_good_index
@@ -243,7 +243,6 @@ class StitchingOperation(Document):
 
 
     def on_cancel(self):
-        # Cancel Stock Entry for Finished Goods (Material Receipt)
         if self.stock_entry_name:
             try:
                 stock_entry = frappe.get_doc("Stock Entry", self.stock_entry_name)
@@ -261,16 +260,15 @@ class StitchingOperation(Document):
                         asm_doc.save()
 
             except Exception as e:
-                frappe.throw(f"❌ Failed to cancel Stock Entry {self.stock_entry_name}: {e}")
+                frappe.throw(f"Failed to cancel Stock Entry {self.stock_entry_name}: {e}")
 
-        # Cancel Stock Entry for Issued Parts (Material Issue)
         if self.issue_entry_name:
             try:
                 issue_entry = frappe.get_doc("Stock Entry", self.issue_entry_name)
                 if issue_entry.docstatus == 1:
                     issue_entry.cancel()
             except Exception as e:
-                frappe.throw(f"❌ Failed to cancel Issue Entry {self.issue_entry_name}: {e}")
+                frappe.throw(f"Failed to cancel Issue Entry {self.issue_entry_name}: {e}")
 
         for fg in self.finish_goods:
             if not fg.operation:
