@@ -21,6 +21,7 @@
   "_consumed_qty_map_json",
   "assemblying_cost_tab",
   "workers_account",
+  "project",
   "workers",
   "workers_total_cost",
   "individual_cost",
@@ -160,12 +161,18 @@
    "fieldtype": "Link",
    "label": "Workers Account",
    "options": "Account"
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-17 12:15:09.252764",
+ "modified": "2025-07-17 15:13:00.256967",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Assemblying",

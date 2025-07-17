@@ -164,6 +164,7 @@ class cuttingoperation(Document):
         issue = frappe.new_doc("Stock Entry")
         issue.purpose = issue.stock_entry_type = "Material Issue"
         issue.company = company
+
         try:
             issue.project = self.project
         except:
@@ -178,7 +179,8 @@ class cuttingoperation(Document):
                 "item_code": r.fabric_item,
                 "qty": u.used_qty,
                 "uom": frappe.db.get_value("Item", r.fabric_item, "stock_uom"),
-                "s_warehouse": u.roll_warehouse
+                "s_warehouse": u.roll_warehouse,
+                "expense_account": self.expense_account,
             })
 
         if issue.items:
@@ -331,6 +333,7 @@ class cuttingoperation(Document):
                 "uom": frappe.db.get_value("Item", cp.part, "stock_uom"),
                 "t_warehouse": cp.warehouse,
                 "basic_rate": cost_per_one_after,
+                "expense_account": self.expense_account,
             })
         
         workstation_account = self.workstation_account
@@ -389,14 +392,19 @@ class cuttingoperation(Document):
 
     def before_cancel(self):
         frappe.flags.ignore_linked_with = True
+        
+        
+        
     def on_cancel(self):
         for field in ("stock_entry_name", "receipt_entry_name"):
             name = self.get(field)
             if name:
                 try:
+                    self.db_set(field, None)
                     se = frappe.get_doc("Stock Entry", name)
                     if se.docstatus == 1:
                         se.cancel()
+                        se.delete()
                 except frappe.DoesNotExistError:
                     pass
                 except Exception as e:
@@ -414,45 +422,19 @@ class cuttingoperation(Document):
                     r.remove(ut)
             r.save()
 
+
         batches = frappe.get_all(
             "Parts Batch",
             filters={"source_operation": self.name},
             fields=["name"]
         )
+        
 
         for b in batches:
             try:
                 pb = frappe.get_doc("Parts Batch", b.name)
-
-                linked_assembly = frappe.get_all(
-                    "Assemblying",
-                    filters=[
-                        ["main_batches", "batch", "=", pb.name],
-                        ["docstatus", "=", 1]
-                    ],
-                    pluck="name"
-                )
-                linked_assembly += frappe.get_all(
-                    "Assemblying",
-                    filters=[
-                        ["other_batches", "batch", "=", pb.name],
-                        ["docstatus", "=", 1]
-                    ],
-                    pluck="name"
-                )
-                linked_assembly = list(set(linked_assembly))
-
-                for assm in linked_assembly:
-                    try:
-                        doc = frappe.get_doc("Assemblying", assm)
-                        frappe.msgprint(f"Cancelling linked Assemblying: {assm}")
-                        doc.cancel()
-                    except Exception as e:
-                        frappe.log_error(f"Failed to cancel Assemblying {assm}: {e}")
-
-                if pb.docstatus == 1:
-                    pb.cancel(ignore_permissions=True)
+                pb.set("source_operation", None)
                 pb.delete(ignore_permissions=True)
-
             except Exception as e:
-                frappe.log_error(f"Error cancelling/deleting Parts Batch {b.name}: {e}")
+                frappe.log_error(f"Failed to cancel Parts Batch {b.name}: {e}")
+        

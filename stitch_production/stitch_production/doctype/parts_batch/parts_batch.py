@@ -4,4 +4,6 @@ import math
 from functools import reduce
 
 class PartsBatch(Document):
-    pass
+    def before_cancel(self):
+        frappe.flags.ignore_linked_with = True
+

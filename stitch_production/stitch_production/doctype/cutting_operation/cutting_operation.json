@@ -20,6 +20,8 @@
   "receipt_entry_name",
   "costs_tab",
   "project",
+  "column_break_vows",
+  "expense_account",
   "section_break_vzgq",
   "workstation",
   "workstation_net_rate",
@@ -218,8 +220,7 @@
    "fieldname": "batches_result",
    "fieldtype": "Table",
    "label": "Batches",
-   "options": "Batches Results",
-   "read_only": 1
+   "options": "Batches Results"
   },
   {
    "fieldname": "workstation_net_rate",
@@ -292,12 +293,23 @@
    "label": "Project",
    "options": "Project",
    "reqd": 1
+  },
+  {
+   "fieldname": "expense_account",
+   "fieldtype": "Link",
+   "label": "Between Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "column_break_vows",
+   "fieldtype": "Column Break"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-17 14:32:07.143868",
+ "modified": "2025-07-17 15:25:29.664522",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "cutting operation",
