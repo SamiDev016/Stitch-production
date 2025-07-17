@@ -547,43 +547,55 @@ class Assemblying(Document):
             pgcd = reduce(math.gcd, ints) if ints else 0
             frappe.db.set_value("Parts Batch", pb.name, "pgcd_qty", pgcd)
 
-    def on_cancel(self):
-        if self.stock_entry_name:
-            try:
-                se = frappe.get_doc("Stock Entry", self.stock_entry_name)
-                if se.docstatus == 1:
-                    se.cancel()
-            except Exception as e:
-                frappe.throw(f"Could not cancel Stock Entry {self.stock_entry_name}: {e}")
 
+@frappe.whitelist()
+def force_cancel(docname):
+    doc = frappe.get_doc("Assemblying", docname)
+    try:
+        consumed_map = json.loads(doc._consumed_qty_map_json or "{}")
+    except Exception:
+        consumed_map = {}
+
+    def unlink_parts_batch_operations(batches):
+        for b in batches:
+            pb = frappe.get_doc("Parts Batch", b.batch)
+
+            for r in pb.batches_reserves:
+                if r.operation == doc.name:
+                    frappe.db.set_value("Batches Reserves", r.name, "operation", None)
+
+            frappe.db.commit()
+            pb.reload()
+
+            pb.batches_reserves = [r for r in pb.batches_reserves if r.operation]
+            
+            for row in pb.parts:
+                used_qty = Decimal(str(consumed_map.get(row.name, 0)))
+                if used_qty:
+                    row.qty = (Decimal(str(row.qty or 0)) + used_qty).quantize(Decimal("0.00001"))
+
+            qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
+            ints = [int(q) for q in qtys if float(q).is_integer()]
+            pb.pgcd_qty = reduce(math.gcd, ints) if ints else 0
+
+            pb.save(ignore_permissions=True)
+
+    unlink_parts_batch_operations(doc.main_batches)
+    unlink_parts_batch_operations(doc.other_batches)
+
+    if doc.stock_entry_name:
         try:
-            consumed_map = json.loads(self._consumed_qty_map_json or "{}")
-        except Exception:
-            consumed_map = {}
+            se = frappe.get_doc("Stock Entry", doc.stock_entry_name)
+            if se.docstatus == 1:
+                se.flags.ignore_linked_doctypes = ('Assemblying',)
+                se.cancel()
+        except Exception as e:
+            frappe.log_error(f"Failed to cancel Stock Entry {doc.stock_entry_name}: {e}")
 
-        def restore_parts(batches):
-            for b in batches:
-                pb = frappe.get_doc("Parts Batch", b.batch)
+    doc.db_set("stock_entry_name", None)
+    doc.db_set("_consumed_qty_map_json", None)
 
-                for row in pb.parts:
-                    part_key = row.name
-                    used_qty = Decimal(str(consumed_map.get(part_key, 0)))
+    frappe.db.commit()
+    doc.cancel()
 
-                    if used_qty == 0:
-                        continue
-
-                    original_qty = Decimal(str(row.qty or 0))
-                    row.qty = (original_qty + used_qty).quantize(Decimal("0.00001"))
-
-                    for reserve in pb.batches_reserves:
-                        if reserve.part == row.part and reserve.operation == self.name:
-                            reserve.reserved_qty = 0.0
-                            break
-
-                pb.save(ignore_permissions=True)
-
-        restore_parts(self.main_batches)
-        restore_parts(self.other_batches)
-
-        self.db_set("stock_entry_name", None)
-        self.db_set("_consumed_qty_map_json", None)
+    frappe.msgprint("Force cancel complete, quantities restored.")

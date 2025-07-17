@@ -143,7 +143,7 @@
   },
   {
    "fieldname": "purchase_receipt_link",
-   "fieldtype": "Link",
+   "fieldtype": "Data",
    "label": "PURCHASE RECEIPT LINK",
    "options": "Purchase Receipt",
    "read_only": 1
@@ -152,8 +152,8 @@
  "image_field": "attache_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-02 12:55:53.664691",
- "modified_by": "Administrator",
+ "modified": "2025-07-15 19:33:11.567320",
+ "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Rolls",
  "naming_rule": "Expression (old style)",

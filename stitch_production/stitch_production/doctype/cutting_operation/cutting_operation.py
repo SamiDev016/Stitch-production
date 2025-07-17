@@ -341,9 +341,13 @@ class cuttingoperation(Document):
             name = self.get(field)
             if name:
                 try:
-                    frappe.get_doc("Stock Entry", name).cancel()
+                    se = frappe.get_doc("Stock Entry", name)
+                    if se.docstatus == 1:
+                        se.cancel()
                 except frappe.DoesNotExistError:
                     pass
+                except Exception as e:
+                    frappe.log_error(f"Failed to cancel Stock Entry {name}: {e}")
 
         for u in self.used_rolls or []:
             if not u.roll:
@@ -351,6 +355,7 @@ class cuttingoperation(Document):
             r = frappe.get_doc("Rolls", u.roll)
             used = u.used_qty or 0
             r.weight = (r.weight or 0) + used
+
             for ut in list(r.used_time or []):
                 if ut.operation == self.name:
                     r.remove(ut)
@@ -358,12 +363,43 @@ class cuttingoperation(Document):
 
         batches = frappe.get_all(
             "Parts Batch",
-            filters={"batch_name": ["like", f"%-{self.name}"]},
+            filters={"source_operation": self.name},
             fields=["name"]
         )
+
         for b in batches:
             try:
                 pb = frappe.get_doc("Parts Batch", b.name)
-                pb.cancel(ignore_permissions=True)
-            except Exception:
-                frappe.log_error(f"Failed to cancel Parts Batch {b.name}")
+
+                linked_assembly = frappe.get_all(
+                    "Assemblying",
+                    filters=[
+                        ["main_batches", "batch", "=", pb.name],
+                        ["docstatus", "=", 1]
+                    ],
+                    pluck="name"
+                )
+                linked_assembly += frappe.get_all(
+                    "Assemblying",
+                    filters=[
+                        ["other_batches", "batch", "=", pb.name],
+                        ["docstatus", "=", 1]
+                    ],
+                    pluck="name"
+                )
+                linked_assembly = list(set(linked_assembly))
+
+                for assm in linked_assembly:
+                    try:
+                        doc = frappe.get_doc("Assemblying", assm)
+                        frappe.msgprint(f"Cancelling linked Assemblying: {assm}")
+                        doc.cancel()
+                    except Exception as e:
+                        frappe.log_error(f"Failed to cancel Assemblying {assm}: {e}")
+
+                if pb.docstatus == 1:
+                    pb.cancel(ignore_permissions=True)
+                pb.delete(ignore_permissions=True)
+
+            except Exception as e:
+                frappe.log_error(f"Error cancelling/deleting Parts Batch {b.name}: {e}")

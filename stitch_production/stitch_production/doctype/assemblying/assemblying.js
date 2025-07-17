@@ -39,3 +39,29 @@ frappe.ui.form.on("Assemblying", {
         setup_main_bom_query(frm);
     }
 });
+
+frappe.ui.form.on("Assemblying", {
+    refresh(frm) {
+        if (frm.doc.docstatus === 1) {
+            frm.add_custom_button("Force Cancel", () => {
+                frappe.confirm(
+                    "Are you sure you want to force cancel and unlink all references?",
+                    () => {
+                        frappe.call({
+                            method: "stitch_production.stitch_production.doctype.assemblying.assemblying.force_cancel",
+                            args: {
+                                docname: frm.doc.name
+                            },
+                            callback: function(r) {
+                                if (!r.exc) {
+                                    frappe.show_alert("Force canceled successfully!");
+                                    frm.reload_doc();
+                                }
+                            }
+                        });
+                    }
+                );
+            });
+        }
+    }
+});
