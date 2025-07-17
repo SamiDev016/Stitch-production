@@ -164,6 +164,10 @@ class cuttingoperation(Document):
         issue = frappe.new_doc("Stock Entry")
         issue.purpose = issue.stock_entry_type = "Material Issue"
         issue.company = company
+        try:
+            issue.project = self.project
+        except:
+            frappe.msgprint("Project not found", alert=True)
         
 
         for u in self.used_rolls:
@@ -305,6 +309,11 @@ class cuttingoperation(Document):
         receipt = frappe.new_doc("Stock Entry")
         receipt.purpose = receipt.stock_entry_type = "Material Receipt"
         receipt.company = company
+        try:
+            receipt.project = self.project
+        except:
+            frappe.msgprint("Project not found", alert = True)
+        
         
 
         for cp in self.cutting_parts:
@@ -323,19 +332,48 @@ class cuttingoperation(Document):
                 "t_warehouse": cp.warehouse,
                 "basic_rate": cost_per_one_after,
             })
+        
+        workstation_account = self.workstation_account
+        spreading_workers_account = self.spreading_workers_account
+        drawing_workers_account = self.drawing_workers_account
+        cutting_workers_account = self.cutting_workers_account
+        extra_cost_account = self.extra_cost_account
 
-        receipt.append("additional_costs", {
-            "expense_account": self.workstation_account,
-            "amount": self.operation_cost,
-            "description": "Additional Cost"
-        })
+        if workstation_account:
+            receipt.append("additional_costs", {
+                "expense_account": workstation_account,
+                "amount": self.workstation_total_cost,
+                "description": "Workstation Cost"
+            })
+        if spreading_workers_account:
+            receipt.append("additional_costs", {
+                "expense_account": spreading_workers_account,
+                "amount": self.total_spreading_workers_cost,
+                "description": "Spreading Workers Cost"
+            })
+        if drawing_workers_account:
+            receipt.append("additional_costs", {
+                "expense_account": drawing_workers_account,
+                "amount": self.total_drawing_workers_cost,
+                "description": "Drawing Workers Cost"
+            })
+        if cutting_workers_account:
+            receipt.append("additional_costs", {
+                "expense_account": cutting_workers_account,
+                "amount": self.total_cutting_workers_cost,
+                "description": "Cutting Workers Cost"
+            })
+        if extra_cost_account:
+            receipt.append("additional_costs", {
+                "expense_account": extra_cost_account,
+                "amount": self.individual_cost,
+                "description": "Extra Cost"
+            }) 
+               
 
         if receipt.items:
             receipt.insert()
             receipt.validate()
-            # receipt.run_method("validate")
-            # receipt.set_missing_values()
-            # receipt.save()
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
         

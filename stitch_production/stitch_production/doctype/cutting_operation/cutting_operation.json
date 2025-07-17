@@ -19,6 +19,7 @@
   "stock_entry_name",
   "receipt_entry_name",
   "costs_tab",
+  "project",
   "section_break_vzgq",
   "workstation",
   "workstation_net_rate",
@@ -42,6 +43,7 @@
   "section_break_iyys",
   "used_rolls_cost",
   "individual_cost",
+  "extra_cost_account",
   "operation_cost",
   "total_cost",
   "amended_from"
@@ -253,31 +255,49 @@
    "fieldname": "workstation_account",
    "fieldtype": "Link",
    "label": "Workstation Account",
-   "options": "Account"
+   "options": "Account",
+   "reqd": 1
   },
   {
    "fieldname": "spreading_workers_account",
    "fieldtype": "Link",
    "label": "Spreading Workers Account",
-   "options": "Account"
+   "options": "Account",
+   "reqd": 1
   },
   {
    "fieldname": "drawing_workers_account",
    "fieldtype": "Link",
    "label": "Drawing Workers Account",
-   "options": "Account"
+   "options": "Account",
+   "reqd": 1
   },
   {
    "fieldname": "cutting_workers_account",
    "fieldtype": "Link",
    "label": "Cutting Workers Account",
-   "options": "Account"
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "extra_cost_account",
+   "fieldtype": "Link",
+   "label": "Extra Cost Account",
+   "options": "Account",
+   "reqd": 1
+  },
+  {
+   "fieldname": "project",
+   "fieldtype": "Link",
+   "label": "Project",
+   "options": "Project",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-17 14:07:39.305558",
+ "modified": "2025-07-17 14:32:07.143868",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "cutting operation",
