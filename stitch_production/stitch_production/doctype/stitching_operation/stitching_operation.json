@@ -15,6 +15,7 @@
   "stock_entry_name",
   "issue_entry_name",
   "cost_tab",
+  "stitching_workers_account",
   "stitching_workers",
   "total_workers_cost",
   "extra_cost",
@@ -105,12 +106,18 @@
    "label": "issue_entry_name",
    "options": "Stock Entry",
    "read_only": 1
+  },
+  {
+   "fieldname": "stitching_workers_account",
+   "fieldtype": "Link",
+   "label": "Stitching Workers Account",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-12 15:41:26.018102",
+ "modified": "2025-07-17 12:15:40.747258",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Stitching Operation",

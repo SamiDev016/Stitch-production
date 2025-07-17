@@ -259,7 +259,9 @@ class cuttingoperation(Document):
                 continue
 
             bom_doc = frappe.get_doc("BOM", bom_name)
+            bom_total_cost_after = self.used_rolls_cost * (bom_percent / 100.0)
             bom_total_cost = self.total_cost * (bom_percent / 100.0)
+            
 
             part_cost_map = {}
             total_part_percent = 0
@@ -275,9 +277,11 @@ class cuttingoperation(Document):
                 batch.cost_per_unit = 0
 
                 cost_per_batch = batch.pgcd_qty / total_pgcd_qty * bom_total_cost 
+                cost_per_batch_after = batch.pgcd_qty / total_pgcd_qty * bom_total_cost_after 
 
                 batch.cost = cost_per_batch
-                batch.cost_per_unit = cost_per_batch / batch.pgcd_qty
+                #batch.cost = cost_per_batch_after
+                batch.cost_per_unit = cost_per_batch_after / batch.pgcd_qty
                 for part_row in batch.parts:
                     part_code = part_row.part
                     template_code = frappe.db.get_value("Item", part_code, "variant_of")
@@ -285,8 +289,11 @@ class cuttingoperation(Document):
                     qty = part_row.qty or 1
                     if part_percent > 0 and total_part_percent > 0:
                         part_total_cost = cost_per_batch * (part_percent / total_part_percent)
+                        part_total_cost_after = cost_per_batch_after * (part_percent / total_part_percent)
                         cost_per_one = part_total_cost / qty
+                        cost_per_one_after = part_total_cost_after / qty
                         part_row.cost_per_one = cost_per_one
+                        part_row.cost_per_one_after = cost_per_one_after
                 batch.save()
 
         for batch in parts_batches.values():
@@ -298,29 +305,37 @@ class cuttingoperation(Document):
         receipt = frappe.new_doc("Stock Entry")
         receipt.purpose = receipt.stock_entry_type = "Material Receipt"
         receipt.company = company
+        
 
         for cp in self.cutting_parts:
             if not cp.part or (cp.quantity or 0) <= 0:
                 continue
-            cost_per_one = 0
+            cost_per_one_after = 0
             for batch in parts_batches.values():
                 for part_row in batch.parts:
                     if part_row.part == cp.part:
-                        cost_per_one = part_row.cost_per_one or 0
+                        cost_per_one_after = part_row.cost_per_one_after or 0
                         break
             receipt.append("items", {
                 "item_code": cp.part,
                 "qty": cp.quantity,
                 "uom": frappe.db.get_value("Item", cp.part, "stock_uom"),
                 "t_warehouse": cp.warehouse,
-                "allow_zero_valuation_rate": 1,
-                "basic_rate": cost_per_one,
-                "valuation_rate": cost_per_one,
-                "set_basic_rate_manually": 1
+                "basic_rate": cost_per_one_after,
             })
+
+        receipt.append("additional_costs", {
+            "expense_account": self.workstation_account,
+            "amount": self.operation_cost,
+            "description": "Additional Cost"
+        })
 
         if receipt.items:
             receipt.insert()
+            receipt.validate()
+            # receipt.run_method("validate")
+            # receipt.set_missing_values()
+            # receipt.save()
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
         
