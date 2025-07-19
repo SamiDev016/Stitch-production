@@ -7,6 +7,17 @@ app_license = "mit"
 
 
 
+
+doc_events = {
+    "Batch": {
+        "after_insert": "stitch_production.events.handle_batch_created"
+    }
+}
+
+
+
+
+
 # Apps
 # ------------------
 

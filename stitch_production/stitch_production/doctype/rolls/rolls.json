@@ -23,7 +23,8 @@
   "used_time",
   "finished",
   "attache_image",
-  "purchase_receipt_link"
+  "purchase_receipt_link",
+  "batch_number"
  ],
  "fields": [
   {
@@ -147,12 +148,17 @@
    "label": "PURCHASE RECEIPT LINK",
    "options": "Purchase Receipt",
    "read_only": 1
+  },
+  {
+   "fieldname": "batch_number",
+   "fieldtype": "Data",
+   "label": "Batch Number"
   }
  ],
  "image_field": "attache_image",
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-07-17 11:22:38.441005",
+ "modified": "2025-07-18 23:43:28.048504",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Rolls",
