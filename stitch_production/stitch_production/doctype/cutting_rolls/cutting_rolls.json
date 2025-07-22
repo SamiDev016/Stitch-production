@@ -11,7 +11,8 @@
   "used_qty",
   "lap",
   "color",
-  "roll_warehouse"
+  "roll_warehouse",
+  "batch_number"
  ],
  "fields": [
   {
@@ -55,12 +56,19 @@
    "label": "roll_warehouse",
    "options": "Warehouse",
    "read_only": 1
+  },
+  {
+   "fieldname": "batch_number",
+   "fieldtype": "Link",
+   "label": "Batch number",
+   "options": "Batch",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-06-30 17:55:07.873418",
+ "modified": "2025-07-19 18:38:02.886834",
  "modified_by": "stitch@half-ware.com",
  "module": "stitch production",
  "name": "Cutting Rolls",

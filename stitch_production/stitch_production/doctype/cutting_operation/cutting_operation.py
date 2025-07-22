@@ -175,13 +175,16 @@ class cuttingoperation(Document):
             if not u.roll or (u.used_qty or 0) <= 0:
                 continue
             r = frappe.get_doc("Rolls", u.roll)
-            issue.append("items", {
+            item_row = {
                 "item_code": r.fabric_item,
                 "qty": u.used_qty,
                 "uom": frappe.db.get_value("Item", r.fabric_item, "stock_uom"),
                 "s_warehouse": u.roll_warehouse,
                 "expense_account": self.expense_account,
-            })
+                "batch_no": u.batch_number
+            }
+
+            issue.append("items", item_row)
 
         if issue.items:
             issue.insert()

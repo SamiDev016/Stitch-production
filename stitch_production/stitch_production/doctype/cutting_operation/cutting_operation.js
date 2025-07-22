@@ -26,7 +26,7 @@ frappe.ui.form.on('Cutting Rolls', {
 
             frappe.db.get_value('Rolls',
                 { serial_number_barcode: bc },
-                ['name', 'weight', 'color']
+                ['name', 'weight', 'color', 'batch_number']
             ).then(res => {
                 console.log('[Cutting Rolls] lookup response:', res);
                 const m = res.message || {};
@@ -39,6 +39,7 @@ frappe.ui.form.on('Cutting Rolls', {
                 frappe.model.set_value(cdt, cdn, 'used_qty', m.weight || 0);
                 frappe.model.set_value(cdt, cdn, 'color', m.color || '');
                 frappe.model.set_value(cdt, cdn, 'roll_barcode', bc);
+                frappe.model.set_value(cdt, cdn, 'batch_number', m.batch_number || '');
             }).catch(err => {
                 console.error('[Cutting Rolls] Error fetching Rolls:', err);
                 frappe.msgprint(__('Error looking up roll — see console.'));
@@ -53,17 +54,19 @@ frappe.ui.form.on('Cutting Rolls', {
             return;
         }
 
-        frappe.db.get_value('Rolls', row.roll, ['weight', 'color', 'serial_number_barcode'])
+        frappe.db.get_value('Rolls', row.roll, ['weight', 'color', 'serial_number_barcode', 'batch_number'])
             .then(res => {
                 console.log('[Cutting Rolls] roll data:', res);
                 const m = res.message || {};
                 const wt = m.weight || 0;
                 const col = m.color || '';
                 const bc = m.serial_number_barcode || '';
+                const batch = m.batch_number || '';
 
                 frappe.model.set_value(cdt, cdn, 'used_qty', wt);
                 frappe.model.set_value(cdt, cdn, 'color', col);
                 frappe.model.set_value(cdt, cdn, 'roll_barcode', bc);
+                frappe.model.set_value(cdt, cdn, 'batch_number', batch);
             })
             .catch(err => console.error('[Cutting Rolls] roll lookup error:', err));
     },
@@ -91,6 +94,7 @@ frappe.ui.form.on('Cutting Rolls', {
             .catch(err => console.error('[Cutting Rolls] clamp lookup error:', err));
     }
 });
+
 
 
 
