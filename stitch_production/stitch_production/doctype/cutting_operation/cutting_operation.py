@@ -315,6 +315,7 @@ class cuttingoperation(Document):
         receipt = frappe.new_doc("Stock Entry")
         receipt.purpose = receipt.stock_entry_type = "Material Receipt"
         receipt.company = company
+        receipt.custom_is_from_cutting = 1
         try:
             receipt.project = self.project
         except:
@@ -381,8 +382,10 @@ class cuttingoperation(Document):
         if receipt.items:
             receipt.insert()
             receipt.validate()
+            
             receipt.submit()
             self.db_set("receipt_entry_name", receipt.name)
+            
         
         self.set("batches_result", [])
         for batch in parts_batches.values():
