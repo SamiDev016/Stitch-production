@@ -452,7 +452,7 @@ class Assemblying(Document):
 
         consumed_map = {}
 
-        def add_item(item_code, qty, from_warehouse, to_warehouse, rate):
+        def add_item(item_code, qty, from_warehouse, to_warehouse, rate,batch_number):
             uom = frappe.db.get_value("Item", item_code, "stock_uom")
             issue.append("items", {
                 "item_code": item_code,
@@ -460,12 +460,14 @@ class Assemblying(Document):
                 "uom": uom,
                 "stock_uom": uom,
                 "conversion_factor": 1,
-                "valuation_rate": float(rate),
-                "basic_rate": float(rate),
-                "set_basic_rate_manually": 1,
-                "allow_zero_valuation_rate": 1,
+                # "valuation_rate": float(rate),
+                # "basic_rate": float(rate),
+                # "set_basic_rate_manually": 1,
+                # "allow_zero_valuation_rate": 1,
                 "s_warehouse": from_warehouse,
-                "t_warehouse": to_warehouse
+                "t_warehouse": to_warehouse,
+                "use_serial_batch_fields": 1,
+                "batch_no": batch_number
             })
 
         def process_batches(batches, is_main):
@@ -490,7 +492,8 @@ class Assemblying(Document):
                     to_consume = finish_qty * fg_qty
 
                     cost = p.cost_per_one or 0
-                    consumptions.append((b.batch, p.part, to_consume, source_wh, dest_wh, cost, part_key))
+                    batch_number = p.batch_number or ""
+                    consumptions.append((b.batch, p.part, to_consume, source_wh, dest_wh, cost, part_key,batch_number))
             return consumptions
 
 
@@ -500,7 +503,7 @@ class Assemblying(Document):
         other_consumption = process_batches(self.other_batches, False)
         all_consumption = main_consumption + other_consumption
         
-        for batch_name, part_code, qty_used, _, _, _, part_rowname in all_consumption:
+        for batch_name, part_code, qty_used, _, _, _, part_rowname,batch_number in all_consumption:
             pb = frappe.get_doc("Parts Batch", batch_name)
             for row in pb.parts:
                 if row.part == part_code:
@@ -530,8 +533,8 @@ class Assemblying(Document):
 
         self.db_set("_consumed_qty_map_json", json.dumps(consumed_map))
 
-        for batch_name, part_code, qty_used, source_wh, dest_wh, cost, part_rowname in all_consumption:
-            add_item(part_code, qty_used, source_wh, dest_wh, cost)
+        for batch_name, part_code, qty_used, source_wh, dest_wh, cost, part_rowname,batch_number in all_consumption:
+            add_item(part_code, qty_used, source_wh, dest_wh, cost, batch_number)
 
         if not issue.items:
             frappe.throw("No items were added to the Stock Entry.")
