@@ -181,6 +181,7 @@ class cuttingoperation(Document):
                 "uom": frappe.db.get_value("Item", r.fabric_item, "stock_uom"),
                 "s_warehouse": u.roll_warehouse,
                 "expense_account": self.expense_account,
+                "use_serial_batch_fields": 1,
                 "batch_no": u.batch_number
             }
 
