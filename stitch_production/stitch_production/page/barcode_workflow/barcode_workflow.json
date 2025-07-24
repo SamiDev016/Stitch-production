@@ -1,0 +1,19 @@
+{
+ "content": null,
+ "creation": "2025-07-24 12:53:40.201106",
+ "docstatus": 0,
+ "doctype": "Page",
+ "idx": 0,
+ "modified": "2025-07-24 12:53:40.201106",
+ "modified_by": "Administrator",
+ "module": "stitch production",
+ "name": "barcode-workflow",
+ "owner": "Administrator",
+ "page_name": "barcode-workflow",
+ "roles": [],
+ "script": null,
+ "standard": "Yes",
+ "style": null,
+ "system_page": 0,
+ "title": "Barcode Post Assemblying"
+}

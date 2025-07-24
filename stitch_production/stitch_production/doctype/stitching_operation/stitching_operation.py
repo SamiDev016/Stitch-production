@@ -151,9 +151,6 @@ class StitchingOperation(Document):
                 "stock_uom": uom,
                 "conversion_factor": 1,
                 "t_warehouse": warehouse,
-                "allow_zero_valuation_rate": 1,
-                "valuation_rate": rate,
-                "set_basic_rate_manually": 1
 
             })
 
@@ -180,7 +177,7 @@ class StitchingOperation(Document):
         issue_entry.company = company
         issue_entry.allow_valuation_rate = 1
 
-        def issue_part(part_code, qty, warehouse, rate):
+        def issue_part(part_code, qty, warehouse, rate,batch_number):
             uom = frappe.db.get_value("Item", part_code, "stock_uom")
             issue_entry.append("items", {
                 "item_code": part_code,
@@ -190,9 +187,8 @@ class StitchingOperation(Document):
                 "conversion_factor": 1,
                 "s_warehouse": warehouse,
                 "allow_zero_valuation_rate": 1,
-                "valuation_rate": rate,
-                "set_basic_rate_manually": 1,
-                "basic_rate": rate
+                "use_serial_batch_fields": 1,
+                "batch_no": batch_number
             })
 
         for fg in self.finish_goods:
@@ -229,7 +225,7 @@ class StitchingOperation(Document):
                     if not part_row.cost_per_one:
                         frappe.throw(f"Missing cost per one for part {part_code} in batch {pb_doc.name}")
 
-                    issue_part(part_code, reserved_qty, warehouse, part_row.cost_per_one)
+                    issue_part(part_code, reserved_qty, warehouse, part_row.cost_per_one,part_row.batch_number)
 
                     reserve.reserved_qty = 0
 
