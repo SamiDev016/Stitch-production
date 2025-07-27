@@ -1,0 +1,124 @@
+{
+ "actions": [],
+ "autoname": "format:{finished} YYYY.####",
+ "creation": "2025-07-24 13:52:04.459933",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "section_break_c4nx",
+  "status",
+  "finished",
+  "qty",
+  "cost_per_one",
+  "operation",
+  "column_break_dkty",
+  "total_cost",
+  "colour",
+  "size",
+  "section_break_owrd",
+  "records",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "section_break_c4nx",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Post Assembly",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Assembly\nWIP Stitching\nStitched\nWIP Finishing\nFinished\nWIP Pressing\nPressed\nWIP Wrapping\nWrapped\nEND"
+  },
+  {
+   "fieldname": "finished",
+   "fieldtype": "Link",
+   "label": "Finished",
+   "options": "Item"
+  },
+  {
+   "fieldname": "qty",
+   "fieldtype": "Float",
+   "label": "QTY"
+  },
+  {
+   "fieldname": "cost_per_one",
+   "fieldtype": "Currency",
+   "label": "Cost per one"
+  },
+  {
+   "fieldname": "total_cost",
+   "fieldtype": "Currency",
+   "label": "Total Cost"
+  },
+  {
+   "fieldname": "operation",
+   "fieldtype": "Link",
+   "label": "Operation",
+   "options": "Assemblying"
+  },
+  {
+   "fieldname": "size",
+   "fieldtype": "Data",
+   "label": "Size"
+  },
+  {
+   "fieldname": "colour",
+   "fieldtype": "Data",
+   "label": "Colour"
+  },
+  {
+   "fieldname": "column_break_dkty",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_owrd",
+   "fieldtype": "Section Break"
+  },
+  {
+   "fieldname": "records",
+   "fieldtype": "Table",
+   "label": "Records",
+   "options": "Stitching Status"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-07-24 14:16:50.228339",
+ "modified_by": "Administrator",
+ "module": "stitch production",
+ "name": "Post Assembly",
+ "naming_rule": "Expression",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "submit": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

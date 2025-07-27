@@ -41,7 +41,7 @@ class Assemblying(Document):
         self.set("other_batches", [])
 
         # Main batches
-        for idx, pb in enumerate(batch_names):
+        for idx, pb in enumerate(batch_names, start=1):
             batch_doc = frappe.get_doc("Parts Batch", pb["name"])
             possible_quantities = []
             for part in batch_doc.parts:
@@ -131,7 +131,7 @@ class Assemblying(Document):
             fields=["name", "item_code"]
         )
 
-        fg_idx = 0
+        fg_idx = 1
         for batch in self.main_batches:
             color = batch.color.strip().lower()
             size = batch.size.strip().lower()
@@ -275,7 +275,7 @@ class Assemblying(Document):
         self.set("main_batches", [])
         self.set("other_batches", [])
 
-        for idx, pb in enumerate(batch_names):
+        for idx, pb in enumerate(batch_names, start=1):
             batch_doc = frappe.get_doc("Parts Batch", pb["name"])
             possible_quantities = []
             for part in batch_doc.parts:
@@ -374,7 +374,7 @@ class Assemblying(Document):
             fields=["name", "item_code"]
         )
 
-        for idx, batch in enumerate(self.main_batches):
+        for idx, batch in enumerate(self.main_batches, start=1):
             size = batch.size.strip().lower()
             matched_variant = None
 
@@ -420,7 +420,7 @@ class Assemblying(Document):
             batch.cost = total_batch_cost
             parts_cost += total_batch_cost
 
-        for idx, fg in enumerate(self.finish_goods):
+        for idx, fg in enumerate(self.finish_goods, start=1):
             cost = 0.0
 
             for mb in self.main_batches:
