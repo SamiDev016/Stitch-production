@@ -70,9 +70,11 @@ class Assemblying(Document):
 
         p_doc = frappe.get_doc("Parent BOM", self.parent_bom)
         other_boms = [b.bom for b in p_doc.boms if b.bom != self.main_bom]
-        
+        batch_number_check_counter = 1
 
         # Other batches
+        batch_number_check_counter = 1 
+
         for main_batch in self.main_batches:
             color = main_batch.color
             size = main_batch.size
@@ -81,6 +83,7 @@ class Assemblying(Document):
 
             for bom in other_boms:
                 accumulated_qty = 0
+                current_group_batches = []
 
                 other_batches = frappe.get_all(
                     "Parts Batch",
@@ -109,17 +112,25 @@ class Assemblying(Document):
                         take_qty = min(min_qty, required_qty - accumulated_qty)
                         accumulated_qty += take_qty
 
-                        self.append("other_batches", {
+                        # Append to current group, to apply batch_number_check together later
+                        current_group_batches.append({
                             "batch": ob.batch_name,
                             "qty": take_qty,
-                            "finish_good_index": main_batch.finish_good_index
+                            "finish_good_index": main_batch.finish_good_index,
+                            "batch_number_check": float(batch_number_check_counter)
                         })
+
+                if current_group_batches:
+                    for b in current_group_batches:
+                        self.append("other_batches", b)
+                    batch_number_check_counter += 1  # Increment only if group used
 
                 if accumulated_qty < required_qty:
                     frappe.throw(
                         f"Not enough parts for BOM <b>{bom}</b> with color <b>{color}</b> and size <b>{size}</b>. "
                         f"Needed: {required_qty}, Found: {accumulated_qty} for main batch <b>{main_batch_name}</b>"
                     )
+
 
         # Finish Goods
         self.set("finish_goods", [])
@@ -304,6 +315,7 @@ class Assemblying(Document):
 
         c_bom = frappe.get_doc("Custom BOM", self.custom_bom)
         other_boms = [b.bom for b in c_bom.boms if b.bom != self.main_bom]
+        batch_number_check_counter = 1
 
         for main_batch in self.main_batches:
             color = main_batch.color
@@ -322,6 +334,7 @@ class Assemblying(Document):
                     frappe.throw(f"Color for BOM {bom} not found in Custom BOM {self.custom_bom}")
 
                 accumulated_qty = 0
+                current_group_batches = []
 
                 other_batches = frappe.get_all(
                     "Parts Batch",
@@ -353,11 +366,17 @@ class Assemblying(Document):
                         take_qty = min(min_qty, required_qty - accumulated_qty)
                         accumulated_qty += take_qty
 
-                        self.append("other_batches", {
+                        current_group_batches.append({
                             "batch": ob.batch_name,
                             "qty": take_qty,
-                            "finish_good_index": main_batch.finish_good_index
+                            "finish_good_index": main_batch.finish_good_index,
+                            "batch_number_check": float(batch_number_check_counter)
                         })
+
+                if current_group_batches:
+                    for b in current_group_batches:
+                        self.append("other_batches", b)
+                    batch_number_check_counter += 1  # increment only if used
 
                 if accumulated_qty < required_qty:
                     frappe.throw(
@@ -440,6 +459,56 @@ class Assemblying(Document):
         self.parts_cost = parts_cost
         self.total_cost = total_cost + individual_cost + parts_cost
 
+
+    def before_submit(self):
+        updated_batches = set()
+        damage_map = {}
+
+        for mb in self.main_batches:
+            fg = next((f for f in self.finish_goods if f.finish_good_index == mb.finish_good_index), None)
+            if not fg:
+                continue
+
+            prev_qty = mb.original_parts_qty or mb.parts_qty or 0
+            new_qty = fg.real_qty
+            lost_qty = prev_qty - new_qty if prev_qty > new_qty else 0
+
+            mb.parts_qty = new_qty
+
+            if lost_qty > 0:
+                pb = frappe.get_doc("Parts Batch", mb.batch)
+
+                existing = next((row for row in pb.qty_perts if row.operation == self.name), None)
+                if existing:
+                    existing.perts_qty += lost_qty
+                else:
+                    pb.append("qty_perts", {
+                        "operation": self.name,
+                        "perts_qty": lost_qty
+                    })
+
+                for p in pb.parts:
+                    if p.qty_of_finished_goods and p.qty:
+                        reduction = lost_qty * p.qty_of_finished_goods
+                        p.qty = max((p.qty or 0) - reduction, 0)
+                        damage_map.setdefault(pb.name, []).append((p.part, reduction, p.batch_number or ""))
+
+                pb.save(ignore_permissions=True)
+                updated_batches.add(pb.name)
+
+        for pb_name in updated_batches:
+            frappe.get_doc("Parts Batch", pb_name).save(ignore_permissions=True)
+
+        for ob in self.other_batches:
+            fg = next((f for f in self.finish_goods if f.finish_good_index == ob.finish_good_index), None)
+            if fg:
+                ob.qty = fg.real_qty
+
+        self.db_set("_damage_map_json", json.dumps(damage_map))
+
+
+
+
     def on_submit(self):
         if not self.finish_goods or not self.other_batches or not self.main_batches:
             frappe.throw("No finish goods found.")
@@ -452,7 +521,7 @@ class Assemblying(Document):
 
         consumed_map = {}
 
-        def add_item(item_code, qty, from_warehouse, to_warehouse, rate,batch_number):
+        def add_item(item_code, qty, from_warehouse, to_warehouse, rate, batch_number):
             uom = frappe.db.get_value("Item", item_code, "stock_uom")
             issue.append("items", {
                 "item_code": item_code,
@@ -460,10 +529,6 @@ class Assemblying(Document):
                 "uom": uom,
                 "stock_uom": uom,
                 "conversion_factor": 1,
-                # "valuation_rate": float(rate),
-                # "basic_rate": float(rate),
-                # "set_basic_rate_manually": 1,
-                # "allow_zero_valuation_rate": 1,
                 "s_warehouse": from_warehouse,
                 "t_warehouse": to_warehouse,
                 "use_serial_batch_fields": 1,
@@ -481,46 +546,29 @@ class Assemblying(Document):
 
                 for p in pb.parts:
                     if not p.qty or not p.qty_of_finished_goods:
-                        frappe.throw(f"Invalid 'qty' or 'qty_of_finished_goods' for part {p.part} in batch {b.batch}")
+                        frappe.throw(f"Invalid qty or fg_ratio for part {p.part} in batch {b.batch}")
                     part_key = p.name
-                    base_qty = p.qty
-                    fg_qty = p.qty_of_finished_goods
-
-                    if fg_qty <= 0:
-                        frappe.throw(f"Invalid 'qty_of_finished_goods' for part {p.part} in batch {b.batch}")
-
-                    to_consume = finish_qty * fg_qty
-
+                    to_consume = finish_qty * p.qty_of_finished_goods
                     cost = p.cost_per_one or 0
-                    batch_number = p.batch_number or ""
-                    consumptions.append((b.batch, p.part, to_consume, source_wh, dest_wh, cost, part_key,batch_number))
+                    consumptions.append((b.batch, p.part, to_consume, source_wh, dest_wh, cost, part_key, p.batch_number or ""))
             return consumptions
-
-
-
 
         main_consumption = process_batches(self.main_batches, True)
         other_consumption = process_batches(self.other_batches, False)
         all_consumption = main_consumption + other_consumption
-        
-        for batch_name, part_code, qty_used, _, _, _, part_rowname,batch_number in all_consumption:
+
+        # Apply part reductions and record reserve
+        for batch_name, part_code, qty_used, _, _, _, part_rowname, batch_number in all_consumption:
             pb = frappe.get_doc("Parts Batch", batch_name)
             for row in pb.parts:
                 if row.part == part_code:
-                    old_qty = row.qty or 0
-                    new_qty = old_qty - qty_used
+                    row.qty = max((row.qty or 0) - qty_used, 0)
 
-                    row.qty = float(new_qty)
-
-
-                    already_reserved = False
-                    for reserve in pb.batches_reserves:
-                        if reserve.part == row.part and reserve.operation == self.name:
-                            reserve.reserved_qty += qty_used
-                            already_reserved = True
-                            break
-
-                    if not already_reserved:
+                    # Track reserved
+                    found = next((r for r in pb.batches_reserves if r.part == row.part and r.operation == self.name), None)
+                    if found:
+                        found.reserved_qty += qty_used
+                    else:
                         pb.append("batches_reserves", {
                             "part": row.part,
                             "operation": self.name,
@@ -533,22 +581,34 @@ class Assemblying(Document):
 
         self.db_set("_consumed_qty_map_json", json.dumps(consumed_map))
 
-        for batch_name, part_code, qty_used, source_wh, dest_wh, cost, part_rowname,batch_number in all_consumption:
+        # Add material transfer lines
+        for batch_name, part_code, qty_used, source_wh, dest_wh, cost, part_rowname, batch_number in all_consumption:
             add_item(part_code, qty_used, source_wh, dest_wh, cost, batch_number)
 
+        # Add damage transfers to damage_parts_warehouse
+        damage_map = json.loads(self._damage_map_json or "{}")
+        for batch_name, parts in damage_map.items():
+            pb = frappe.get_doc("Parts Batch", batch_name)
+            source_wh = frappe.get_doc("cutting operation", pb.source_operation).distination_warehouse
+
+            for part_code, lost_qty, batch_number in parts:
+                add_item(part_code, lost_qty, source_wh, self.damage_parts_warehouse, 0, batch_number)
+
         if not issue.items:
-            frappe.throw("No items were added to the Stock Entry.")
+            frappe.throw("No items added to the Stock Entry.")
 
         issue.insert()
         issue.submit()
         self.db_set("stock_entry_name", issue.name)
 
+        # Update pgcd_qty
         for b in self.main_batches + self.other_batches:
             pb = frappe.get_doc("Parts Batch", b.batch)
             qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
             ints = [int(q) for q in qtys if float(q).is_integer()]
             pgcd = reduce(math.gcd, ints) if ints else 0
             frappe.db.set_value("Parts Batch", pb.name, "pgcd_qty", pgcd)
+
 
 
 @frappe.whitelist()

@@ -1,0 +1,124 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "creation": "2025-07-27 12:12:29.266932",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "cutting_operation_tab",
+  "cutting_operation_settings_section",
+  "cutting_project",
+  "parts_distination_warehouse",
+  "cutting_expense_account",
+  "cutting_workstation_account",
+  "cutting_spreading_workers_account",
+  "cutting_drawing_workers_account",
+  "cutting_workers_account",
+  "cutting_extra_cost_account",
+  "assemblying_tab",
+  "assembling_project",
+  "assembling_workers_account"
+ ],
+ "fields": [
+  {
+   "fieldname": "cutting_operation_tab",
+   "fieldtype": "Tab Break",
+   "label": "Cutting Operation"
+  },
+  {
+   "fieldname": "assemblying_tab",
+   "fieldtype": "Tab Break",
+   "label": "Assemblying"
+  },
+  {
+   "fieldname": "parts_distination_warehouse",
+   "fieldtype": "Link",
+   "label": "Parts Distination Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "cutting_workstation_account",
+   "fieldtype": "Link",
+   "label": "Workstation Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "cutting_spreading_workers_account",
+   "fieldtype": "Link",
+   "label": "Spreading Workers Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "cutting_drawing_workers_account",
+   "fieldtype": "Link",
+   "label": "Drawing Workers Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "cutting_workers_account",
+   "fieldtype": "Link",
+   "label": "Cutting Workers Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "cutting_extra_cost_account",
+   "fieldtype": "Link",
+   "label": "Extra Cost Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "cutting_operation_settings_section",
+   "fieldtype": "Section Break",
+   "label": "Cutting Operation Settings"
+  },
+  {
+   "fieldname": "cutting_project",
+   "fieldtype": "Link",
+   "label": "Cutting Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "assembling_workers_account",
+   "fieldtype": "Link",
+   "label": "Assembling Workers Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "assembling_project",
+   "fieldtype": "Link",
+   "label": "Assembling Project",
+   "options": "Project"
+  },
+  {
+   "fieldname": "cutting_expense_account",
+   "fieldtype": "Link",
+   "label": "Between Account",
+   "options": "Account"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "issingle": 1,
+ "links": [],
+ "modified": "2025-07-27 12:27:10.140122",
+ "modified_by": "Administrator",
+ "module": "stitch production",
+ "name": "Stitch Settings",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "print": 1,
+   "read": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "creation",
+ "sort_order": "DESC",
+ "states": []
+}

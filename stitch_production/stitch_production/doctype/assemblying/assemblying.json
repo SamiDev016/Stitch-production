@@ -9,6 +9,7 @@
   "section_break_ztod",
   "special_assembly",
   "distination_warehouse",
+  "damage_parts_warehouse",
   "parent_bom",
   "custom_bom",
   "main_operation",
@@ -19,6 +20,7 @@
   "amended_from",
   "stock_entry_name",
   "_consumed_qty_map_json",
+  "_damage_map_json",
   "assemblying_cost_tab",
   "workers_account",
   "project",
@@ -167,13 +169,25 @@
    "fieldtype": "Link",
    "label": "Project",
    "options": "Project"
+  },
+  {
+   "fieldname": "damage_parts_warehouse",
+   "fieldtype": "Link",
+   "label": "Damage Parts Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "_damage_map_json",
+   "fieldtype": "Text",
+   "hidden": 1,
+   "label": "_damage_map_json"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-17 15:13:00.256967",
- "modified_by": "stitch@half-ware.com",
+ "modified": "2025-07-28 21:44:32.614144",
+ "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",
  "naming_rule": "Expression",

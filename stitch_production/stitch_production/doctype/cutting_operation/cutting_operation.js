@@ -98,3 +98,24 @@ frappe.ui.form.on('Cutting Rolls', {
 
 
 
+frappe.ui.form.on('cutting operation', {
+    onload: function(frm) {
+        if (!frm.is_new()) return;
+
+        frappe.db.get_doc('Stitch Settings', 'Stitch Settings')
+            .then(settings => {
+                frm.set_value('distination_warehouse', settings.parts_distination_warehouse || '');
+                frm.set_value('project', settings.cutting_project || '');
+                frm.set_value('expense_account', settings.cutting_expense_account || '');
+                frm.set_value('workstation_account', settings.cutting_workstation_account || '');
+                frm.set_value('drawing_workers_account', settings.cutting_drawing_workers_account || '');
+                frm.set_value('spreading_workers_account', settings.cutting_spreading_workers_account || '');
+                frm.set_value('cutting_workers_account', settings.cutting_workers_account || '');
+                frm.set_value('extra_cost_account', settings.cutting_extra_cost_account || '');
+            })
+            .catch(err => {
+                console.error('[Cutting Operation] Failed to load Stitch Settings:', err);
+                frappe.msgprint(__('Error loading default settings from Stitch Settings.'));
+            });
+    }
+});
