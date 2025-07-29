@@ -581,11 +581,9 @@ class Assemblying(Document):
 
         self.db_set("_consumed_qty_map_json", json.dumps(consumed_map))
 
-        # Add material transfer lines
         for batch_name, part_code, qty_used, source_wh, dest_wh, cost, part_rowname, batch_number in all_consumption:
             add_item(part_code, qty_used, source_wh, dest_wh, cost, batch_number)
 
-        # Add damage transfers to damage_parts_warehouse
         damage_map = json.loads(self._damage_map_json or "{}")
         for batch_name, parts in damage_map.items():
             pb = frappe.get_doc("Parts Batch", batch_name)
@@ -601,7 +599,6 @@ class Assemblying(Document):
         issue.submit()
         self.db_set("stock_entry_name", issue.name)
 
-        # Update pgcd_qty
         for b in self.main_batches + self.other_batches:
             pb = frappe.get_doc("Parts Batch", b.batch)
             qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
@@ -614,38 +611,58 @@ class Assemblying(Document):
 @frappe.whitelist()
 def force_cancel(docname):
     doc = frappe.get_doc("Assemblying", docname)
+
     try:
         consumed_map = json.loads(doc._consumed_qty_map_json or "{}")
     except Exception:
         consumed_map = {}
 
+    try:
+        damage_map = json.loads(doc._damage_map_json or "{}")
+    except Exception:
+        damage_map = {}
+
     def unlink_parts_batch_operations(batches):
         for b in batches:
             pb = frappe.get_doc("Parts Batch", b.batch)
-
-            for r in pb.batches_reserves:
-                if r.operation == doc.name:
-                    frappe.db.set_value("Batches Reserves", r.name, "operation", None)
-
-            frappe.db.commit()
             pb.reload()
 
-            pb.batches_reserves = [r for r in pb.batches_reserves if r.operation]
-            
+            # Clear reserves
+            pb.batches_reserves = [r for r in pb.batches_reserves if r.operation != doc.name]
+
+            # Restore consumed qty
             for row in pb.parts:
                 used_qty = Decimal(str(consumed_map.get(row.name, 0)))
                 if used_qty:
                     row.qty = (Decimal(str(row.qty or 0)) + used_qty).quantize(Decimal("0.00001"))
 
+            # Restore damaged parts
+            if pb.name in damage_map:
+                for part_code, lost_qty, batch_number in damage_map[pb.name]:
+                    for row in pb.parts:
+                        if row.part == part_code:
+                            row.qty = (Decimal(str(row.qty or 0)) + Decimal(str(lost_qty))).quantize(Decimal("0.00001"))
+
+                # Remove qty_perts entries linked to this doc
+                pb.qty_perts = [
+                    qp for qp in pb.qty_perts
+                    if not (qp.operation == doc.name and qp.perts_qty is not None)
+                ]
+
+            # Recalculate pgcd
             qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
             ints = [int(q) for q in qtys if float(q).is_integer()]
             pb.pgcd_qty = reduce(math.gcd, ints) if ints else 0
 
             pb.save(ignore_permissions=True)
 
+
+
+    # Undo batch effects
     unlink_parts_batch_operations(doc.main_batches)
     unlink_parts_batch_operations(doc.other_batches)
 
+    # Cancel stock entry if exists
     if doc.stock_entry_name:
         try:
             se = frappe.get_doc("Stock Entry", doc.stock_entry_name)
@@ -655,10 +672,12 @@ def force_cancel(docname):
         except Exception as e:
             frappe.log_error(f"Failed to cancel Stock Entry {doc.stock_entry_name}: {e}")
 
+    # Clear internal fields
     doc.db_set("stock_entry_name", None)
     doc.db_set("_consumed_qty_map_json", None)
+    doc.db_set("_damage_map_json", None)
 
     frappe.db.commit()
     doc.cancel()
 
-    frappe.msgprint("Force cancel complete, quantities restored.")
+    frappe.msgprint("Force cancel complete, quantities and damages restored.")

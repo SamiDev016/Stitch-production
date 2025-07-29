@@ -17,6 +17,7 @@
    "options": "Assemblying"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "perts_qty",
    "fieldtype": "Float",
    "label": "Perts Qty"
@@ -26,7 +27,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-27 11:30:44.714939",
+ "modified": "2025-07-29 09:57:34.283549",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Qty Perts",
