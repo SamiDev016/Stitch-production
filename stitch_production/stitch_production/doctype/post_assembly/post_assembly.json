@@ -1,6 +1,6 @@
 {
  "actions": [],
- "autoname": "format:{finished} YYYY.####",
+ "autoname": "format:{finished} {YY}.{####}",
  "creation": "2025-07-24 13:52:04.459933",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -13,7 +13,7 @@
   "operation",
   "column_break_dkty",
   "total_cost",
-  "colour",
+  "color",
   "size",
   "section_break_owrd",
   "records",
@@ -73,11 +73,6 @@
    "label": "Size"
   },
   {
-   "fieldname": "colour",
-   "fieldtype": "Data",
-   "label": "Colour"
-  },
-  {
    "fieldname": "column_break_dkty",
    "fieldtype": "Column Break"
   },
@@ -86,17 +81,24 @@
    "fieldtype": "Section Break"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "records",
    "fieldtype": "Table",
    "label": "Records",
-   "options": "Stitching Status"
+   "options": "Stitching Status",
+   "read_only": 1
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Data",
+   "label": "Color"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-24 14:16:50.228339",
+ "modified": "2025-07-29 11:39:47.110913",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Post Assembly",

@@ -7,13 +7,6 @@ import json
 import random
 
 
-# def generate_barcode(name, index):
-#     return f"{name}-{str(index).zfill(2)}"
-
-
-
-
-
 def generate_barcode(index):
     random_part = ''.join([str(random.randint(0, 9)) for _ in range(8)])
     index_part = str(index).zfill(2)
@@ -606,11 +599,45 @@ class Assemblying(Document):
             pgcd = reduce(math.gcd, ints) if ints else 0
             frappe.db.set_value("Parts Batch", pb.name, "pgcd_qty", pgcd)
 
+        
+        for fg in self.finish_goods:
+            if not fg.barcode or not fg.item or not fg.qty or not fg.color or not fg.size or not fg.cost_per_one_adding_assemblying or not fg.total_finish_good_adding_assemblying:
+                continue
+            # ar = frappe.new_doc("Assembly Result")
+            # ar.assemblying = self.name
+            # ar.barcode = fg.barcode
+            # ar.item = fg.item
+            # ar.qty = fg.qty
+            # ar.color = fg.color
+            # ar.size = fg.size
+            # ar.cost_of_one = fg.cost_per_one_adding_assemblying
+            # ar.total_cost = fg.total_finish_good_adding_assemblying
+            # ar.insert()
+            # ar.submit()
+
+            ps = frappe.new_doc("Post Assembly")
+            ps.status = "Assembly"
+            ps.finished = fg.item
+            ps.qty = fg.qty
+            ps.cost_per_one = fg.cost_per_one_adding_assemblying
+            ps.operation = self.name
+            ps.total_cost = fg.total_finish_good_adding_assemblying
+            ps.color = fg.color
+            ps.size = fg.size
+            ps.insert()
+            ps.submit()
+
 
 
 @frappe.whitelist()
 def force_cancel(docname):
     doc = frappe.get_doc("Assemblying", docname)
+
+    asr = frappe.get_list("Post Assembly", filters={"operation": doc.name}, fields=["name"])
+    for ar in asr:
+        ar_doc = frappe.get_doc("Post Assembly", ar.name)
+        ar_doc.cancel()
+        ar_doc.delete()
 
     try:
         consumed_map = json.loads(doc._consumed_qty_map_json or "{}")
@@ -627,29 +654,23 @@ def force_cancel(docname):
             pb = frappe.get_doc("Parts Batch", b.batch)
             pb.reload()
 
-            # Clear reserves
             pb.batches_reserves = [r for r in pb.batches_reserves if r.operation != doc.name]
 
-            # Restore consumed qty
             for row in pb.parts:
                 used_qty = Decimal(str(consumed_map.get(row.name, 0)))
                 if used_qty:
                     row.qty = (Decimal(str(row.qty or 0)) + used_qty).quantize(Decimal("0.00001"))
 
-            # Restore damaged parts
             if pb.name in damage_map:
                 for part_code, lost_qty, batch_number in damage_map[pb.name]:
                     for row in pb.parts:
                         if row.part == part_code:
                             row.qty = (Decimal(str(row.qty or 0)) + Decimal(str(lost_qty))).quantize(Decimal("0.00001"))
 
-                # Remove qty_perts entries linked to this doc
                 pb.qty_perts = [
                     qp for qp in pb.qty_perts
                     if not (qp.operation == doc.name and qp.perts_qty is not None)
                 ]
-
-            # Recalculate pgcd
             qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
             ints = [int(q) for q in qtys if float(q).is_integer()]
             pb.pgcd_qty = reduce(math.gcd, ints) if ints else 0
@@ -657,12 +678,9 @@ def force_cancel(docname):
             pb.save(ignore_permissions=True)
 
 
-
-    # Undo batch effects
     unlink_parts_batch_operations(doc.main_batches)
     unlink_parts_batch_operations(doc.other_batches)
 
-    # Cancel stock entry if exists
     if doc.stock_entry_name:
         try:
             se = frappe.get_doc("Stock Entry", doc.stock_entry_name)
@@ -672,7 +690,6 @@ def force_cancel(docname):
         except Exception as e:
             frappe.log_error(f"Failed to cancel Stock Entry {doc.stock_entry_name}: {e}")
 
-    # Clear internal fields
     doc.db_set("stock_entry_name", None)
     doc.db_set("_consumed_qty_map_json", None)
     doc.db_set("_damage_map_json", None)

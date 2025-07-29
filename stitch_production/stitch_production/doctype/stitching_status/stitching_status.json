@@ -7,29 +7,14 @@
  "engine": "InnoDB",
  "field_order": [
   "status",
-  "starting_time",
-  "ending_time",
+  "start_time",
+  "end_time",
   "duration",
-  "expense_account"
+  "expense_account",
+  "end_step",
+  "step_index"
  ],
  "fields": [
-  {
-   "fieldname": "starting_time",
-   "fieldtype": "Datetime",
-   "in_list_view": 1,
-   "label": "Starting Time"
-  },
-  {
-   "fieldname": "ending_time",
-   "fieldtype": "Datetime",
-   "in_list_view": 1,
-   "label": "Ending Time"
-  },
-  {
-   "fieldname": "duration",
-   "fieldtype": "Duration",
-   "label": "Duration"
-  },
   {
    "fieldname": "status",
    "fieldtype": "Data",
@@ -42,13 +27,40 @@
    "in_standard_filter": 1,
    "label": "Expense Account",
    "options": "Account"
+  },
+  {
+   "fieldname": "start_time",
+   "fieldtype": "Datetime",
+   "in_list_view": 1,
+   "label": "Start Time"
+  },
+  {
+   "default": "0",
+   "fieldname": "end_step",
+   "fieldtype": "Check",
+   "label": "End Step"
+  },
+  {
+   "fieldname": "end_time",
+   "fieldtype": "Datetime",
+   "label": "End Time"
+  },
+  {
+   "fieldname": "duration",
+   "fieldtype": "Time",
+   "label": "Duration"
+  },
+  {
+   "fieldname": "step_index",
+   "fieldtype": "Int",
+   "label": "Step Index"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-24 15:16:34.542746",
+ "modified": "2025-07-29 12:31:26.269759",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching Status",

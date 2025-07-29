@@ -1,6 +1,7 @@
 {
  "actions": [],
  "allow_rename": 1,
+ "autoname": "format:{item}-{DD},{MM},{YY}-{##}",
  "creation": "2025-07-29 10:59:29.114131",
  "doctype": "DocType",
  "engine": "InnoDB",
@@ -14,7 +15,8 @@
   "size",
   "cost_of_one",
   "total_cost",
-  "amended_from"
+  "amended_from",
+  "assemblying"
  ],
  "fields": [
   {
@@ -72,19 +74,27 @@
    "fieldname": "total_cost",
    "fieldtype": "Currency",
    "label": "Total Cost"
+  },
+  {
+   "fieldname": "assemblying",
+   "fieldtype": "Link",
+   "label": "assemblying",
+   "options": "Assemblying"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-29 11:01:29.880589",
+ "modified": "2025-07-29 11:27:12.527822",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assembly Result",
+ "naming_rule": "Expression",
  "owner": "Administrator",
  "permissions": [
   {
+   "cancel": 1,
    "create": 1,
    "delete": 1,
    "email": 1,
@@ -93,6 +103,7 @@
    "read": 1,
    "report": 1,
    "role": "System Manager",
+   "select": 1,
    "share": 1,
    "submit": 1,
    "write": 1
