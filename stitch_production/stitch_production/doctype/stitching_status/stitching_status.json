@@ -16,12 +16,14 @@
  ],
  "fields": [
   {
+   "allow_on_submit": 1,
    "fieldname": "status",
    "fieldtype": "Data",
    "in_list_view": 1,
    "label": "Status"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "expense_account",
    "fieldtype": "Link",
    "in_standard_filter": 1,
@@ -29,28 +31,33 @@
    "options": "Account"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "start_time",
    "fieldtype": "Datetime",
    "in_list_view": 1,
    "label": "Start Time"
   },
   {
+   "allow_on_submit": 1,
    "default": "0",
    "fieldname": "end_step",
    "fieldtype": "Check",
    "label": "End Step"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "end_time",
    "fieldtype": "Datetime",
    "label": "End Time"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "duration",
-   "fieldtype": "Time",
+   "fieldtype": "Float",
    "label": "Duration"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "step_index",
    "fieldtype": "Int",
    "label": "Step Index"
@@ -60,7 +67,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-29 12:31:26.269759",
+ "modified": "2025-07-29 13:43:51.177528",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitching Status",

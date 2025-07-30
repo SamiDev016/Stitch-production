@@ -5,6 +5,7 @@
  "doctype": "DocType",
  "engine": "InnoDB",
  "field_order": [
+  "barcode",
   "section_break_c4nx",
   "status",
   "finished",
@@ -22,7 +23,8 @@
  "fields": [
   {
    "fieldname": "section_break_c4nx",
-   "fieldtype": "Section Break"
+   "fieldtype": "Section Break",
+   "read_only": 1
   },
   {
    "fieldname": "amended_from",
@@ -35,42 +37,50 @@
    "search_index": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Assembly\nWIP Stitching\nStitched\nWIP Finishing\nFinished\nWIP Pressing\nPressed\nWIP Wrapping\nWrapped\nEND"
+   "options": "Assembly\nWIP Stitching\nStitched\nWIP Finishing\nFinished\nWIP Pressing\nPressed\nWIP Wrapping\nWrapped\nEND",
+   "read_only": 1
   },
   {
    "fieldname": "finished",
    "fieldtype": "Link",
    "label": "Finished",
-   "options": "Item"
+   "options": "Item",
+   "read_only": 1
   },
   {
    "fieldname": "qty",
    "fieldtype": "Float",
-   "label": "QTY"
+   "label": "QTY",
+   "read_only": 1
   },
   {
    "fieldname": "cost_per_one",
    "fieldtype": "Currency",
-   "label": "Cost per one"
+   "label": "Cost per one",
+   "read_only": 1
   },
   {
    "fieldname": "total_cost",
    "fieldtype": "Currency",
-   "label": "Total Cost"
+   "label": "Total Cost",
+   "read_only": 1
   },
   {
    "fieldname": "operation",
    "fieldtype": "Link",
    "label": "Operation",
-   "options": "Assemblying"
+   "options": "Assemblying",
+   "read_only": 1
   },
   {
    "fieldname": "size",
    "fieldtype": "Data",
-   "label": "Size"
+   "label": "Size",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_dkty",
@@ -91,14 +101,21 @@
   {
    "fieldname": "color",
    "fieldtype": "Data",
-   "label": "Color"
+   "label": "Color",
+   "read_only": 1
+  },
+  {
+   "fieldname": "barcode",
+   "fieldtype": "Barcode",
+   "label": "barcode",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-29 11:39:47.110913",
+ "modified": "2025-07-29 13:32:13.676008",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Post Assembly",

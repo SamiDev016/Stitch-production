@@ -17,7 +17,15 @@
   "cutting_extra_cost_account",
   "assemblying_tab",
   "assembling_project",
-  "assembling_workers_account"
+  "assembling_workers_account",
+  "stitching_operation_tab",
+  "expense_account_section",
+  "stitched_expense_account",
+  "finished_expense_account",
+  "pressed_expense_account",
+  "wrapped_expense_account",
+  "stitching_finish_warehouse",
+  "stitched_cost"
  ],
  "fields": [
   {
@@ -94,13 +102,58 @@
    "fieldtype": "Link",
    "label": "Between Account",
    "options": "Account"
+  },
+  {
+   "fieldname": "stitching_operation_tab",
+   "fieldtype": "Tab Break",
+   "label": "Stitching Operation"
+  },
+  {
+   "fieldname": "expense_account_section",
+   "fieldtype": "Section Break",
+   "label": "Expense Account"
+  },
+  {
+   "fieldname": "stitched_expense_account",
+   "fieldtype": "Link",
+   "label": "Stitched Step Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "finished_expense_account",
+   "fieldtype": "Link",
+   "label": "Finished Step Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "pressed_expense_account",
+   "fieldtype": "Link",
+   "label": "Pressed Step Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "wrapped_expense_account",
+   "fieldtype": "Link",
+   "label": "Wrapped Step Expense Account",
+   "options": "Account"
+  },
+  {
+   "fieldname": "stitching_finish_warehouse",
+   "fieldtype": "Link",
+   "label": "Finish Good Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "stitched_cost",
+   "fieldtype": "Currency",
+   "label": "Stitching Cost Per Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-27 12:27:10.140122",
+ "modified": "2025-07-30 01:18:26.696711",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitch Settings",

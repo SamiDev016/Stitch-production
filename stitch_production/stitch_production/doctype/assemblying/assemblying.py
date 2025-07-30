@@ -12,6 +12,10 @@ def generate_barcode(index):
     index_part = str(index).zfill(2)
     return f"{random_part}{index_part}"
 
+def generate_barcode_assembly():
+    return ''.join([str(random.randint(0, 9)) for _ in range(12)])
+    
+
 
 class Assemblying(Document):
     def before_save(self):
@@ -454,6 +458,11 @@ class Assemblying(Document):
 
 
     def before_submit(self):
+        self.barcode = generate_barcode_assembly()
+        if not self.barcode:
+            frappe.throw("Could not generate barcode for assembly.")
+
+
         updated_batches = set()
         damage_map = {}
 
@@ -624,8 +633,8 @@ class Assemblying(Document):
             ps.total_cost = fg.total_finish_good_adding_assemblying
             ps.color = fg.color
             ps.size = fg.size
+            ps.barcode = fg.barcode
             ps.insert()
-            ps.submit()
 
 
 

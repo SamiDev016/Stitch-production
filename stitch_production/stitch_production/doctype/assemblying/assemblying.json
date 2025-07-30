@@ -7,6 +7,7 @@
  "engine": "InnoDB",
  "field_order": [
   "section_break_ztod",
+  "barcode",
   "special_assembly",
   "distination_warehouse",
   "damage_parts_warehouse",
@@ -181,12 +182,18 @@
    "fieldtype": "Text",
    "hidden": 1,
    "label": "_damage_map_json"
+  },
+  {
+   "fieldname": "barcode",
+   "fieldtype": "Barcode",
+   "label": "Barcode",
+   "read_only": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-28 21:44:32.614144",
+ "modified": "2025-07-30 01:32:39.885744",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",
