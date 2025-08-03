@@ -20,6 +20,7 @@
   "assembling_workers_account",
   "stitching_operation_tab",
   "expense_account_section",
+  "cost_calculation_method",
   "stitched_expense_account",
   "finished_expense_account",
   "pressed_expense_account",
@@ -147,13 +148,21 @@
    "fieldname": "stitched_cost",
    "fieldtype": "Currency",
    "label": "Stitching Cost Per Item"
+  },
+  {
+   "default": "Item Based",
+   "fieldname": "cost_calculation_method",
+   "fieldtype": "Select",
+   "label": "Cost Calculation Method",
+   "options": "Item Based\nTime Based",
+   "read_only": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-30 01:18:26.696711",
+ "modified": "2025-07-31 17:02:42.847877",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitch Settings",
