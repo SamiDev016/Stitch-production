@@ -18,6 +18,9 @@
   "assemblying_tab",
   "assembling_project",
   "assembling_workers_account",
+  "distination_warehouse",
+  "damage_parts_warehouse",
+  "assembly_extra_cost_account",
   "stitching_operation_tab",
   "expense_account_section",
   "cost_calculation_method",
@@ -156,13 +159,31 @@
    "label": "Cost Calculation Method",
    "options": "Item Based\nTime Based",
    "read_only": 1
+  },
+  {
+   "fieldname": "distination_warehouse",
+   "fieldtype": "Link",
+   "label": "Distination Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "damage_parts_warehouse",
+   "fieldtype": "Link",
+   "label": "Damage Perts Warehouse",
+   "options": "Warehouse"
+  },
+  {
+   "fieldname": "assembly_extra_cost_account",
+   "fieldtype": "Link",
+   "label": "Assembly Extra Cost Account",
+   "options": "Account"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-07-31 17:02:42.847877",
+ "modified": "2025-08-04 12:29:21.597252",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitch Settings",

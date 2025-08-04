@@ -7,7 +7,8 @@
  "engine": "InnoDB",
  "field_order": [
   "operation",
-  "perts_qty"
+  "perts_qty",
+  "item"
  ],
  "fields": [
   {
@@ -21,13 +22,19 @@
    "fieldname": "perts_qty",
    "fieldtype": "Float",
    "label": "Perts Qty"
+  },
+  {
+   "fieldname": "item",
+   "fieldtype": "Link",
+   "label": "item",
+   "options": "Item"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-29 09:57:34.283549",
+ "modified": "2025-08-04 13:12:14.207457",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Qty Perts",

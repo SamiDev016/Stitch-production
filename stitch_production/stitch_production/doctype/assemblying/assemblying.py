@@ -457,15 +457,145 @@ class Assemblying(Document):
         self.total_cost = total_cost + individual_cost + parts_cost
 
 
+    # def before_submit(self):
+    #     self.barcode = generate_barcode_assembly()
+    #     if not self.barcode:
+    #         frappe.throw("Could not generate barcode for assembly.")
+
+
+    #     updated_batches = set()
+    #     damage_map = {}
+
+    #     for mb in self.main_batches:
+    #         fg = next((f for f in self.finish_goods if f.finish_good_index == mb.finish_good_index), None)
+    #         if not fg:
+    #             continue
+
+    #         prev_qty = mb.original_parts_qty or mb.parts_qty or 0
+    #         new_qty = fg.real_qty
+    #         lost_qty = prev_qty - new_qty if prev_qty > new_qty else 0
+
+    #         mb.parts_qty = new_qty
+
+    #         if lost_qty > 0:
+    #             pb = frappe.get_doc("Parts Batch", mb.batch)
+
+    #             existing = next((row for row in pb.qty_perts if row.operation == self.name), None)
+    #             if existing:
+    #                 existing.perts_qty += lost_qty
+    #             else:
+    #                 pb.append("qty_perts", {
+    #                     "operation": self.name,
+    #                     "perts_qty": lost_qty
+    #                 })
+
+    #             for p in pb.parts:
+    #                 if p.qty_of_finished_goods and p.qty:
+    #                     reduction = lost_qty * p.qty_of_finished_goods
+    #                     p.qty = max((p.qty or 0) - reduction, 0)
+    #                     damage_map.setdefault(pb.name, []).append((p.part, reduction, p.batch_number or ""))
+
+    #             pb.save(ignore_permissions=True)
+    #             updated_batches.add(pb.name)
+
+    #     for pb_name in updated_batches:
+    #         frappe.get_doc("Parts Batch", pb_name).save(ignore_permissions=True)
+
+    #     for ob in self.other_batches:
+    #         fg = next((f for f in self.finish_goods if f.finish_good_index == ob.finish_good_index), None)
+    #         if fg:
+    #             ob.qty = fg.real_qty
+
+    #     self.db_set("_damage_map_json", json.dumps(damage_map))
+
+
+
+    # def before_submit(self):
+    #     self.barcode = generate_barcode_assembly()
+    #     if not self.barcode:
+    #         frappe.throw("Could not generate barcode for assembly.")
+
+    #     updated_batches = set()
+    #     damage_map = {}
+
+    #     for mb in self.main_batches:
+    #         fg = next((f for f in self.finish_goods if f.finish_good_index == mb.finish_good_index), None)
+    #         if not fg:
+    #             continue
+
+    #         prev_qty = mb.original_parts_qty or mb.parts_qty or 0
+    #         new_qty = fg.real_qty
+    #         lost_qty = prev_qty - new_qty if prev_qty > new_qty else 0
+
+    #         mb.parts_qty = new_qty
+
+    #         if lost_qty > 0:
+    #             pb = frappe.get_doc("Parts Batch", mb.batch)
+
+    #             existing = next((row for row in pb.qty_perts if row.operation == self.name), None)
+    #             if existing:
+    #                 existing.perts_qty += lost_qty
+    #             else:
+    #                 pb.append("qty_perts", {
+    #                     "operation": self.name,
+    #                     "perts_qty": lost_qty
+    #                 })
+
+    #             for p in pb.parts:
+    #                 if p.qty_of_finished_goods and p.qty:
+    #                     reduction = lost_qty * p.qty_of_finished_goods
+    #                     p.qty = max((p.qty or 0) - reduction, 0)
+    #                     damage_map.setdefault(pb.name, []).append((p.part, reduction, p.batch_number or ""))
+
+    #             pb.save(ignore_permissions=True)
+    #             updated_batches.add(pb.name)
+
+    #     for ob in self.other_batches:
+    #         fg = next((f for f in self.finish_goods if f.finish_good_index == ob.finish_good_index), None)
+    #         if not fg:
+    #             continue
+
+    #         prev_qty = ob.original_parts_qty or ob.qty or 0
+    #         new_qty = ob.new_qty_pivot or 0
+    #         lost_qty = prev_qty - new_qty if prev_qty > new_qty else 0
+
+    #         if lost_qty > 0:
+    #             pb = frappe.get_doc("Parts Batch", ob.batch)
+
+    #             existing = next((row for row in pb.qty_perts if row.operation == self.name), None)
+    #             if existing:
+    #                 existing.perts_qty += lost_qty
+    #             else:
+    #                 pb.append("qty_perts", {
+    #                     "operation": self.name,
+    #                     "perts_qty": lost_qty
+    #                 })
+
+    #             for p in pb.parts:
+    #                 if p.qty_of_finished_goods and p.qty:
+    #                     reduction = lost_qty * p.qty_of_finished_goods
+    #                     p.qty = max((p.qty or 0) - reduction, 0)
+    #                     damage_map.setdefault(pb.name, []).append((p.part, reduction, p.batch_number or ""))
+
+    #             pb.save(ignore_permissions=True)
+    #             updated_batches.add(pb.name)
+
+    #     for pb_name in updated_batches:
+    #         frappe.get_doc("Parts Batch", pb_name).save(ignore_permissions=True)
+
+    #     self.db_set("_damage_map_json", json.dumps(damage_map))
+
+
+
     def before_submit(self):
         self.barcode = generate_barcode_assembly()
         if not self.barcode:
             frappe.throw("Could not generate barcode for assembly.")
 
-
         updated_batches = set()
         damage_map = {}
 
+        # === Handle MAIN BATCHES ===
         for mb in self.main_batches:
             fg = next((f for f in self.finish_goods if f.finish_good_index == mb.finish_good_index), None)
             if not fg:
@@ -473,42 +603,78 @@ class Assemblying(Document):
 
             prev_qty = mb.original_parts_qty or mb.parts_qty or 0
             new_qty = fg.real_qty
-            lost_qty = prev_qty - new_qty if prev_qty > new_qty else 0
+            lost_qty = max(prev_qty - new_qty, 0)
 
             mb.parts_qty = new_qty
 
             if lost_qty > 0:
                 pb = frappe.get_doc("Parts Batch", mb.batch)
 
-                existing = next((row for row in pb.qty_perts if row.operation == self.name), None)
-                if existing:
-                    existing.perts_qty += lost_qty
-                else:
-                    pb.append("qty_perts", {
-                        "operation": self.name,
-                        "perts_qty": lost_qty
-                    })
+                for part_row in pb.parts:
+                    if part_row.qty_of_finished_goods and part_row.qty:
+                        reduction = lost_qty * part_row.qty_of_finished_goods
+                        part_row.qty = max((part_row.qty or 0) - reduction, 0)
 
-                for p in pb.parts:
-                    if p.qty_of_finished_goods and p.qty:
-                        reduction = lost_qty * p.qty_of_finished_goods
-                        p.qty = max((p.qty or 0) - reduction, 0)
-                        damage_map.setdefault(pb.name, []).append((p.part, reduction, p.batch_number or ""))
+                        # ✅ NEW LOGIC: Store in qty_perts per part + operation
+                        existing = next((row for row in pb.qty_perts
+                                        if row.operation == self.name and row.item == part_row.part), None)
+                        if existing:
+                            existing.perts_qty += reduction
+                        else:
+                            pb.append("qty_perts", {
+                                "operation": self.name,
+                                "item": part_row.part,
+                                "perts_qty": reduction
+                            })
+
+                        # Track in damage map
+                        damage_map.setdefault(pb.name, []).append((part_row.part, reduction, part_row.batch_number or ""))
 
                 pb.save(ignore_permissions=True)
                 updated_batches.add(pb.name)
 
+        # === Handle OTHER BATCHES ===
+        for ob in self.other_batches:
+            fg = next((f for f in self.finish_goods if f.finish_good_index == ob.finish_good_index), None)
+            if not fg:
+                continue
+
+            prev_qty = ob.original_parts_qty or ob.qty or 0
+            new_qty = ob.new_qty_pivot or 0
+            lost_qty = max(prev_qty - new_qty, 0)
+
+            if lost_qty > 0:
+                pb = frappe.get_doc("Parts Batch", ob.batch)
+
+                for part_row in pb.parts:
+                    if part_row.qty_of_finished_goods and part_row.qty:
+                        reduction = lost_qty * part_row.qty_of_finished_goods
+                        part_row.qty = max((part_row.qty or 0) - reduction, 0)
+
+                        # ✅ NEW LOGIC: Store in qty_perts per part + operation
+                        existing = next((row for row in pb.qty_perts
+                                        if row.operation == self.name and row.item == part_row.part), None)
+                        if existing:
+                            existing.perts_qty += reduction
+                        else:
+                            pb.append("qty_perts", {
+                                "operation": self.name,
+                                "item": part_row.part,
+                                "perts_qty": reduction
+                            })
+
+                        # Track in damage map
+                        damage_map.setdefault(pb.name, []).append((part_row.part, reduction, part_row.batch_number or ""))
+
+                pb.save(ignore_permissions=True)
+                updated_batches.add(pb.name)
+
+        # === Re-save all updated batches (safe redundancy) ===
         for pb_name in updated_batches:
             frappe.get_doc("Parts Batch", pb_name).save(ignore_permissions=True)
 
-        for ob in self.other_batches:
-            fg = next((f for f in self.finish_goods if f.finish_good_index == ob.finish_good_index), None)
-            if fg:
-                ob.qty = fg.real_qty
-
+        # === Save damage map JSON for history / display ===
         self.db_set("_damage_map_json", json.dumps(damage_map))
-
-
 
 
     def on_submit(self):
@@ -612,18 +778,6 @@ class Assemblying(Document):
         for fg in self.finish_goods:
             if not fg.barcode or not fg.item or not fg.qty or not fg.color or not fg.size or not fg.cost_per_one_adding_assemblying or not fg.total_finish_good_adding_assemblying:
                 continue
-            # ar = frappe.new_doc("Assembly Result")
-            # ar.assemblying = self.name
-            # ar.barcode = fg.barcode
-            # ar.item = fg.item
-            # ar.qty = fg.qty
-            # ar.color = fg.color
-            # ar.size = fg.size
-            # ar.cost_of_one = fg.cost_per_one_adding_assemblying
-            # ar.total_cost = fg.total_finish_good_adding_assemblying
-            # ar.insert()
-            # ar.submit()
-
             ps = frappe.new_doc("Post Assembly")
             ps.status = "Assembly"
             ps.finished = fg.item
@@ -636,74 +790,3 @@ class Assemblying(Document):
             ps.barcode = fg.barcode
             ps.insert()
 
-
-
-@frappe.whitelist()
-def force_cancel(docname):
-    doc = frappe.get_doc("Assemblying", docname)
-
-    asr = frappe.get_list("Post Assembly", filters={"operation": doc.name}, fields=["name"])
-    for ar in asr:
-        ar_doc = frappe.get_doc("Post Assembly", ar.name)
-        ar_doc.cancel()
-        ar_doc.delete()
-
-    try:
-        consumed_map = json.loads(doc._consumed_qty_map_json or "{}")
-    except Exception:
-        consumed_map = {}
-
-    try:
-        damage_map = json.loads(doc._damage_map_json or "{}")
-    except Exception:
-        damage_map = {}
-
-    def unlink_parts_batch_operations(batches):
-        for b in batches:
-            pb = frappe.get_doc("Parts Batch", b.batch)
-            pb.reload()
-
-            pb.batches_reserves = [r for r in pb.batches_reserves if r.operation != doc.name]
-
-            for row in pb.parts:
-                used_qty = Decimal(str(consumed_map.get(row.name, 0)))
-                if used_qty:
-                    row.qty = (Decimal(str(row.qty or 0)) + used_qty).quantize(Decimal("0.00001"))
-
-            if pb.name in damage_map:
-                for part_code, lost_qty, batch_number in damage_map[pb.name]:
-                    for row in pb.parts:
-                        if row.part == part_code:
-                            row.qty = (Decimal(str(row.qty or 0)) + Decimal(str(lost_qty))).quantize(Decimal("0.00001"))
-
-                pb.qty_perts = [
-                    qp for qp in pb.qty_perts
-                    if not (qp.operation == doc.name and qp.perts_qty is not None)
-                ]
-            qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
-            ints = [int(q) for q in qtys if float(q).is_integer()]
-            pb.pgcd_qty = reduce(math.gcd, ints) if ints else 0
-
-            pb.save(ignore_permissions=True)
-
-
-    unlink_parts_batch_operations(doc.main_batches)
-    unlink_parts_batch_operations(doc.other_batches)
-
-    if doc.stock_entry_name:
-        try:
-            se = frappe.get_doc("Stock Entry", doc.stock_entry_name)
-            if se.docstatus == 1:
-                se.flags.ignore_linked_doctypes = ('Assemblying',)
-                se.cancel()
-        except Exception as e:
-            frappe.log_error(f"Failed to cancel Stock Entry {doc.stock_entry_name}: {e}")
-
-    doc.db_set("stock_entry_name", None)
-    doc.db_set("_consumed_qty_map_json", None)
-    doc.db_set("_damage_map_json", None)
-
-    frappe.db.commit()
-    doc.cancel()
-
-    frappe.msgprint("Force cancel complete, quantities and damages restored.")

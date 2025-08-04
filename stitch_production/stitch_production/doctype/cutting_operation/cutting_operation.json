@@ -164,13 +164,15 @@
    "fieldname": "stock_entry_name",
    "fieldtype": "Link",
    "label": "Stock Entry - Issue Raw Materials",
-   "options": "Stock Entry"
+   "options": "Stock Entry",
+   "read_only": 1
   },
   {
    "fieldname": "receipt_entry_name",
    "fieldtype": "Link",
    "label": "Stock Entry - Receipt Parts",
-   "options": "Stock Entry"
+   "options": "Stock Entry",
+   "read_only": 1
   },
   {
    "fieldname": "column_break_iczb",
@@ -214,13 +216,15 @@
    "fieldname": "stock_entry_transfer",
    "fieldtype": "Link",
    "label": "Stock Entry - Transfer Raw Materials",
-   "options": "Stock Entry"
+   "options": "Stock Entry",
+   "read_only": 1
   },
   {
    "fieldname": "batches_result",
    "fieldtype": "Table",
    "label": "Batches",
-   "options": "Batches Results"
+   "options": "Batches Results",
+   "read_only": 1
   },
   {
    "fieldname": "workstation_net_rate",
@@ -309,8 +313,8 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-17 15:25:29.664522",
- "modified_by": "stitch@half-ware.com",
+ "modified": "2025-08-03 14:10:53.334358",
+ "modified_by": "Administrator",
  "module": "stitch production",
  "name": "cutting operation",
  "naming_rule": "Expression",

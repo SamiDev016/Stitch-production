@@ -11,10 +11,10 @@
   "special_assembly",
   "distination_warehouse",
   "damage_parts_warehouse",
-  "parent_bom",
   "custom_bom",
   "main_operation",
   "main_bom",
+  "parent_bom",
   "main_batches",
   "other_batches",
   "finish_goods",
@@ -23,11 +23,12 @@
   "_consumed_qty_map_json",
   "_damage_map_json",
   "assemblying_cost_tab",
-  "workers_account",
   "project",
   "workers",
   "workers_total_cost",
+  "workers_account",
   "individual_cost",
+  "assembly_extra_cost_account",
   "parts_cost",
   "total_cost_without_parts",
   "total_cost"
@@ -41,6 +42,7 @@
    "depends_on": "eval:!doc.special_assembly",
    "fieldname": "parent_bom",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Parent Bom",
    "options": "Parent BOM"
   },
@@ -150,6 +152,7 @@
   {
    "fieldname": "distination_warehouse",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Distination Warehouse",
    "options": "Warehouse"
   },
@@ -174,6 +177,7 @@
   {
    "fieldname": "damage_parts_warehouse",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "Damage Parts Warehouse",
    "options": "Warehouse"
   },
@@ -188,12 +192,18 @@
    "fieldtype": "Barcode",
    "label": "Barcode",
    "read_only": 1
+  },
+  {
+   "fieldname": "assembly_extra_cost_account",
+   "fieldtype": "Link",
+   "label": "Assembly Extra Cost Account",
+   "options": "Account"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-07-30 01:32:39.885744",
+ "modified": "2025-08-04 12:28:35.515618",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",

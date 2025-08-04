@@ -11,7 +11,8 @@
   "cost",
   "finish_good_index",
   "batch_number_check",
-  "original_parts_qty"
+  "original_parts_qty",
+  "new_qty_pivot"
  ],
  "fields": [
   {
@@ -48,12 +49,17 @@
    "fieldname": "original_parts_qty",
    "fieldtype": "Float",
    "label": "original_parts_qty"
+  },
+  {
+   "fieldname": "new_qty_pivot",
+   "fieldtype": "Float",
+   "label": "new_qty_pivot"
   }
  ],
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-28 21:05:18.984104",
+ "modified": "2025-08-04 12:47:10.571251",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying Result",

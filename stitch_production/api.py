@@ -202,3 +202,20 @@ def get_post_assemblies_by_assembly_barcode(barcode):
         "assembly": assembly.name,
         "posts": posts
     }
+
+
+
+
+@frappe.whitelist()
+def get_parent_boms_containing_main_bom(main_bom):
+    parent_boms = frappe.get_all("Parent BOM", filters={}, fields=["name"])
+    matching_parents = []
+
+    for bom in parent_boms:
+        doc = frappe.get_doc("Parent BOM", bom.name)
+        for row in doc.boms:
+            if row.bom == main_bom:
+                matching_parents.append(bom.name)
+                break
+
+    return matching_parents
