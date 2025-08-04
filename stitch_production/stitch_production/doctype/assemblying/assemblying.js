@@ -225,6 +225,7 @@ frappe.ui.form.on('Assemblying', {
                 frm.set_value('workers_account', settings.assembling_workers_account || '');
                 frm.set_value('project', settings.assembling_project || '');
                 frm.set_value('assembly_extra_cost_account', settings.assembly_extra_cost_account || '');
+                frm.set_value('assembly_damage_account', settings.assembly_damage_account || '');
                 
             })
             .catch(err => {

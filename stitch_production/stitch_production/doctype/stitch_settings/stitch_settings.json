@@ -21,6 +21,7 @@
   "distination_warehouse",
   "damage_parts_warehouse",
   "assembly_extra_cost_account",
+  "assembly_damage_account",
   "stitching_operation_tab",
   "expense_account_section",
   "cost_calculation_method",
@@ -177,13 +178,19 @@
    "fieldtype": "Link",
    "label": "Assembly Extra Cost Account",
    "options": "Account"
+  },
+  {
+   "fieldname": "assembly_damage_account",
+   "fieldtype": "Link",
+   "label": "Assembly Damage Parts Account",
+   "options": "Account"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "issingle": 1,
  "links": [],
- "modified": "2025-08-04 12:29:21.597252",
+ "modified": "2025-08-04 13:51:05.760789",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Stitch Settings",
