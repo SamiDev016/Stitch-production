@@ -716,10 +716,16 @@ class Assemblying(Document):
             ps.status = "Assembly"
             ps.finished = fg.item
             ps.qty = fg.qty
-            ps.cost_per_one = fg.cost_per_one_adding_assemblying
+            ps.cost_per_one = fg.total_finish_good_adding_assemblying / fg.qty
             ps.operation = self.name
             ps.total_cost = fg.total_finish_good_adding_assemblying
             ps.color = fg.color
             ps.size = fg.size
             ps.barcode = fg.barcode
             ps.insert()
+
+            # frappe.msgprint("cost per one adding assembly before ",fg.cost_per_one_adding_assemblying)
+            # fg.cost_per_one_adding_assemblying = fg.total_finish_good_adding_assemblying / fg.qty
+            # frappe.msgprint("cost per one adding assembly after ",fg.cost_per_one_adding_assemblying)
+            # self.set("finish_goods", self.finish_goods)
+            # self.save(ignore_permissions=True)

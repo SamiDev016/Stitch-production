@@ -76,21 +76,27 @@
    "label": "Size"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "cost",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Total Finish Good Cost"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "cost_per_one",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Cost Per One"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "cost_per_one_adding_assemblying",
    "fieldtype": "Currency",
    "label": "Cost per one adding assemblying"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "total_finish_good_adding_assemblying",
    "fieldtype": "Currency",
    "label": "Total finish good adding assemblying"
@@ -109,7 +115,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-07-27 11:15:31.942103",
+ "modified": "2025-08-04 14:49:50.009106",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Finish Goods",

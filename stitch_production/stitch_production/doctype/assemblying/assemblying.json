@@ -145,6 +145,7 @@
    "read_only": 1
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "workers_total_cost",
    "fieldtype": "Currency",
    "label": "Workers Total Cost",
@@ -185,6 +186,7 @@
   {
    "fieldname": "_damage_map_json",
    "fieldtype": "Text",
+   "hidden": 1,
    "label": "_damage_map_json"
   },
   {
@@ -209,7 +211,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-04 13:49:43.888404",
+ "modified": "2025-08-04 14:56:49.418719",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",
