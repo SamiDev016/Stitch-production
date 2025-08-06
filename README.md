@@ -1,40 +1,59 @@
-### stitch production
+* Stitching Operations App (Custom Frappe App)
+A powerful custom Frappe app tailored for stitching and sewing companies, helping you manage the entire manufacturing process – from purchasing raw tissue materials to delivering the final stitched product.
 
-Custom app for stitch company
+* Key Features
+Custom Purchase Receipt
+Purchase raw tissue materials and instantly convert them into usable rolls.
 
-### Installation
+Roll Transfer
+Easily transfer rolls across departments or warehouses.
 
-You can install this app using the [bench](https://github.com/frappe/bench) CLI:
+Cutting Operation
+Manage cutting of rolls, track batches, and monitor quantities.
 
-```bash
-cd $PATH_TO_YOUR_BENCH
-bench get-app $URL_OF_THIS_REPO --branch develop
-bench install-app stitch_production
-```
+Assembly Operation
+Assemble components before stitching, including cost-per-unit adjustments.
 
-### Contributing
+Stitching Operation
+Final stitching and production of finished goods with full traceability.
 
-This app uses `pre-commit` for code formatting and linting. Please [install pre-commit](https://pre-commit.com/#installation) and enable it for this repository:
+Damage and Loss Handling
+Log and manage damaged or lost stock during operations, auto-adjusting costs per unit.
 
-```bash
-cd apps/stitch_production
-pre-commit install
-```
+Bonus / Free Items Handling
+Add bonus/free stock entries at zero rate without affecting inventory valuation.
 
-Pre-commit is configured to use the following tools for checking and formatting your code:
+Stock Movement Management
+Comprehensive tracking of stock movement between departments with accuracy and transparency.
 
-- ruff
-- eslint
-- prettier
-- pyupgrade
-### CI
+* Ideal For
+Stitching and textile manufacturing companies
 
-This app can use GitHub Actions for CI. The following workflows are configured:
+Garment factories
 
-- CI: Installs this app and runs unit tests on every push to `develop` branch.
-- Linters: Runs [Frappe Semgrep Rules](https://github.com/frappe/semgrep-rules) and [pip-audit](https://pypi.org/project/pip-audit/) on every pull request.
+Any sewing-based production company using Frappe/ERPNext to manage their operations
 
+🚀 Installation & Usage
+Prerequisites
+Ensure you have a working Frappe/ERPNext site setup. If not, follow the official Frappe Bench guide.
 
-### License
+Step 1: Get the App
+cd ~/frappe-bench/apps
+git clone https://github.com/your-org/stitching_operations.git
+Step 2: Install the App on Your Site
+cd ~/frappe-bench
+bench --site your-site-name install-app stitching_operations
+Replace your-site-name with your actual Frappe site name.
 
-mit
+Step 3: Apply Migrations
+bench --site your-site-name migrate
+Step 4: Start Using the App
+You will now find new modules and doctypes inside your Frappe Desk UI, covering:
+
+Purchase → Tissue to Roll Conversion
+
+Stock → Roll Transfers
+
+Manufacturing → Cutting / Assembly / Stitching
+
+Reports and Tracking
