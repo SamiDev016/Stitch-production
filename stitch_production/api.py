@@ -95,6 +95,99 @@ def get_post_assembly_by_barcode(barcode):
 
 #     return {"message": f"Advanced to step {step['status']}"}
 
+
+#Stitching Operation
+# @frappe.whitelist()
+# def advance_stitching_step(docname, final_qty=None):
+#     doc = frappe.get_doc("Post Assembly", docname)
+#     doc_records = doc.records
+
+#     steps = [
+#         {"status": "WIP Stitching", "step_index": 1, "end_step": 0},
+#         {"status": "Stitched", "step_index": 1, "end_step": 1},
+#         {"status": "WIP Finishing", "step_index": 2, "end_step": 0},
+#         {"status": "Finished", "step_index": 2, "end_step": 1},
+#         {"status": "WIP Pressing", "step_index": 3, "end_step": 0},
+#         {"status": "Pressed", "step_index": 3, "end_step": 1},
+#         {"status": "WIP Wrapping", "step_index": 4, "end_step": 0},
+#         {"status": "Wrapped", "step_index": 4, "end_step": 1}
+#     ]
+
+#     now = now_datetime()
+
+#     if len(doc_records) >= len(steps):
+#         if final_qty:
+#             if doc.docstatus != 1:
+#                 doc.qty = float(final_qty)
+#                 doc.cost_per_one += frappe.get_single("Stitch Settings").stitched_cost
+#                 doc.total_cost = float(doc.cost_per_one) * doc.qty
+#                 doc.submit()
+
+#                 stock_entry = frappe.new_doc("Stock Entry")
+#                 stock_entry.stock_entry_type = "Material Receipt"
+#                 target_warehouse = frappe.get_single("Stitch Settings").stitching_finish_warehouse
+#                 stock_entry.append("items", {
+#                     "item_code": doc.finished,
+#                     "qty": doc.qty,
+#                     "basic_rate": doc.cost_per_one,
+#                     "uom": frappe.db.get_value("Item", doc.finished, "stock_uom"),
+#                     "conversion_factor": 1,
+#                     "t_warehouse": target_warehouse
+#                 })
+#                 stock_entry.insert()
+#                 stock_entry.submit()
+
+#                 return {"message": f"Submitted. Receipt: {stock_entry.name}"}
+#             else:
+#                 return {"message": "Already submitted."}
+#         else:
+#             return {
+#                 "final_step": True,
+#                 "item": doc.finished,
+#                 "qty": doc.qty
+#             }
+
+#     current_index = len(doc_records)
+#     step = steps[current_index]
+
+#     new_record = doc.append("records", {})
+#     new_record.step_index = step["step_index"]
+#     new_record.step = step["status"]
+
+#     if step["end_step"] == 0:
+#         new_record.start_time = now
+#         new_record.status = step["status"]
+
+#     elif step["end_step"] == 1:
+#         last_wip_record = None
+#         for r in reversed(doc_records):
+#             if r.step_index == step["step_index"] and r.start_time:
+#                 last_wip_record = r
+#                 break
+
+#         new_record.end_time = now
+#         new_record.start_time = last_wip_record.start_time if last_wip_record else now
+#         new_record.duration = (
+#             frappe.utils.time_diff_in_seconds(now, new_record.start_time) / 60
+#         )
+#         new_record.status = step["status"]
+
+#         stitch_settings = frappe.get_single("Stitch Settings")
+#         if step["status"] == "Stitched":
+#             new_record.expense_account = stitch_settings.stitched_expense_account
+#         elif step["status"] == "Finished":
+#             new_record.expense_account = stitch_settings.finished_expense_account
+#         elif step["status"] == "Pressed":
+#             new_record.expense_account = stitch_settings.pressed_expense_account
+#         elif step["status"] == "Wrapped":
+#             new_record.expense_account = stitch_settings.wrapped_expense_account
+
+#     doc.status = step["status"]
+#     doc.save()
+
+#     return {"message": f"Advanced to step {step['status']}"}
+
+
 @frappe.whitelist()
 def advance_stitching_step(docname, final_qty=None):
     doc = frappe.get_doc("Post Assembly", docname)
@@ -117,23 +210,83 @@ def advance_stitching_step(docname, final_qty=None):
         if final_qty:
             if doc.docstatus != 1:
                 doc.qty = float(final_qty)
-                doc.cost_per_one += frappe.get_single("Stitch Settings").stitched_cost
-                doc.total_cost = float(doc.cost_per_one) * doc.qty
+
+                settings = frappe.get_single("Stitch Settings")
+                item = frappe.get_doc("Item", doc.finished)
+                additional_costs = []
+                additional_cost_per_unit = 0
+
+                if settings.cost_calculation_method == "Item Based":
+                    if item.custom_stitching_cost:
+                        additional_costs.append({
+                            "description": "Stitching Cost",
+                            "amount": item.custom_stitching_cost,
+                            "expense_account": settings.stitched_expense_account
+                        })
+                        additional_cost_per_unit += item.custom_stitching_cost
+
+                    if item.custom_finishing_cost:
+                        additional_costs.append({
+                            "description": "Finishing Cost",
+                            "amount": item.custom_finishing_cost,
+                            "expense_account": settings.finished_expense_account
+                        })
+                        additional_cost_per_unit += item.custom_finishing_cost
+
+                    if item.custom_pressing_cost:
+                        additional_costs.append({
+                            "description": "Pressing Cost",
+                            "amount": item.custom_pressing_cost,
+                            "expense_account": settings.pressed_expense_account
+                        })
+                        additional_cost_per_unit += item.custom_pressing_cost
+
+                    if item.custom_wrapping_cost:
+                        additional_costs.append({
+                            "description": "Wrapping Cost",
+                            "amount": item.custom_wrapping_cost,
+                            "expense_account": settings.wrapped_expense_account
+                        })
+                        additional_cost_per_unit += item.custom_wrapping_cost
+
+                # Step 1: Keep original total cost (e.g., materials + wages)
+                base_total_cost = doc.total_cost or 0
+
+                # Step 2: Recalculate cost_per_one using new quantity
+                doc.cost_per_one = base_total_cost / doc.qty if doc.qty else 0
+                doc.total_cost = base_total_cost  # Do NOT add additional cost here
                 doc.submit()
 
+                # Step 3: Create Material Receipt with basic rate = cost_per_one
                 stock_entry = frappe.new_doc("Stock Entry")
                 stock_entry.stock_entry_type = "Material Receipt"
-                target_warehouse = frappe.get_single("Stitch Settings").stitching_finish_warehouse
+                target_warehouse = settings.stitching_finish_warehouse
+
                 stock_entry.append("items", {
                     "item_code": doc.finished,
                     "qty": doc.qty,
                     "basic_rate": doc.cost_per_one,
-                    "uom": frappe.db.get_value("Item", doc.finished, "stock_uom"),
+                    "uom": item.stock_uom,
                     "conversion_factor": 1,
                     "t_warehouse": target_warehouse
                 })
+
+                # Step 4: Add additional costs to stock entry
+                for cost in additional_costs:
+                    stock_entry.append("additional_costs", {
+                        "description": cost["description"],
+                        "amount": cost["amount"] * doc.qty,
+                        "expense_account": cost["expense_account"]
+                    })
+
                 stock_entry.insert()
                 stock_entry.submit()
+
+                # Step 5: Add additional costs to total_cost AFTER stock entry
+                total_additional = additional_cost_per_unit * doc.qty
+                doc.total_cost += total_additional
+                doc.cost_per_one = doc.total_cost / doc.qty if doc.qty else 0
+                doc.save()
 
                 return {"message": f"Submitted. Receipt: {stock_entry.name}"}
             else:
@@ -145,6 +298,7 @@ def advance_stitching_step(docname, final_qty=None):
                 "qty": doc.qty
             }
 
+    # --- Normal step flow (for stitching, finishing, etc.)
     current_index = len(doc_records)
     step = steps[current_index]
 
@@ -187,6 +341,21 @@ def advance_stitching_step(docname, final_qty=None):
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#Stitching Operation Get Assembly when user Scan
 @frappe.whitelist()
 def get_post_assemblies_by_assembly_barcode(barcode):
     assembly = frappe.get_doc("Assemblying", {"barcode": barcode})
@@ -206,6 +375,7 @@ def get_post_assemblies_by_assembly_barcode(barcode):
 
 
 
+# assembly operation , JS Code
 @frappe.whitelist()
 def get_parent_boms_containing_main_bom(main_bom):
     parent_boms = frappe.get_all("Parent BOM", filters={}, fields=["name"])
