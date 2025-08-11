@@ -13,6 +13,9 @@ doc_events = {
             "stitch_production.events.handle_batch_created",
             "stitch_production.events.handle_batch_created_cutting"
         ]
+    },
+    "Item Attribute": {
+        "on_update": "stitch_production.events.sync_item_attribute_values"
     }
 }
 

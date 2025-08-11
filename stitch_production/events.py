@@ -51,50 +51,55 @@ def handle_batch_created_cutting(doc, method=None):
                         return
 
 
+def sync_item_attribute_values(doc, method):
+    """
+    After saving Item Attribute, copy each row.attribute_value from the child
+    table item_attribute_values into the corresponding custom doctype:
+      - Item Attribute "Colour" -> DocType "Colour", field "colour"
+      - Item Attribute "Size"   -> DocType "Size",   field "size"
+    """
 
+    if not getattr(doc, "attribute_name", None):
+        return
 
+    attr = (doc.attribute_name or "").strip().lower()
+    if attr not in ("size", "colour"):
+        return
 
+    mapping = {
+        "size":   {"doctype": "Size",   "field": "size"},
+        "colour": {"doctype": "Colour", "field": "colour"},
+    }
 
-# def handle_batch_created_cutting(doc, method=None):
-#     if doc.reference_doctype == "Stock Entry" and doc.reference_name:
-#         stock_entry = frappe.get_doc("Stock Entry", doc.reference_name)
+    target = mapping[attr]["doctype"]
+    target_field = mapping[attr]["field"]
 
-#         if stock_entry.stock_entry_type != "Material Receipt":
-#             return
+    if not frappe.db.exists("DocType", target):
+        frappe.log_error(f"Sync failed: target doctype '{target}' not found.")
+        return
 
-#         cutting_op = frappe.get_value(
-#             "cutting operation",
-#             {"receipt_entry_name": stock_entry.name},
-#             "name"
-#         )
+    meta = frappe.get_meta(target)
+    if not meta.has_field(target_field):
+        frappe.log_error(f"Sync failed: field '{target_field}' not found in '{target}'.")
+        return
 
-#         if not cutting_op:
-#             return
+    rows = frappe.get_all(target, fields=[target_field])
+    existing = set([ (r.get(target_field) or "").strip() for r in rows if r.get(target_field) ])
 
-#         for item in stock_entry.items:
-#             if item.item_code != doc.item:
-#                 continue
+    to_create = []
+    for row in doc.get("item_attribute_values") or []:
+        val = (row.attribute_value or "").strip()
+        if not val:
+            continue
+        if val not in existing:
+            to_create.append(val)
+            existing.add(val)
 
-#             parts_batches = frappe.get_all(
-#                 "Parts Batch",
-#                 filters={
-#                     "docstatus": 1,
-#                     "source_operation": cutting_op
-#                 },
-#                 fields=["name"]
-#             )
-
-#             for pb in parts_batches:
-#                 parts_batch = frappe.get_doc("Parts Batch", pb.name)
-#                 for part_row in parts_batch.parts:
-#                     if (
-#                         part_row.part == item.item_code
-#                         and not part_row.get("batch_number")
-#                         and abs((part_row.qty or 0) - (item.qty or 0)) < 0.001
-#                     ):
-#                         part_row.batch_number = doc.name
-#                         parts_batch.save()
-#                         frappe.db.commit()
-#                         return
-
+    for val in to_create:
+        try:
+            new_doc = frappe.new_doc(target)
+            new_doc.update({target_field: val})
+            new_doc.insert(ignore_permissions=True)
+        except Exception:
+            frappe.log_error(f"Failed to create {target} record for value: {val}\n{frappe.get_traceback()}")
 
