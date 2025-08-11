@@ -82,27 +82,6 @@ frappe.ui.form.on("Assemblying", {
     },
 
     refresh(frm) {
-        if (frm.doc.docstatus === 1) {
-            frm.add_custom_button("Force Cancel", () => {
-                frappe.confirm(
-                    "Are you sure you want to force cancel and unlink all references?",
-                    () => {
-                        frappe.call({
-                            method: "stitch_production.stitch_production.doctype.assemblying.assemblying.force_cancel",
-                            args: {
-                                docname: frm.doc.name
-                            },
-                            callback: function (r) {
-                                if (!r.exc) {
-                                    frappe.show_alert("Force canceled successfully!");
-                                    frm.reload_doc();
-                                }
-                            }
-                        });
-                    }
-                );
-            });
-        }
 
         if (frm.doc.docstatus === 0 && frm.doc.finish_goods && frm.doc.finish_goods.length) {
             frm.add_custom_button(__('Handle Damage'), () => {
@@ -232,5 +211,11 @@ frappe.ui.form.on('Assemblying', {
                 console.error('[Assemblying] Failed to load Stitch Settings:', err);
                 frappe.msgprint(__('Error loading default settings from Stitch Settings.'));
             });
+    }
+});
+
+frappe.ui.form.on("Assemblying", {
+    setup: function(frm) {
+        frm.ignore_doctypes_on_cancel_all = ["Parts Batch"];
     }
 });

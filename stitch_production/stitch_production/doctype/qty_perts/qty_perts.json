@@ -13,6 +13,7 @@
  ],
  "fields": [
   {
+   "allow_on_submit": 1,
    "fieldname": "operation",
    "fieldtype": "Link",
    "label": "Operation",
@@ -25,12 +26,14 @@
    "label": "Perts Qty"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "item",
    "fieldtype": "Link",
    "label": "item",
    "options": "Item"
   },
   {
+   "allow_on_submit": 1,
    "fieldname": "cost_per_one",
    "fieldtype": "Currency",
    "label": "cost_per_one"
@@ -40,7 +43,7 @@
  "index_web_pages_for_search": 1,
  "istable": 1,
  "links": [],
- "modified": "2025-08-04 14:11:27.706898",
+ "modified": "2025-08-11 02:55:29.353959",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Qty Perts",

@@ -20,6 +20,8 @@
   "finish_goods",
   "amended_from",
   "stock_entry_name",
+  "damage_issue_name",
+  "damage_receipt_name",
   "_consumed_qty_map_json",
   "_damage_map_json",
   "assemblying_cost_tab",
@@ -186,7 +188,6 @@
   {
    "fieldname": "_damage_map_json",
    "fieldtype": "Text",
-   "hidden": 1,
    "label": "_damage_map_json"
   },
   {
@@ -206,12 +207,24 @@
    "fieldtype": "Link",
    "label": "Damage Parts Account",
    "options": "Account"
+  },
+  {
+   "fieldname": "damage_issue_name",
+   "fieldtype": "Link",
+   "label": "damage_issue_name",
+   "options": "Stock Entry"
+  },
+  {
+   "fieldname": "damage_receipt_name",
+   "fieldtype": "Link",
+   "label": "damage_receipt_name",
+   "options": "Stock Entry"
   }
  ],
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-04 14:56:49.418719",
+ "modified": "2025-08-11 02:09:53.636201",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",

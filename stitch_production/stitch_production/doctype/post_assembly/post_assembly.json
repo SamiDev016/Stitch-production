@@ -16,6 +16,7 @@
   "total_cost",
   "color",
   "size",
+  "stock_enry_receipt",
   "section_break_owrd",
   "records",
   "amended_from"
@@ -111,13 +112,19 @@
    "fieldtype": "Barcode",
    "label": "barcode",
    "read_only": 1
+  },
+  {
+   "fieldname": "stock_enry_receipt",
+   "fieldtype": "Link",
+   "label": "stock_enry_receipt",
+   "options": "Stock Entry"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-06 01:01:31.651744",
+ "modified": "2025-08-11 02:21:04.847323",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Post Assembly",

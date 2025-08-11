@@ -640,6 +640,7 @@ class Assemblying(Document):
                     })
 
             damage_issue.insert()
+            self.db_set("damage_issue_name", damage_issue.name)
             damage_issue.submit()
 
             damage_receipt = frappe.new_doc("Stock Entry")
@@ -663,7 +664,7 @@ class Assemblying(Document):
             if damage_receipt.items:
                 damage_receipt.insert()
                 damage_receipt.submit()
-
+            self.db_set("damage_receipt_name", damage_receipt.name)
         total_extra = self.individual_cost or 0
         total_workers = self.workers_total_cost or 0
         # total_damage_cost = sum(
@@ -729,3 +730,94 @@ class Assemblying(Document):
             # frappe.msgprint("cost per one adding assembly after ",fg.cost_per_one_adding_assemblying)
             # self.set("finish_goods", self.finish_goods)
             # self.save(ignore_permissions=True)
+
+
+    def before_cancel(self):
+        frappe.flags.ignore_linked_with = True
+
+        self._batch_data_for_rollback = []
+
+        for b in self.main_batches + self.other_batches:
+            if not b.batch:
+                continue
+            pb = frappe.get_doc("Parts Batch", b.batch)
+            batch_info = {
+                "name": pb.name,
+                "reserved_qty": {r.part: r.reserved_qty for r in pb.batches_reserves if r.operation == self.name},
+                "damage_qty": {r.item: r.perts_qty for r in pb.qty_perts if r.operation == self.name}
+            }
+            self._batch_data_for_rollback.append(batch_info)
+
+        for row in self.main_batches:
+            row.batch = None
+        for row in self.other_batches:
+            row.batch = None
+
+
+    def on_cancel(self):
+        frappe.flags.ignore_linked_with = True
+        self.ignore_linked_doctypes = ("Parts Batch",)
+
+        try:
+            for field in ("stock_entry_name", "damage_issue_name", "damage_receipt_name"):
+                name = self.get(field)
+                if name:
+                    try:
+                        self.db_set(field, None)
+                        se = frappe.get_doc("Stock Entry", name)
+                        if se.docstatus == 1:
+                            se.cancel()
+                            se.delete()
+                    except frappe.DoesNotExistError:
+                        pass
+                    except Exception as e:
+                        frappe.log_error(f"Failed to cancel Stock Entry {name}: {e}")
+
+            for batch_data in getattr(self, "_batch_data_for_rollback", []):
+                try:
+                    pb = frappe.get_doc("Parts Batch", batch_data["name"])
+                    for part_code, qty in batch_data["reserved_qty"].items():
+                        for row in pb.parts:
+                            if row.part == part_code:
+                                row.qty = (row.qty or 0) + qty
+                        pb.batches_reserves = [r for r in pb.batches_reserves if not (r.part == part_code and r.operation == self.name)]
+
+                    for item_code, qty in batch_data["damage_qty"].items():
+                        for row in pb.parts:
+                            if row.part == item_code:
+                                row.qty = (row.qty or 0) + qty
+                        pb.qty_perts = [r for r in pb.qty_perts if not (r.item == item_code and r.operation == self.name)]
+
+                    qtys = [p.qty for p in pb.parts if p.qty and p.qty > 0]
+                    ints = [int(q) for q in qtys if float(q).is_integer()]
+                    pgcd = reduce(math.gcd, ints) if ints else 0
+                    pb.pgcd_qty = pgcd
+
+                    pb.save(ignore_permissions=True)
+
+                except Exception as e:
+                    frappe.log_error(f"Failed to rollback Parts Batch {batch_data['name']}: {e}")
+
+            pa_list = frappe.get_all("Post Assembly", filters={"operation": self.name})
+            for p in pa_list:
+                pa_doc = frappe.get_doc("Post Assembly", p.name)
+                if pa_doc.docstatus == 1:
+                    name = pa_doc.stock_enry_receipt
+                    try:
+                        pa_doc.db_set("stock_enry_receipt", None)
+                        se = frappe.get_doc("Stock Entry", name)
+                        if se.docstatus == 1:
+                            se.cancel()
+                            se.delete()
+                    except frappe.DoesNotExistError:
+                        pass
+                    except Exception as e:
+                        frappe.log_error(f"Failed to cancel Stock Entry {name}: {e}")
+
+                    pa_doc.cancel()
+                    pa_doc.delete()
+                else:
+                    pa_doc.delete()
+
+        finally:
+            frappe.flags.ignore_linked_with = False
