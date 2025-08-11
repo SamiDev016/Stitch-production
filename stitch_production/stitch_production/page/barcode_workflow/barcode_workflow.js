@@ -1,11 +1,20 @@
 frappe.pages['barcode-workflow'].on_page_load = function(wrapper) {
+    // Load scripts only if not already loaded
     if (!window.html2pdf) {
         const script = document.createElement("script");
-        const script2 = document.createElement("script");
         script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-        script2.src = "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4";
+        script.onload = () => console.log("html2pdf loaded");
         document.head.appendChild(script);
+
+        const script2 = document.createElement("script");
+        script2.src = "https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4";
         document.head.appendChild(script2);
+
+        // Load JsBarcode
+        const jsBarcodeScript = document.createElement("script");
+        jsBarcodeScript.src = "https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js";
+        jsBarcodeScript.onload = () => console.log("JsBarcode loaded");
+        document.head.appendChild(jsBarcodeScript);
     }
 
     frappe.ui.make_app_page({
@@ -16,6 +25,7 @@ frappe.pages['barcode-workflow'].on_page_load = function(wrapper) {
 
     $(wrapper).html(`
         <div class="max-w-4xl mx-auto py-6">
+            
             <div class="bg-white shadow rounded-lg p-6 mb-6">
                 <h2 class="text-xl font-semibold text-center mb-4">Scan Assembly Operation</h2>
                 <input type="text" id="barcode_input_assembly" class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Scan Barcode..." autofocus />
@@ -24,9 +34,7 @@ frappe.pages['barcode-workflow'].on_page_load = function(wrapper) {
                 <h2 class="text-xl font-semibold text-center mb-4">Scan Batch</h2>
                 <input type="text" id="barcode_input" class="w-full p-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Scan Barcode..." autofocus />
             </div>
-
             
-
             <div id="download-button-container" class="hidden text-right mb-4">
                 <button id="download-pdf" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition">Download Table</button>
             </div>
@@ -139,7 +147,7 @@ frappe.pages['barcode-workflow'].on_page_load = function(wrapper) {
                             <h5 class="mb-4 text-xl text-blue-600">Assembly: <strong>${r.message.assembly}</strong></h5>
                             <div class="overflow-x-auto">
                                 <table class="min-w-full divide-y divide-gray-200 text-sm text-center border">
-                                    <thead class="bg-blue-100 text-blue-800">
+                                    <thead class="bg-blue-100 text-blue-800 w-full">
                                         <tr>
                                             <th class="px-4 py-2">Step</th>
                                             <th class="px-4 py-2">Finished</th>
@@ -152,11 +160,13 @@ frappe.pages['barcode-workflow'].on_page_load = function(wrapper) {
 
                     posts.forEach(post => {
                         html += `
-                            <tr class="hover:bg-gray-50">
-                                <td class="px-4 py-2">${post.status}</td>
-                                <td class="px-4 py-2">${post.finished}</td>
-                                <td class="px-4 py-2">${post.qty}</td>
-                                <td class="px-4 py-2">${post.barcode || ''}</td>
+                            <tr class="hover:bg-gray-50 justify-center">
+                                <td class="px-4 py-2 text-center">${post.status}</td>
+                                <td class="px-4 py-2 text-center">${post.finished}</td>
+                                <td class="px-4 py-2 text-center">${post.qty}</td>
+                                <td class="px-4 py-2 text-center">
+                                    <svg class="barcode-svg" jsbarcode-value="${post.barcode || ''}" jsbarcode-textmargin="0" jsbarcode-fontoptions="bold"></svg>
+                                </td>
                             </tr>
                         `;
                     });
@@ -174,24 +184,46 @@ frappe.pages['barcode-workflow'].on_page_load = function(wrapper) {
                         $(wrapper).append(`<div id="post-assembly-table" class="mt-4">${html}</div>`);
                     }
 
+                    // Render barcodes
+                    if (window.JsBarcode) {
+                        JsBarcode(".barcode-svg").init();
+                    }
+
                     $('#download-button-container').removeClass('hidden');
 
                     setTimeout(() => {
                         $('#download-pdf').off('click').on('click', function () {
                             const element = document.getElementById('post-assembly-table');
                             if (!element) return;
-
-                            const opt = {
-                                margin: 0.5,
-                                filename: 'assembly-report.pdf',
-                                image: { type: 'jpeg', quality: 0.98 },
-                                html2canvas: { scale: 2 },
-                                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                    
+                            // Open a new print-friendly window
+                            const printWindow = window.open('', '_blank');
+                            printWindow.document.write(`
+                                <html>
+                                    <head>
+                                        <title>Assembly Report</title>
+                                        <style>
+                                            body { font-family: Arial, sans-serif; padding: 20px; }
+                                            table { width: 100%; border-collapse: collapse; }
+                                            th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
+                                            th { background-color: #f0f0f0; }
+                                        </style>
+                                    </head>
+                                    <body>
+                                        ${element.innerHTML}
+                                    </body>
+                                </html>
+                            `);
+                            printWindow.document.close();
+                    
+                            // Wait for the content to load, then print
+                            printWindow.onload = function () {
+                                printWindow.focus();
+                                printWindow.print();
                             };
-
-                            html2pdf().from(element).set(opt).save();
                         });
                     }, 300);
+                    
                 }
             });
         }

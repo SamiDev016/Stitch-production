@@ -188,6 +188,7 @@
   {
    "fieldname": "_damage_map_json",
    "fieldtype": "Text",
+   "hidden": 1,
    "label": "_damage_map_json"
   },
   {
@@ -211,12 +212,14 @@
   {
    "fieldname": "damage_issue_name",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "damage_issue_name",
    "options": "Stock Entry"
   },
   {
    "fieldname": "damage_receipt_name",
    "fieldtype": "Link",
+   "hidden": 1,
    "label": "damage_receipt_name",
    "options": "Stock Entry"
   }
@@ -224,7 +227,7 @@
  "index_web_pages_for_search": 1,
  "is_submittable": 1,
  "links": [],
- "modified": "2025-08-11 02:09:53.636201",
+ "modified": "2025-08-11 11:28:39.341167",
  "modified_by": "Administrator",
  "module": "stitch production",
  "name": "Assemblying",
